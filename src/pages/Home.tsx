@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLogto } from '@logto/react';
+import { useLogto, useHandleSignInCallback } from '@logto/react';
 import './home.css';
 
 import wordmark from '../assets/veracity-wordmark.png';
@@ -7,8 +7,16 @@ import eye from '../assets/veracity-eye.png';
 
 export default function Home() {
   const { isAuthenticated, signIn, signOut } = useLogto();
+
   const [active, setActive] = useState<'link' | 'image'>('link');
   const [url, setUrl] = useState('');
+
+  useHandleSignInCallback(() => {
+    window.history.replaceState({}, '', `${window.location.origin}/`);
+  });
+
+  const redirectUri = `${window.location.origin}/`;
+  const postLogoutRedirectUri = `${window.location.origin}/`;
 
   return (
     <div className="v-bg">
@@ -37,11 +45,17 @@ export default function Home() {
         </nav>
 
         {!isAuthenticated ? (
-          <button className="v-btn v-btn--login" onClick={() => signIn(window.location.origin)}>
+          <button
+            className="v-btn v-btn--login"
+            onClick={() => signIn(redirectUri)}
+          >
             Login
           </button>
         ) : (
-          <button className="v-btn v-btn--login" onClick={() => signOut(window.location.origin)}>
+          <button
+            className="v-btn v-btn--login"
+            onClick={() => signOut(postLogoutRedirectUri)} 
+          >
             Sair
           </button>
         )}
