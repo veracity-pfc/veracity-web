@@ -14,6 +14,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       config={{
         endpoint,
         appId,
+        scopes: ['openid', 'profile', 'email'],
         ...(resource ? { resources: [resource] } : {}),
       }}
     >
