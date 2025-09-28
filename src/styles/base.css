@@ -8,8 +8,15 @@ body {
   color: #E7ECEA;
   font-family: Inter, ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans", sans-serif;
 }
+
 .v-bg { 
   min-height: 100vh; 
+  display: flex;
+  flex-direction: column;
+}
+
+.v-footer-wrap {
+  margin-top: auto;
 }
 
 .v-nav {

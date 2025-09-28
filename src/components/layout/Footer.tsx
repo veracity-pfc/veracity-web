@@ -3,7 +3,7 @@ import wordmark from '../../assets/veracity-wordmark.png';
 
 export default function Footer() {
   return (
-    <>
+    <div className="v-footer-wrap">
       <footer className="v-footer">
         <div className="v-footer__grid">
           <div className="v-foot-col">
@@ -32,6 +32,6 @@ export default function Footer() {
       </footer>
 
       <div className="v-copyright">Veracity — 2025 © Todos os direitos reservados.</div>
-    </>
+    </div>
   );
 }

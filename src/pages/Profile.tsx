@@ -5,6 +5,7 @@ import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 
 import '../styles/base.css';
+import '../styles/profile.css';
 
 type Claims = Record<string, unknown> & {
   name?: string;
@@ -35,21 +36,17 @@ export default function Profile() {
     <div className="v-bg">
       <Header current="perfil" />
 
-      <div style={{ maxWidth: 860, margin: '28px auto 0', padding: '0 16px', color: '#fff' }}>
-        <h1 style={{ fontSize: 28, marginBottom: 8 }}>Meu perfil</h1>
-        <p style={{ opacity: 0.85, marginBottom: 24 }}>Informações básicas da sua sessão</p>
+      <div className="profile-page">
+        <h1 className="profile-title">Meu perfil</h1>
+        <p className="profile-sub">Informações básicas da sua sessão</p>
 
-        <div
-          style={{
-            background: '#1f1f1f',
-            borderRadius: 14,
-            padding: 20,
-            lineHeight: 1.7,
-            boxShadow: '0 10px 30px rgba(0,0,0,.25)',
-          }}
-        >
-          <div><strong>Nome:</strong> {claims?.name ?? '—'}</div>
-          <div><strong>E-mail:</strong> {claims?.email ?? '—'}</div>
+        <div className="profile-card">
+          <div>
+            <strong>Nome:</strong> {claims?.name ?? '—'}
+          </div>
+          <div>
+            <strong>E-mail:</strong> {claims?.email ?? '—'}
+          </div>
         </div>
       </div>
 
