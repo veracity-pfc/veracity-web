@@ -13,9 +13,24 @@ type Claims = Record<string, unknown> & {
   sub?: string;
 };
 
+const ACCESS_DENIED_FLAG = 'v_access_denied_once';
+
 export default function Profile() {
   const { isAuthenticated, getIdTokenClaims } = useLogto() as any;
   const [claims, setClaims] = useState<Claims | null>(null);
+
+  useEffect(() => {
+    let t: number | undefined;
+    if (isAuthenticated === false) {
+      t = window.setTimeout(() => {
+        sessionStorage.setItem(ACCESS_DENIED_FLAG, '1');
+        window.location.replace(`${window.location.origin}/`);
+      }, 50);
+    }
+    return () => {
+      if (t) window.clearTimeout(t);
+    };
+  }, [isAuthenticated]);
 
   useEffect(() => {
     let mounted = true;

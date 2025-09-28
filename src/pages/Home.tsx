@@ -10,6 +10,8 @@ import '../styles/home.css';
 
 import accessDeniedImg from '../assets/access-denied.png';
 
+const ACCESS_DENIED_FLAG = 'v_access_denied_once';
+
 export default function Home() {
   const { isAuthenticated, signIn } = useLogto();
 
@@ -22,6 +24,14 @@ export default function Home() {
   });
 
   const redirectUri = `${window.location.origin}/`;
+
+  useEffect(() => {
+    const flag = sessionStorage.getItem(ACCESS_DENIED_FLAG);
+    if (flag === '1') {
+      sessionStorage.removeItem(ACCESS_DENIED_FLAG);
+      setShowDenied(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (!showDenied) return;
@@ -62,10 +72,16 @@ export default function Home() {
         <p className="v-hero__sub">Verifique a autenticidade de conteúdos digitais</p>
 
         <div className="v-switch">
-          <button className={`v-chip ${active === 'link' ? 'is-active' : ''}`} onClick={() => setActive('link')}>
+          <button
+            className={`v-chip ${active === 'link' ? 'is-active' : ''}`}
+            onClick={() => setActive('link')}
+          >
             Análise de links
           </button>
-          <button className={`v-chip ${active === 'image' ? 'is-active' : ''}`} onClick={() => setActive('image')}>
+          <button
+            className={`v-chip ${active === 'image' ? 'is-active' : ''}`}
+            onClick={() => setActive('image')}
+          >
             Análise de imagens
           </button>
         </div>
