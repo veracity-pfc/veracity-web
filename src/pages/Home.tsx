@@ -9,8 +9,10 @@ import '../styles/base.css';
 import '../styles/home.css';
 
 import accessDeniedImg from '../assets/access-denied.png';
+import accessDeniedAdminImg from '../assets/access-denied-admin.png';
 
 const ACCESS_DENIED_FLAG = 'v_access_denied_once';
+const ADMIN_DENIED_FLAG = 'v_admin_denied_once';
 
 export default function Home() {
   const { isAuthenticated, signIn } = useLogto();
@@ -18,6 +20,7 @@ export default function Home() {
   const [active, setActive] = useState<'link' | 'image'>('link');
   const [url, setUrl] = useState('');
   const [showDenied, setShowDenied] = useState(false);
+  const [showAdminDenied, setShowAdminDenied] = useState(false);
 
   useHandleSignInCallback(() => {
     window.history.replaceState({}, '', `${window.location.origin}/`);
@@ -26,15 +29,27 @@ export default function Home() {
   const redirectUri = `${window.location.origin}/`;
 
   useEffect(() => {
-    const flag = sessionStorage.getItem(ACCESS_DENIED_FLAG);
-    if (flag === '1') {
+    const adminFlag = sessionStorage.getItem(ADMIN_DENIED_FLAG);
+    const loginFlag = sessionStorage.getItem(ACCESS_DENIED_FLAG);
+
+    if (adminFlag === '1') {
+      sessionStorage.removeItem(ADMIN_DENIED_FLAG);
+      sessionStorage.removeItem(ACCESS_DENIED_FLAG); 
+      setShowAdminDenied(true);
+      setShowDenied(false);
+      return;
+    }
+
+    if (loginFlag === '1') {
       sessionStorage.removeItem(ACCESS_DENIED_FLAG);
       setShowDenied(true);
+      setShowAdminDenied(false);
     }
   }, []);
 
   useEffect(() => {
-    if (!showDenied) return;
+    const open = showDenied || showAdminDenied;
+    if (!open) return;
     const body = document.body;
     const docEl = document.documentElement;
     const prevOverflow = body.style.overflow;
@@ -46,21 +61,30 @@ export default function Home() {
       body.style.overflow = prevOverflow;
       body.style.paddingRight = prevPaddingRight;
     };
-  }, [showDenied]);
+  }, [showDenied, showAdminDenied]);
 
   const onPerfilClick: React.MouseEventHandler<HTMLAnchorElement> = (e) => {
     if (!isAuthenticated) {
       e.preventDefault();
+      setShowAdminDenied(false);
       setShowDenied(true);
     }
   };
+
+  const modalBoxStyle = {
+    width: 'min(92vw, 520px)',
+    minHeight: 420, 
+  } as const;
 
   return (
     <div className="v-bg">
       <Header
         current="home"
         onPerfilClick={onPerfilClick}
-        onRequireLogin={() => setShowDenied(true)} 
+        onRequireLogin={() => {
+          setShowAdminDenied(false);
+          setShowDenied(true);
+        }}
       />
 
       <section className="v-hero">
@@ -108,9 +132,19 @@ export default function Home() {
       </section>
 
       <Footer />
-
-      {showDenied && (
-        <ModalBase onClose={() => setShowDenied(false)}>
+      {showAdminDenied ? (
+        <ModalBase onClose={() => setShowAdminDenied(false)} boxStyle={modalBoxStyle}>
+          <img
+            src={accessDeniedAdminImg}
+            alt="Acesso negado - admin"
+            style={{ width: 'min(64vw, 260px)', height: 'auto', display: 'block', userSelect: 'none' }}
+            draggable={false}
+          />
+          <h3 className="v-modal__title">Acesso negado</h3>
+          <p className="v-modal__text">Somente administradores podem ter acesso a essa página</p>
+        </ModalBase>
+      ) : showDenied ? (
+        <ModalBase onClose={() => setShowDenied(false)} boxStyle={modalBoxStyle}>
           <img
             src={accessDeniedImg}
             alt="Acesso negado"
@@ -130,7 +164,7 @@ export default function Home() {
             Login
           </button>
         </ModalBase>
-      )}
+      ) : null}
     </div>
   );
 }
