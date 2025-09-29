@@ -5,21 +5,71 @@ import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 
 import '../styles/base.css';
+import '../styles/admin.css';
 
-type ClaimsLike = { roleNames?: string[]; roles?: string[] };
+type ClaimsLike = Record<string, unknown>;
 
 const ACCESS_DENIED_FLAG = 'v_access_denied_once';
 const ADMIN_DENIED_FLAG = 'v_admin_denied_once';
 
+const ALLOWED_ACCOUNT_NAME = 'admin';
+const ALLOWED_EMAILS = ['admin@veracity.com.br'];
+
+function normalize(str: unknown): string {
+  return typeof str === 'string' ? str.trim().toLowerCase() : '';
+}
+
+async function resolveAccountNameAndEmail(
+  getIdTokenClaims: () => Promise<unknown>,
+  fetchUserInfo?: () => Promise<unknown>
+): Promise<{ name: string | null; email: string | null }> {
+  try {
+    const claims = (await getIdTokenClaims()) as ClaimsLike;
+
+    const nameClaim =
+      (claims['name'] as string) ??
+      (claims['preferred_username'] as string) ??
+      (claims['username'] as string);
+
+    const emailClaim =
+      (claims['email'] as string) ??
+      (claims['primaryEmail'] as string);
+
+    if (nameClaim || emailClaim) {
+      return { name: nameClaim ?? null, email: emailClaim ?? null };
+    }
+
+    if (fetchUserInfo) {
+      const ui = (await fetchUserInfo()) as ClaimsLike;
+      const nameUi =
+        (ui['name'] as string) ??
+        (ui['preferred_username'] as string) ??
+        (ui['username'] as string) ??
+        ((ui['profile'] as any)?.nickname as string) ??
+        ((ui['profile'] as any)?.givenName as string);
+
+      const emailUi =
+        (ui['email'] as string) ??
+        (ui['primaryEmail'] as string);
+
+      return { name: nameUi ?? null, email: emailUi ?? null };
+    }
+  } catch {
+  }
+  return { name: null, email: null };
+}
+
 export default function Admin() {
-  const { isAuthenticated, getIdTokenClaims } = useLogto();
+  const { isAuthenticated, isLoading, getIdTokenClaims, fetchUserInfo } = useLogto();
 
   const [checked, setChecked] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [allowed, setAllowed] = useState(false);
 
   const redirectUri = useMemo(() => `${window.location.origin}/`, []);
 
   useEffect(() => {
+    if (isLoading) return;
+
     (async () => {
       if (!isAuthenticated) {
         sessionStorage.setItem(ACCESS_DENIED_FLAG, '1');
@@ -27,48 +77,32 @@ export default function Admin() {
         return;
       }
 
-      try {
-        const claims = (await getIdTokenClaims()) as unknown as ClaimsLike;
-        const roles = claims?.roleNames ?? claims?.roles ?? [];
-        const _isAdmin = Array.isArray(roles) && roles.includes('admin');
+      const { name, email } = await resolveAccountNameAndEmail(getIdTokenClaims, fetchUserInfo);
+      const isNameAllowed = normalize(name) === normalize(ALLOWED_ACCOUNT_NAME);
+      const isEmailAllowed = ALLOWED_EMAILS.map(normalize).includes(normalize(email));
 
-        if (!_isAdmin) {
-          sessionStorage.setItem(ADMIN_DENIED_FLAG, '1');
-          window.location.replace(redirectUri);
-          return;
-        }
-
-        setIsAdmin(true);
-        setChecked(true);
-      } catch {
+      if (!isNameAllowed && !isEmailAllowed) {
         sessionStorage.setItem(ADMIN_DENIED_FLAG, '1');
         window.location.replace(redirectUri);
+        return;
       }
+
+      setAllowed(true);
+      setChecked(true);
     })();
-  }, [isAuthenticated, getIdTokenClaims, redirectUri]);
+  }, [isLoading, isAuthenticated, getIdTokenClaims, fetchUserInfo, redirectUri]);
 
   return (
     <div className="v-bg">
       <Header current="admin" disableAdminLink />
-      {checked && isAdmin && (
-        <div style={{ maxWidth: 980, margin: '28px auto 0', padding: '0 16px', color: '#fff' }}>
-          <h1 style={{ fontSize: 28, marginBottom: 8 }}>Administração</h1>
-          <p style={{ opacity: 0.85, marginBottom: 24 }}>
-            Bem-vinda(o) à área administrativa.
-          </p>
-          <div
-            style={{
-              background: '#1f1f1f',
-              borderRadius: 14,
-              padding: 20,
-              boxShadow: '0 10px 30px rgba(0,0,0,.25)',
-              minHeight: 160,
-            }}
-          >
-            Tela em construção...
-          </div>
-        </div>
+
+      {checked && allowed && (
+        <section className="admin-page">
+          <h1 className="admin-title">Painel administrativo</h1>
+          <p className="admin-sub">Tela em construção...</p>
+        </section>
       )}
+
       <Footer />
     </div>
   );
