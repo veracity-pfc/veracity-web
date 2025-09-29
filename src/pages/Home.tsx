@@ -3,7 +3,7 @@ import { useLogto, useHandleSignInCallback } from '@logto/react';
 
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
-import ModalBase from '../components/ui/ModalBase';
+import ModalBase from '../components/modals/ModalBase';
 
 import '../styles/base.css';
 import '../styles/home.css';
