@@ -30,7 +30,7 @@ export default function Footer() {
           <div>
             <div className="footer-title">Informação</div>
             <div className="footer-links">
-              <a href="#">Conheça nossa história</a>
+              <a href="/about">Conheça nossa história</a>
               <a href="#">Entre em contato conosco</a>
               <a href="#">Como utilizar a plataforma</a>
             </div>
