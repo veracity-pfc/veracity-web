@@ -9,6 +9,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noEmit": true,
+
+    "allowJs": true,
+    "checkJs": false,
+
     "baseUrl": ".",
     "paths": {
       "@components/*": ["src/components/*"],
@@ -18,5 +22,6 @@
     },
     "types": ["vite/client"]
   },
-  "include": ["src"]
+  "include": ["src", "src/**/*", "vite.config.*"],
+  "exclude": ["node_modules", "dist"]
 }

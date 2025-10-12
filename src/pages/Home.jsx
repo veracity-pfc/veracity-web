@@ -1,0 +1,34 @@
+import React, { useState } from 'react';
+import Tabs from '../components/Tabs.jsx';
+import SearchForm from '../components/SearchForm.jsx';
+
+export default function Home() {
+  const [activeTab, setActiveTab] = useState('links');
+
+  return (
+    <main className="container">
+      <section className="hero">
+        <h1>Detectando manipulações<br />com inteligência</h1>
+        <p className="sub">Verifique a autenticidade de conteúdos digitais</p>
+
+        <Tabs
+          active={activeTab}
+          onChange={setActiveTab}
+          labels={{ links: 'Análise de links', images: 'Análise de imagens' }}
+        />
+
+        <div className="search-wrap">
+          <SearchForm
+            mode={activeTab}
+            onSubmit={(value) => {
+              console.log('Verificar:', activeTab, value);
+            }}
+          />
+          <p className="legal">
+            Ao utilizar o Veracity eu concordo com os <a href="#">Termos de Uso</a> e com a <a href="#">Política de Privacidade</a> da plataforma
+          </p>
+        </div>
+      </section>
+    </main>
+  );
+}
