@@ -22,6 +22,7 @@ export default function Header() {
   useEffect(() => {
     const path = window.location.pathname || '';
     if (path.startsWith('/about')) setActiveKey('sobre');
+    else if (path.startsWith('/instructions')) setActiveKey('instrucoes');
   }, []);
 
   useEffect(() => {
@@ -31,17 +32,11 @@ export default function Header() {
       setOpen(false);
     }
     function onKey(e) {
-      if (e.key === 'Escape') {
-        setOpen(false);
-        setMobileOpen(false);
-      }
+      if (e.key === 'Escape') { setOpen(false); setMobileOpen(false); }
     }
     document.addEventListener('click', onDocClick);
     document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('click', onDocClick);
-      document.removeEventListener('keydown', onKey);
-    };
+    return () => { document.removeEventListener('click', onDocClick); document.removeEventListener('keydown', onKey); };
   }, []);
 
   return (
@@ -52,16 +47,8 @@ export default function Header() {
           role="link"
           tabIndex={0}
           style={{ cursor: 'pointer' }}
-          onClick={(e) => {
-            e.preventDefault();
-            window.location.assign('/');
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              window.location.assign('/');
-            }
-          }}
+          onClick={(e) => { e.preventDefault(); window.location.assign('/'); }}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.location.assign('/'); } }}
           aria-label="Ir para a página inicial"
         >
           <Logo />
@@ -69,203 +56,94 @@ export default function Header() {
 
         <nav className="nav-links" aria-label="Principal">
           {ITEMS.map((item) => {
-            if (item.key !== 'sobre') {
+            if (item.key === 'sobre') {
+              return (
+                <div key="sobre" className="about-group">
+                  <a
+                    href="/about"
+                    className={`nav-link ${activeKey === 'sobre' ? 'is-active' : ''}`}
+                    onClick={() => setActiveKey('sobre')}
+                  >
+                    Sobre
+                  </a>
+                  <button
+                    ref={btnRef}
+                    type="button"
+                    className={`about-toggle ${open ? 'open' : ''}`}
+                    aria-haspopup="menu"
+                    aria-expanded={open}
+                    aria-controls="about-menu"
+                    onClick={() => setOpen(v => !v)}
+                    title="Abrir menu Sobre"
+                  />
+                  {open && (
+                    <div id="about-menu" ref={menuRef} role="menu" className="about-menu">
+                      <a role="menuitem" tabIndex={0} href="/about" className="about-item">Conheça nossa história</a>
+                      <a role="menuitem" tabIndex={0} href="#" className="about-item" onClick={(e) => e.preventDefault()}>Política de privacidade</a>
+                      <a role="menuitem" tabIndex={0} href="#" className="about-item" onClick={(e) => e.preventDefault()}>Termos de uso</a>
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            if (item.key === 'instrucoes') {
               return (
                 <a
                   key={item.key}
                   className={`nav-link ${activeKey === item.key ? 'is-active' : ''}`}
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();       
-                    setActiveKey(item.key);    
-                  }}
+                  href="/instructions"
+                  onClick={() => setActiveKey('instrucoes')}
                 >
                   {item.label}
                 </a>
               );
             }
+
             return (
-              <div key="sobre" className="about-group">
-                <a
-                  href="/about"
-                  className={`nav-link ${activeKey === 'sobre' ? 'is-active' : ''}`}
-                  onClick={() => setActiveKey('sobre')}
-                >
-                  Sobre
-                </a>
-                <button
-                  ref={btnRef}
-                  type="button"
-                  className={`about-toggle ${open ? 'open' : ''}`}
-                  aria-haspopup="menu"
-                  aria-expanded={open}
-                  aria-controls="about-menu"
-                  onClick={() => setOpen((v) => !v)}
-                  title="Abrir menu Sobre"
-                />
-                {open && (
-                  <div
-                    id="about-menu"
-                    ref={menuRef}
-                    role="menu"
-                    className="about-menu"
-                    aria-labelledby="about-toggle"
-                  >
-                    <a role="menuitem" tabIndex={0} href="/about" className="about-item">
-                      Conheça nossa história
-                    </a>
-                    <a
-                      role="menuitem"
-                      tabIndex={0}
-                      href="#"
-                      className="about-item"
-                      onClick={(e) => e.preventDefault()}
-                    >
-                      Política de privacidade
-                    </a>
-                    <a
-                      role="menuitem"
-                      tabIndex={0}
-                      href="#"
-                      className="about-item"
-                      onClick={(e) => e.preventDefault()}
-                    >
-                      Termos de uso
-                    </a>
-                  </div>
-                )}
-              </div>
+              <a
+                key={item.key}
+                className={`nav-link ${activeKey === item.key ? 'is-active' : ''}`}
+                href="#"
+                onClick={(e) => { e.preventDefault(); setActiveKey(item.key); }}
+              >
+                {item.label}
+              </a>
             );
           })}
-          <a
-            href="#"
-            className="nav-link login-cta"
-            onClick={(e) => e.preventDefault()}
-          >
-            Login
-          </a>
+          <a href="#" className="nav-link login-cta" onClick={(e) => e.preventDefault()}>Login</a>
         </nav>
 
-        <button
-          className="mobile-toggle"
-          aria-label="Abrir menu"
-          aria-expanded={mobileOpen}
-          onClick={() => setMobileOpen((v) => !v)}
-        >
-          <span></span>
-          <span></span>
-          <span></span>
+        <button className="mobile-toggle" aria-label="Abrir menu" aria-expanded={mobileOpen} onClick={() => setMobileOpen(v => !v)}>
+          <span></span><span></span><span></span>
         </button>
       </div>
 
       <div className={`mobile-menu ${mobileOpen ? 'open' : ''}`} role="dialog" aria-modal="true">
         <div className="container">
           <div className="mobile-group">
-            <a
-              className={`mobile-link ${activeKey === 'perfil' ? 'is-active' : ''}`}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveKey('perfil');
-                setMobileOpen(false);
-              }}
-            >
-              Perfil
-            </a>
-            <a
-              className={`mobile-link ${activeKey === 'admin' ? 'is-active' : ''}`}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveKey('admin');
-                setMobileOpen(false);
-              }}
-            >
-              Administração
-            </a>
-            <a
-              className={`mobile-link ${activeKey === 'historico' ? 'is-active' : ''}`}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveKey('historico');
-                setMobileOpen(false);
-              }}
-            >
-              Histórico de análises
-            </a>
-            <a
-              className={`mobile-link ${activeKey === 'instrucoes' ? 'is-active' : ''}`}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveKey('instrucoes');
-                setMobileOpen(false);
-              }}
-            >
+            <a className={`mobile-link ${activeKey === 'perfil' ? 'is-active' : ''}`} href="#" onClick={(e) => { e.preventDefault(); setActiveKey('perfil'); setMobileOpen(false); }}>Perfil</a>
+            <a className={`mobile-link ${activeKey === 'admin' ? 'is-active' : ''}`} href="#" onClick={(e) => { e.preventDefault(); setActiveKey('admin'); setMobileOpen(false); }}>Administração</a>
+            <a className={`mobile-link ${activeKey === 'historico' ? 'is-active' : ''}`} href="#" onClick={(e) => { e.preventDefault(); setActiveKey('historico'); setMobileOpen(false); }}>Histórico de análises</a>
+
+            <a className={`mobile-link ${activeKey === 'instrucoes' ? 'is-active' : ''}`} href="/instructions" onClick={() => { setActiveKey('instrucoes'); setMobileOpen(false); }}>
               Instruções
             </a>
-            <a
-              className={`mobile-link ${activeKey === 'contato' ? 'is-active' : ''}`}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveKey('contato');
-                setMobileOpen(false);
-              }}
-            >
-              Contato
-            </a>
 
-            <a
-              className={`mobile-link ${activeKey === 'sobre' ? 'is-active' : ''}`}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveKey('sobre');
-                setMobileSobreOpen((v) => !v);
-              }}
-            >
+            <a className={`mobile-link ${activeKey === 'contato' ? 'is-active' : ''}`} href="#" onClick={(e) => { e.preventDefault(); setActiveKey('contato'); setMobileOpen(false); }}>Contato</a>
+
+            <a className={`mobile-link ${activeKey === 'sobre' ? 'is-active' : ''}`} href="#" onClick={(e) => { e.preventDefault(); setActiveKey('sobre'); setMobileSobreOpen(v => !v); }}>
               Sobre ▾
             </a>
             {mobileSobreOpen && (
               <>
-                <a className="mobile-subitem" href="/about" onClick={() => setMobileOpen(false)}>
-                  Conheça nossa história
-                </a>
-                <a
-                  className="mobile-subitem"
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setMobileOpen(false);
-                  }}
-                >
-                  Política de privacidade
-                </a>
-                <a
-                  className="mobile-subitem"
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setMobileOpen(false);
-                  }}
-                >
-                  Termos de uso
-                </a>
+                <a className="mobile-subitem" href="/about" onClick={() => setMobileOpen(false)}>Conheça nossa história</a>
+                <a className="mobile-subitem" href="#" onClick={(e) => { e.preventDefault(); setMobileOpen(false); }}>Política de privacidade</a>
+                <a className="mobile-subitem" href="#" onClick={(e) => { e.preventDefault(); setMobileOpen(false); }}>Termos de uso</a>
               </>
             )}
 
-            <a
-              className="mobile-login"
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setMobileOpen(false);
-              }}
-            >
-              Login
-            </a>
+            <a className="mobile-login" href="#" onClick={(e) => { e.preventDefault(); setMobileOpen(false); }}>Login</a>
           </div>
         </div>
       </div>
