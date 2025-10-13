@@ -6,12 +6,7 @@ export default function Contact() {
 
   return (
     <main>
-      <section className="hero">
-        <h1>Detectando manipulações<br />com inteligência</h1>
-        <p className="sub">Verifique a autenticidade de conteúdos digitais</p>
-      </section>
-
-      <section className="contact-section container">
+      <section className="contact-section container page-offset">
         <div className="contact-grid">
           <div className="contact-image-wrap">
             <img className="contact-image" src={cover} alt="Arte ilustrativa de contato" />

@@ -4,12 +4,7 @@ import cover from '../assets/about-cover.png';
 export default function About() {
   return (
     <main className="container">
-      <section className="hero">
-        <h1>Detectando manipulações<br />com inteligência</h1>
-        <p className="sub">Verifique a autenticidade de conteúdos digitais</p>
-      </section>
-
-      <section className="about-section">
+      <section className="about-section page-offset">
         <div className="about-grid">
           <div className="about-image-wrap">
             <img className="about-image" src={cover} alt="Arte do projeto Veracity" />

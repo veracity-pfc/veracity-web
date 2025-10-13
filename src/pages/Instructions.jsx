@@ -76,10 +76,8 @@ export default function Instructions() {
   return (
     <main>
       <section className="hero">
-        <h1>Detectando manipulações<br/>com inteligência</h1>
-        <p className="sub">Verifique a autenticidade de conteúdos digitais</p>
+        <h1 class="instructions-h1">Como utilizar a plataforma</h1>
       </section>
-
       <Steps title="Análise de links" steps={linkSteps} />
       <Steps title="Análise de imagens" steps={imageSteps} />
     </main>

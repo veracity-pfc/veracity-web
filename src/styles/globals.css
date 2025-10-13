@@ -45,6 +45,10 @@ button {
   padding-inline: 28px; 
 }
 
+.page-offset {
+  padding-top: 80px;
+}
+
 .site-header {
   position: sticky; 
   top: 0; 
@@ -471,6 +475,9 @@ button {
   font-weight: 900;
 }
 
+.instructions-h1 {
+  font-size: 60px !important;
+}
 .steps-wrap {
   border-radius: 14px;
   background: #1e1d1d;
