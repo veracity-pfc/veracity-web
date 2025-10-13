@@ -6,6 +6,8 @@ import Home from './pages/Home.jsx';
 import About from './pages/About.jsx';
 import Instructions from './pages/Instructions.jsx';
 import Contact from './pages/Contact.jsx';
+import TermsOfUse from './pages/TermsOfUse.jsx';
+import PrivacyPolicy from './pages/PrivacyPolicy.jsx';
 
 export default function App() {
   return (
@@ -16,6 +18,8 @@ export default function App() {
         <Route path="/about" element={<About />} />
         <Route path="/instructions" element={<Instructions />} />
         <Route path="/contact-us" element={<Contact />} />
+        <Route path="/terms-of-use" element={<TermsOfUse />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       </Routes>
       <Footer />
     </>

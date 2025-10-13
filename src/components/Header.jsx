@@ -80,8 +80,8 @@ export default function Header() {
                   {open && (
                     <div id="about-menu" ref={menuRef} role="menu" className="about-menu">
                       <a role="menuitem" tabIndex={0} href="/about" className="about-item">Conheça nossa história</a>
-                      <a role="menuitem" tabIndex={0} href="#" className="about-item" onClick={(e) => e.preventDefault()}>Política de privacidade</a>
-                      <a role="menuitem" tabIndex={0} href="#" className="about-item" onClick={(e) => e.preventDefault()}>Termos de uso</a>
+                      <a role="menuitem" tabIndex={0} href="/privacy-policy" className="about-item" onClick={(e)=>{e.preventDefault();window.open('/privacy-policy','_blank','noopener');}}>Política de privacidade</a>
+                      <a role="menuitem" tabIndex={0} href="/terms-of-use" className="about-item" onClick={(e)=>{e.preventDefault();window.open('/terms-of-use','_blank','noopener');}}>Termos de uso</a>
                     </div>
                   )}
                 </div>

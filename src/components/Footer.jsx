@@ -13,8 +13,8 @@ export default function Footer() {
               <Logo />
             </div>
             <div className="footer-links">
-              <a href="#">Política de privacidade</a>
-              <a href="#">Termos de uso</a>
+              <a href="/privacy-policy" onClick={(e)=>{e.preventDefault();window.open('/privacy-policy','_blank','noopener');}}>Política de privacidade</a>
+              <a href="/terms-of-use" onClick={(e)=>{e.preventDefault();window.open('terms-of-use','_blank','noopener');}}>Termos de uso</a>
             </div>
           </div>
 

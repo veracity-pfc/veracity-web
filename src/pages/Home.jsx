@@ -25,7 +25,7 @@ export default function Home() {
             }}
           />
           <p className="legal">
-            Ao utilizar o Veracity eu concordo com os <a href="#">Termos de Uso</a> e com a <a href="#">Política de Privacidade</a> da plataforma
+            Ao utilizar o Veracity eu concordo com os <a href="/terms-of-use" onClick={(e)=>{e.preventDefault();window.open('/terms-of-use','_blank','noopener');}}>Termos de Uso</a> e com a <a href="/privacy-policy" onClick={(e)=>{e.preventDefault();window.open('/privacy-policy','_blank','noopener');}}>Política de Privacidade</a> da plataforma
           </p>
         </div>
       </section>

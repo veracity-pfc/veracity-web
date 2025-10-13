@@ -38,6 +38,11 @@ button {
   cursor: pointer; 
 }
 
+body.bare-page .site-header,
+body.bare-page .site-footer {
+  display: none !important;
+}
+
 .container { 
   width: 100%; 
   max-width: var(--container); 
