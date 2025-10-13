@@ -23,6 +23,7 @@ export default function Header() {
     const path = window.location.pathname || '';
     if (path.startsWith('/about')) setActiveKey('sobre');
     else if (path.startsWith('/instructions')) setActiveKey('instrucoes');
+    else if (path.startsWith('/contact-us')) setActiveKey('contato');
   }, []);
 
   useEffect(() => {
@@ -100,6 +101,19 @@ export default function Header() {
               );
             }
 
+            if (item.key === 'contato') {
+              return (
+                <a
+                  key={item.key}
+                  className={`nav-link ${activeKey === item.key ? 'is-active' : ''}`}
+                  href="/contact-us"
+                  onClick={() => setActiveKey('contato')}
+                >
+                  {item.label}
+                </a>
+              );
+            }
+
             return (
               <a
                 key={item.key}
@@ -126,15 +140,10 @@ export default function Header() {
             <a className={`mobile-link ${activeKey === 'admin' ? 'is-active' : ''}`} href="#" onClick={(e) => { e.preventDefault(); setActiveKey('admin'); setMobileOpen(false); }}>Administração</a>
             <a className={`mobile-link ${activeKey === 'historico' ? 'is-active' : ''}`} href="#" onClick={(e) => { e.preventDefault(); setActiveKey('historico'); setMobileOpen(false); }}>Histórico de análises</a>
 
-            <a className={`mobile-link ${activeKey === 'instrucoes' ? 'is-active' : ''}`} href="/instructions" onClick={() => { setActiveKey('instrucoes'); setMobileOpen(false); }}>
-              Instruções
-            </a>
+            <a className={`mobile-link ${activeKey === 'instrucoes' ? 'is-active' : ''}`} href="/instructions" onClick={() => { setActiveKey('instrucoes'); setMobileOpen(false); }}>Instruções</a>
+            <a className={`mobile-link ${activeKey === 'contato' ? 'is-active' : ''}`} href="/contact-us" onClick={() => { setActiveKey('contato'); setMobileOpen(false); }}>Contato</a>
 
-            <a className={`mobile-link ${activeKey === 'contato' ? 'is-active' : ''}`} href="#" onClick={(e) => { e.preventDefault(); setActiveKey('contato'); setMobileOpen(false); }}>Contato</a>
-
-            <a className={`mobile-link ${activeKey === 'sobre' ? 'is-active' : ''}`} href="#" onClick={(e) => { e.preventDefault(); setActiveKey('sobre'); setMobileSobreOpen(v => !v); }}>
-              Sobre ▾
-            </a>
+            <a className={`mobile-link ${activeKey === 'sobre' ? 'is-active' : ''}`} href="#" onClick={(e) => { e.preventDefault(); setActiveKey('sobre'); setMobileSobreOpen(v => !v); }}>Sobre ▾</a>
             {mobileSobreOpen && (
               <>
                 <a className="mobile-subitem" href="/about" onClick={() => setMobileOpen(false)}>Conheça nossa história</a>

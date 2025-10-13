@@ -31,8 +31,8 @@ export default function Footer() {
             <div className="footer-title">Informação</div>
             <div className="footer-links">
               <a href="/about">Conheça nossa história</a>
-              <a href="#">Entre em contato conosco</a>
-              <a href="#">Como utilizar a plataforma</a>
+              <a href="/contact-us">Entre em contato conosco</a>
+              <a href="/instructions">Como utilizar a plataforma</a>
             </div>
           </div>
         </div>

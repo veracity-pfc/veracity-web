@@ -510,7 +510,6 @@ button {
   line-height: 1;
 }
 
-
 .step-btn.is-active {
   color: #fff;
   background: #1c6a58;      
@@ -529,6 +528,94 @@ button {
   color: var(--text-primary); 
   opacity: .95;
 }
+
+.contact-section { 
+  padding-bottom: 48px; 
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 36px;
+  align-items: start;
+}
+
+.contact-image-wrap { 
+  border-radius: 12px; overflow: hidden; 
+}
+
+.contact-image { 
+  display:block; 
+  width:100%; 
+  height:500px; 
+  border-radius:12px; 
+  box-shadow:0 10px 24px rgba(0,0,0,.35); 
+}
+
+.contact-title { 
+  margin: 0 0 8px; 
+  font-size: 60px; 
+  line-height: 1.15; 
+  font-weight: 900; 
+}
+
+.contact-subtitle { 
+  margin: 0 0 18px; 
+  font-weight: 700; 
+  color: var(--text-primary); 
+}
+
+.contact-form { 
+  display: grid; 
+  gap: 10px; 
+  max-width: 620px; 
+}
+
+.form-label { 
+  font-weight: 900; 
+  font-size: 14px; 
+}
+
+.form-control {
+  height: 38px;
+  border: 1px solid var(--text-muted);
+  outline: none;
+  padding: 0 12px;
+  color: #0C1714;
+  background: #FFFFFF;
+  font-family: inherit;   
+  font-size: 16px;      
+  border-radius: 8px;
+}
+
+.form-control::placeholder { 
+  color: #8aa39b; 
+  font-weight: 400;
+}
+
+.form-control.textarea { 
+  height: 140px; 
+  padding: 10px 12px; 
+  resize: vertical; 
+}
+
+.btn-primary {
+  height: 38px;
+  padding: 0 16px;
+  border: 1px solid #173B31;
+  background: #173B31;
+  border-radius: 8px;
+  color: #EAF6F2;
+  font-weight: 900;
+  width: fit-content;
+}
+
+@media (max-width: 980px) {
+  .contact-grid { grid-template-columns: 1fr; gap: 20px; }
+  .contact-image-wrap { display: none; } 
+  .contact-title { font-size: 32px; }
+}
+
 
 @media (max-width: 670px) {
   .step-btn { width: 44px; height: 44px; font-size: 18px; }
