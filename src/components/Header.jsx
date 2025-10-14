@@ -125,7 +125,7 @@ export default function Header() {
               </a>
             );
           })}
-          <a href="#" className="nav-link login-cta" onClick={(e) => e.preventDefault()}>Login</a>
+          <a href="/login" className="nav-link login-cta">Login</a>
         </nav>
 
         <button className="mobile-toggle" aria-label="Abrir menu" aria-expanded={mobileOpen} onClick={() => setMobileOpen(v => !v)}>
@@ -152,7 +152,7 @@ export default function Header() {
               </>
             )}
 
-            <a className="mobile-login" href="#" onClick={(e) => { e.preventDefault(); setMobileOpen(false); }}>Login</a>
+            <a className="mobile-login" href="/login">Login</a>
           </div>
         </div>
       </div>
