@@ -222,7 +222,7 @@ body.bare-page .site-footer {
   width: 16px; 
   height: 2px; 
   background: #e7efec;
-  margin: 3px auto;                 
+  margin: 3px auto;                  
   border-radius: 2px;
 }
 
@@ -641,10 +641,6 @@ body.bare-page .site-footer {
   height: 72px; 
 }
 
-@media (max-width: 670px) { 
-  .login-logo .logo-wordmark{ height: 52px; } 
-}
-
 .login-card {
   position: relative;               
   width: 100%;
@@ -687,7 +683,7 @@ body.bare-page .site-footer {
 
 .form-control {
   width: 100%;            
-  height: 44px;         
+  height: 44px;          
   border: 1px solid var(--text-muted);
   outline: none;
   padding: 0 12px;
@@ -773,47 +769,12 @@ body.auth-only-footer footer {
   margin-top: auto !important;             
 }
 
-@media (max-width: 670px) {
-  .login-card{ padding: 22px 18px; }
-  .login-back{ left: 12px; top: 12px; }
-}
-
-@media (max-width: 640px) {
-  body.auth-only-footer main {
-    padding-bottom: clamp(16px, 6vh, 40px) !important; 
-  }
-}
-
-@media (max-width: 640px) {
-  .login-card {
-    margin-bottom: clamp(20px, 8vh, 56px) !important;
-  }
-}
-
-@media (max-width: 670px) {
-  .copy {
-    padding: 10px 16px !important; 
-  }
-}
-
 @media (max-width: 980px) {
   .contact-grid { grid-template-columns: 1fr; gap: 20px; }
   .contact-image-wrap { display: none; } 
   .contact-title { font-size: 32px; }
-}
 
-
-@media (max-width: 670px) {
-  .step-btn { width: 44px; height: 44px; font-size: 18px; }
-  .instructions-title { font-size: 22px; }
-}
-
-
-@media (max-width: 980px) {
-  .nav-links { 
-    display: none; 
-  }
-
+  .nav-links { display: none; }
   .mobile-toggle { 
     display: inline-flex; 
     flex-direction: column; 
@@ -821,47 +782,39 @@ body.auth-only-footer footer {
     justify-content: center; 
   }
 
-  .hero h1 { 
-    font-size: 48px; 
-  }
+  .hero h1 { font-size: 48px; }
+  .tab-btn { min-width: 150px; }
 
-  .tab-btn { 
-    min-width: 150px; 
-  }
+  .search-card { grid-template-columns: 1fr; }
+  .verify-btn { width: 100%; }
 
-  .search-card { 
-    grid-template-columns: 1fr; 
-  }
-
-  .verify-btn { 
-    width: 100%; 
-  }
-
-  .about-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  .about-image-wrap { 
-    display: none; 
-  }
-  .about-title { 
-    font-size: 32px; 
-  }
-  .hero { 
-    padding-bottom: 20px; 
-  }
+  .about-grid { grid-template-columns: 1fr; gap: 20px; }
+  .about-image-wrap { display: none; }
+  .about-title { font-size: 32px; }
+  .hero { padding-bottom: 20px; }
 }
 
 @media (max-width: 670px) {
-  .copy { 
-    padding: 10px 0; 
-  }
+  .login-logo .logo-wordmark { height: 52px; }
 
-  .footer-inner { 
-    grid-template-columns: 1fr; 
-  }
+  .step-btn { width: 44px; height: 44px; font-size: 18px; }
+  .instructions-title { font-size: 22px; }
 
-  .hero h1 { 
-    font-size: 40px; 
+  .login-card { padding: 22px 18px; }
+  .login-back { left: 12px; top: 12px; }
+
+  .copy { padding: 10px 16px !important; }
+  .copy { padding: 10px 0; }
+
+  .footer-inner { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 40px; }
+}
+
+@media (max-width: 640px) {
+  body.auth-only-footer main {
+    padding-bottom: clamp(16px, 6vh, 40px) !important; 
+  }
+  .login-card {
+    margin-bottom: clamp(20px, 8vh, 56px) !important;
   }
 }
