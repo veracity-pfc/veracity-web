@@ -147,8 +147,8 @@ export default function Header() {
             {mobileSobreOpen && (
               <>
                 <a className="mobile-subitem" href="/about" onClick={() => setMobileOpen(false)}>Conheça nossa história</a>
-                <a className="mobile-subitem" href="#" onClick={(e) => { e.preventDefault(); setMobileOpen(false); }}>Política de privacidade</a>
-                <a className="mobile-subitem" href="#" onClick={(e) => { e.preventDefault(); setMobileOpen(false); }}>Termos de uso</a>
+                <a className="mobile-subitem" href="/privacy-policy" onClick={() => setMobileOpen(false)}>Política de privacidade</a>
+                <a className="mobile-subitem" href="/terms-of-use" onClick={() => setMobileOpen(false)}>Termos de uso</a>
               </>
             )}
 
