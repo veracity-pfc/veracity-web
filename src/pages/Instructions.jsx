@@ -76,7 +76,7 @@ export default function Instructions() {
   return (
     <main>
       <section className="hero">
-        <h1 class="instructions-h1">Como utilizar a plataforma</h1>
+        <h1 className="instructions-h1">Como utilizar a plataforma</h1>
       </section>
       <Steps title="Análise de links" steps={linkSteps} />
       <Steps title="Análise de imagens" steps={imageSteps} />
