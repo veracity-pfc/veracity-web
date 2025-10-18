@@ -12,6 +12,7 @@ import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Profile from './pages/Profile.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx';
+import VerifyEmail from "./pages/VerifyEmail";
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="/sign-up" element={<Register />} />
         <Route path="/user/profile" element={<Profile />}/>
         <Route path="/administration" element={<AdminDashboard />}/>
+        <Route path="/verify-email" element={<VerifyEmail />} />
       </Routes>
       <Footer />
     </>

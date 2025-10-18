@@ -2,15 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import Logo from './Logo.jsx';
 import { apiLogout, clearToken, getRole, getToken } from '../api/client';
 
-const ITEMS = [
-  { key: 'perfil', label: 'Perfil', href: '/user/profile' },
-  { key: 'admin', label: 'Administração', href: '/administration' },
-  { key: 'historico', label: 'Histórico de análises', href: '/user/history' },
-  { key: 'instrucoes', label: 'Instruções', href: '/instructions' },
-  { key: 'contato', label: 'Contato', href: '/contact-us' },
-  { key: 'sobre', label: 'Sobre', href: '/about' },
-];
-
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [activeKey, setActiveKey] = useState(null);
@@ -38,8 +29,17 @@ export default function Header() {
         setRole(getRole());
       }
     };
+    const onAuthChanged = () => {
+      setIsAuthed(!!getToken());
+      setRole(getRole());
+    };
+
     window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
+    window.addEventListener('veracity-auth-changed', onAuthChanged);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('veracity-auth-changed', onAuthChanged);
+    };
   }, []);
 
   useEffect(() => {
@@ -53,15 +53,18 @@ export default function Header() {
     }
     document.addEventListener('click', onDocClick);
     document.addEventListener('keydown', onKey);
-    return () => { document.removeEventListener('click', onDocClick); document.removeEventListener('keydown', onKey); };
+    return () => {
+      document.removeEventListener('click', onDocClick);
+      document.removeEventListener('keydown', onKey);
+    };
   }, []);
 
   const handleLogout = async () => {
-    try { await apiLogout(); } catch (_) {}
+    try { await apiLogout(); } catch {}
     clearToken();
     setIsAuthed(false);
     setRole(null);
-    window.location.assign('/'); 
+    window.location.assign('/');
   };
 
   const isAdmin = role === 'admin';
@@ -154,13 +157,22 @@ export default function Header() {
           {!isAuthed ? (
             <a href="/login" className="nav-link login-cta">Login</a>
           ) : (
-            <button type="button" className="nav-link login-cta" onClick={handleLogout}>
+            <a
+              href="#"
+              className="nav-link login-cta"
+              onClick={(e) => { e.preventDefault(); handleLogout(); }}
+            >
               Sair
-            </button>
+            </a>
           )}
         </nav>
 
-        <button className="mobile-toggle" aria-label="Abrir menu" aria-expanded={mobileOpen} onClick={() => setMobileOpen(v => !v)}>
+        <button
+          className="mobile-toggle"
+          aria-label="Abrir menu"
+          aria-expanded={mobileOpen}
+          onClick={() => setMobileOpen(v => !v)}
+        >
           <span></span><span></span><span></span>
         </button>
       </div>
@@ -174,7 +186,13 @@ export default function Header() {
             <a className={`mobile-link ${activeKey === 'instrucoes' ? 'is-active' : ''}`} href="/instructions" onClick={() => setMobileOpen(false)}>Instruções</a>
             <a className={`mobile-link ${activeKey === 'contato' ? 'is-active' : ''}`} href="/contact-us" onClick={() => setMobileOpen(false)}>Contato</a>
 
-            <a className={`mobile-link ${activeKey === 'sobre' ? 'is-active' : ''}`} href="#" onClick={(e) => { e.preventDefault(); setActiveKey('sobre'); setMobileSobreOpen(v => !v); }}>Sobre ▾</a>
+            <a
+              className={`mobile-link ${activeKey === 'sobre' ? 'is-active' : ''}`}
+              href="#"
+              onClick={(e) => { e.preventDefault(); setActiveKey('sobre'); setMobileSobreOpen(v => !v); }}
+            >
+              Sobre ▾
+            </a>
             {mobileSobreOpen && (
               <>
                 <a className="mobile-subitem" href="/about" onClick={() => setMobileOpen(false)}>Conheça nossa história</a>
@@ -186,9 +204,13 @@ export default function Header() {
             {!isAuthed ? (
               <a className="mobile-login" href="/login" onClick={() => setMobileOpen(false)}>Login</a>
             ) : (
-              <button className="mobile-login" onClick={() => { setMobileOpen(false); handleLogout(); }}>
+              <a
+                className="mobile-login"
+                href="#"
+                onClick={(e) => { e.preventDefault(); setMobileOpen(false); handleLogout(); }}
+              >
                 Sair
-              </button>
+              </a>
             )}
           </div>
         </div>

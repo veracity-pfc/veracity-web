@@ -3,7 +3,7 @@ import wordmark from '../assets/veracity-wordmark.png';
 
 export default function Logo() {
   return (
-    <a href="#" className="logo-link" aria-label="Veracity – Página inicial">
+    <a href="/" className="logo-link" aria-label="Veracity – Página inicial">
       <img
         src={wordmark}
         alt="Veracity"
