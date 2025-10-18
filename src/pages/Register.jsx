@@ -43,7 +43,7 @@ export default function Register() {
 
   useEffect(() => {
     if (!email) return setErrEmail("");
-    if (email.length > 30) return setErrEmail("Máximo de 30 caracteres.");
+    if (email.length > 60) return setErrEmail("Máximo de 60 caracteres.");
     setErrEmail(emailRegex.test(email.toLowerCase()) ? "" : "O e-mail digitado não é válido. Tente novamente.");
   }, [email]);
 
@@ -140,7 +140,7 @@ export default function Register() {
             placeholder="Informe seu e-mail"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            maxLength={30}
+            maxLength={60}
             required
           />
           {errEmail && <small className="field-hint field-error">{errEmail}</small>}
