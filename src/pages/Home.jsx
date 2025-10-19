@@ -3,7 +3,7 @@ import Tabs from '../components/Tabs.jsx';
 import SearchForm from '../components/SearchForm.jsx';
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState('links');
+  const [activeTab, setActiveTab] = useState('urls');
 
   return (
     <main className="container">
@@ -14,7 +14,7 @@ export default function Home() {
         <Tabs
           active={activeTab}
           onChange={setActiveTab}
-          labels={{ links: 'Análise de links', images: 'Análise de imagens' }}
+          labels={{ urls: 'Análise de URLs', images: 'Análise de imagens' }}
         />
 
         <div className="search-wrap">

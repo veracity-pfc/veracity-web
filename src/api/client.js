@@ -48,4 +48,4 @@ export const apiVerifyEmail = async (email, code) => {
 export const apiResendCode   = (email) => apiFetch("/auth/resend-code", { method:"POST", body:{ email, code:"000000" } });
 export const apiGetProfile   = () => apiFetch("/user/profile", { auth:true });
 export const apiAdminMetrics = () => apiFetch("/administration/metrics", { auth:true });
-export const apiAnalyzeLink  = (url) => apiFetch("/analysis/link", { method:"POST", body:{ url } });
+export const apiAnalyzeUrl  = (url) => apiFetch("/analysis/url", { method:"POST", body:{ url } });

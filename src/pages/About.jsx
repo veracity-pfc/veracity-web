@@ -18,13 +18,13 @@ export default function About() {
               conclusão de curso (PFC) em Engenharia de Software, com o objetivo de
               ajudar pessoas a verificarem a <strong>autenticidade de conteúdos digitais</strong>.
               A proposta surgiu ao observarmos o crescimento de golpes, desinformação e
-              manipulações geradas por IA em links e imagens.
+              manipulações geradas por IA em URLs e imagens.
             </p>
 
             <p>
               Desde o início, o foco foi unir <strong>boas práticas de desenvolvimento de software</strong> com
               <strong> responsabilidade</strong>: respeito à <strong>LGPD</strong>, transparência sobre as fontes e
-              explicabilidade dos resultados. O sistema oferece análise de links e de imagens,
+              explicabilidade dos resultados. O sistema oferece análise de URls e de imagens,
               registrando o histórico de consultas de forma segura.
             </p>
 

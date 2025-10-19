@@ -11,8 +11,8 @@ export default function SearchForm({ mode, onSubmit }) {
   }
 
   const placeholder =
-    mode === 'links'
-      ? 'Adicione o link que deseja verificar'
+    mode === 'urls'
+      ? 'Adicione A URL que deseja verificar'
       : 'Adicione a imagem que deseja verificar';
 
   return (
@@ -20,7 +20,7 @@ export default function SearchForm({ mode, onSubmit }) {
       <input
         className="search-input"
         type="text"
-        inputMode={mode === 'links' ? 'url' : 'text'}
+        inputMode={mode === 'urls' ? 'url' : 'text'}
         placeholder={placeholder}
         value={value}
         onChange={(e) => setValue(e.target.value)}

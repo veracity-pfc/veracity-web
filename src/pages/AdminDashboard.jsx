@@ -19,7 +19,7 @@ export default function AdminDashboard() {
       <h2>Admin • Métricas ({m.reference_month})</h2>
       <ul>
         <li>Total no mês: <b>{m.total_month}</b></li>
-        <li>Links no mês: <b>{m.links_month}</b></li>
+        <li>URLs no mês: <b>{m.urls_month}</b></li>
         <li>Imagens no mês: <b>{m.images_month}</b></li>
       </ul>
     </div>

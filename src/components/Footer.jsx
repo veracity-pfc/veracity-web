@@ -21,7 +21,7 @@ export default function Footer() {
           <div>
             <div className="footer-title">Serviços</div>
             <div className="footer-links">
-              <a href="#">Análise de links</a>
+              <a href="#">Análise de URLs</a>
               <a href="#">Análise de imagens</a>
               <a href="#">Histórico de análises</a>
             </div>

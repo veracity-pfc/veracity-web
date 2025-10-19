@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const linkSteps = [
+const urlSteps = [
   {
     title: 'Insira a URL',
     text: 'Preencha o campo com uma URL válida e pressione o botão "Verificar". A URL deve possuir no máximo 60 caracteres.'
@@ -78,7 +78,7 @@ export default function Instructions() {
       <section className="hero">
         <h1 className="instructions-h1">Como utilizar a plataforma</h1>
       </section>
-      <Steps title="Análise de links" steps={linkSteps} />
+      <Steps title="Análise de URLs" steps={urlSteps} />
       <Steps title="Análise de imagens" steps={imageSteps} />
     </main>
   );

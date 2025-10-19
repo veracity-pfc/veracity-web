@@ -5,12 +5,12 @@ export default function Tabs({ active, onChange, labels }) {
     <div className="tabs" role="tablist" aria-label="Tipo de análise">
       <button
         type="button"
-        className={`tab-btn ${active === 'links' ? 'active' : ''}`}
+        className={`tab-btn ${active === 'urls' ? 'active' : ''}`}
         role="tab"
-        aria-selected={active === 'links'}
-        onClick={() => onChange('links')}
+        aria-selected={active === 'urls'}
+        onClick={() => onChange('urls')}
       >
-        {labels.links}
+        {labels.urls}
       </button>
 
       <button
