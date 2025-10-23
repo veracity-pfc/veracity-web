@@ -10,7 +10,9 @@ export function saveToken(token, role) {
   notifyAuthChange(); 
 }
 export function getToken() { return localStorage.getItem("veracity_token"); }
+
 export function getRole()  { return localStorage.getItem("veracity_role"); }
+
 export function clearToken() {
   localStorage.removeItem("veracity_token");
   localStorage.removeItem("veracity_role");
@@ -35,7 +37,9 @@ export const apiLogin  = async (email, password) => {
   saveToken(data.access_token, data.role);
   return data;
 };
+
 export const apiLogout = () => apiFetch("/auth/logout", { auth:true, method:"POST" }).catch(()=>{}).finally(clearToken);
+
 export const apiRegister = (name, email, password, confirm_password, accepted_terms) =>
   apiFetch("/auth/register", { method:"POST", body:{ name, email, password, confirm_password, accepted_terms } });
 
@@ -46,6 +50,29 @@ export const apiVerifyEmail = async (email, code) => {
 };
 
 export const apiResendCode   = (email) => apiFetch("/auth/resend-code", { method:"POST", body:{ email, code:"000000" } });
+
 export const apiGetProfile   = () => apiFetch("/user/profile", { auth:true });
+
 export const apiAdminMetrics = () => apiFetch("/administration/metrics", { auth:true });
+
 export const apiAnalyzeUrl  = (url) => apiFetch("/analysis/url", { method:"POST", body:{ url } });
+
+export async function apiForgotPassword(email) {
+  const r = await fetch(`${API_BASE}/auth/forgot-password`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ email })
+  });
+  if (!r.ok) throw await r.json();
+  return r.json();
+}
+
+export async function apiResetPassword(token, password, confirm_password) {
+  const r = await fetch(`${API_BASE}/auth/reset-password/${token}`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ password, confirm_password })
+  });
+  if (!r.ok) throw await r.json();
+  return r.json();
+}

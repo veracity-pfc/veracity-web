@@ -915,6 +915,30 @@ button[disabled] {
   color: #66d2a5;      
 }
 
+.auth-card { 
+  max-width: 620px; 
+  padding: 32px 32px 26px;
+}
+
+.auth-sub {
+  max-width: 520px;
+  line-height: 1.35;
+  margin: 0 0 16px;
+}
+
+.auth-actions { 
+  display: flex; 
+  justify-content: center; 
+}
+
+.link-btn {
+  display: inline-block;
+  margin-top: 8px;
+  font-weight: 800;
+  color: #5AB0FF;
+  text-decoration: underline;
+}
+
 @media (max-width: 480px) {
   .login-card.verify-card {
     margin: 0 16px;
