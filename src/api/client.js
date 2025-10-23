@@ -76,3 +76,9 @@ export async function apiResetPassword(token, password, confirm_password) {
   if (!r.ok) throw await r.json();
   return r.json();
 }
+
+export const apiSendContact = (email, subject, message) =>
+  apiFetch("/contact-us", {
+    method: "POST",
+    body: { email, subject, message },
+  });
