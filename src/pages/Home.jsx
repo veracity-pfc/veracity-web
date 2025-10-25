@@ -14,7 +14,7 @@ export default function Home() {
         <Tabs
           active={activeTab}
           onChange={setActiveTab}
-          labels={{ urls: 'Análise de URLs', images: 'Análise de imagens' }}
+          labels={{ urls: 'Análise de URL', images: 'Análise de imagem' }}
         />
 
         <div className="search-wrap">

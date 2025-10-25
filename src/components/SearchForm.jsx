@@ -1,32 +1,90 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { apiAnalyzeUrl } from "../api/client";
+import AnalysisCard from "./AnalysisCard";
 
-export default function SearchForm({ mode, onSubmit }) {
-  const [value, setValue] = useState('');
+export default function SearchForm({ mode = "urls" }) {
+  const [value, setValue] = useState("");
+  const [statusMsg, setStatusMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);
 
-  function handleSubmit(e) {
+  const canSubmit = mode === "urls" && value.trim().length > 0;
+
+  const onChange = (e) => {
+    const v = e.target.value.replace(/[\u0000-\u001F\u007F]/g, "");
+    setValue(v);
+  };
+
+  const clear = () => {
+    setValue("");
+    setStatusMsg("");
+  };
+
+  const submit = async (e) => {
     e.preventDefault();
-    const v = value.trim();
-    if (!v) return;
-    onSubmit(v);
-  }
+    if (!canSubmit || loading) return;
 
-  const placeholder =
-    mode === 'urls'
-      ? 'Adicione A URL que deseja verificar'
-      : 'Adicione a imagem que deseja verificar';
+    setResult(null);
+    setStatusMsg("Analisando url...");
+    setLoading(true);
+    try {
+      const data = await apiAnalyzeUrl(value.trim());
+      setResult(data);
+      setStatusMsg("");
+    } catch (err) {
+      setStatusMsg(err?.message || "Ocorreu um erro ao analisar a URL.");
+      setResult(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <form className="search-card" onSubmit={handleSubmit} role="search">
-      <input
-        className="search-input"
-        type="text"
-        inputMode={mode === 'urls' ? 'url' : 'text'}
-        placeholder={placeholder}
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        aria-label={placeholder}
-      />
-      <button className="verify-btn" type="submit">Verificar</button>
-    </form>
+    <>
+      <form className="search-form" onSubmit={submit} noValidate>
+        <div className="search-form__capsule">
+          <input
+            type="text"
+            inputMode="url"
+            autoComplete="off"
+            spellCheck={false}
+            placeholder={mode === "urls" ? "Digite a URL que deseja verificar" : "Cole aqui o link da imagem"}
+            value={value}
+            onChange={onChange}
+            className="search-form__input--capsule"
+            aria-label="URL para análise"
+          />
+
+          {value && (
+            <button
+              type="button"
+              className="search-form__clear--inside"
+              aria-label="Limpar campo"
+              onClick={clear}
+              disabled={loading}
+              title="Limpar"
+            >
+              ×
+            </button>
+          )}
+
+          <button
+            type="submit"
+            className="search-form__submit--inside"
+            disabled={!canSubmit || loading}
+          >
+            Verificar
+          </button>
+        </div>
+
+        {statusMsg && (
+          <p className={`search-form__hint ${loading ? "is-loading" : "is-error"}`}>
+            {statusMsg}
+          </p>
+        )}
+      </form>
+
+      {result && <AnalysisCard data={result} />}
+    </>
   );
 }
