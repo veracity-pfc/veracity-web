@@ -69,7 +69,7 @@ export const apiResendCode   = (email) => apiFetch("/auth/resend-code", { method
 export const apiGetProfile   = () => apiFetch("/user/profile", { auth:true });
 export const apiAdminMetrics = () => apiFetch("/administration/metrics", { auth:true });
 
-export const apiAnalyzeUrl  = (url) => apiFetch("/analysis/url", { method:"POST", body:{ url } });
+export const apiAnalyzeUrl  = (url) => apiFetch("/analyses/url", { method:"POST", body:{ url } });
 
 export async function apiForgotPassword(email) {
   const r = await fetch(`${API_BASE}/auth/forgot-password`, {
