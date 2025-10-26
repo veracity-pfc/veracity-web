@@ -2,8 +2,9 @@ import React from "react";
 
 const LABEL_MAP = {
   safe: "Seguro",
-  suspicious: "Possivelmente falsificado  ou fraudulento",
+  suspicious: "Possivelmente falsificado ou fraudulento",
   malicious: "Malicioso",
+  fake: "Falsa",
   unknown: "Desconhecido"
 };
 
