@@ -1,7 +1,7 @@
 const API_BASE = import.meta.env.VITE_API_BASE;
 
-function notifyAuthChange() {
-  window.dispatchEvent(new Event("veracity-auth-changed"));
+function notifyAuthChange() { 
+  window.dispatchEvent(new Event("veracity-auth-changed")); 
 }
 
 export function saveToken(token, role) {
@@ -10,15 +10,15 @@ export function saveToken(token, role) {
   notifyAuthChange();
 }
 
-export function getToken() { 
+export function getToken()  { 
   return localStorage.getItem("veracity_token"); 
 }
 
-export function getRole()  { 
+export function getRole()   { 
   return localStorage.getItem("veracity_role"); 
 }
 
-export function clearToken() {
+export function clearToken(){
   localStorage.removeItem("veracity_token");
   localStorage.removeItem("veracity_role");
   notifyAuthChange();
@@ -31,11 +31,10 @@ export const extractErrorMessage = (data, fallback) => {
     (Array.isArray(d.detail) && d.detail[0]?.msg) ||
     d.message ||
     fallback;
-
   return raw === fallback ? fallback : cleanMsg(raw);
 };
 
-function cleanMsg(msg) {
+function cleanMsg(msg){
   if (!msg) return "";
   return String(msg)
     .replace(/^value\s*error,\s*/i, "")
@@ -81,27 +80,28 @@ export const apiGetProfile   = () => apiFetch("/user/profile", { auth:true });
 
 export const apiAdminMetrics = () => apiFetch("/administration/metrics", { auth:true });
 
-export const apiAnalyzeUrl  = (url) => apiFetch("/analyses/url", { method:"POST", body:{ url } });
+export const apiAnalyzeUrl  = (url) =>
+  apiFetch("/analyses/url", { auth:true, method:"POST", body:{ url } });
 
 export async function apiAnalyzeImage(file) {
   const fd = new FormData();
   fd.append("file", file);
+  const headers = {};
+  const t = getToken();
+  if (t) headers.Authorization = `Bearer ${t}`;
 
-  const init = { method: "POST", body: fd }; 
-  const res = await fetch(`${API_BASE}/analyses/image`, init);
+  const res = await fetch(`${API_BASE}/analyses/image`, { method:"POST", headers, body: fd });
   let data = null; try { data = await res.json(); } catch {}
   if (!res.ok) {
     const msg = extractErrorMessage(data, `Erro ${res.status}`);
     const err = new Error(msg); err.status = res.status; err.data = data; throw err;
   }
-  return data; 
+  return data;
 }
 
 export async function apiForgotPassword(email) {
   const r = await fetch(`${API_BASE}/auth/forgot-password`, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ email })
+    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email })
   });
   if (!r.ok) throw await r.json();
   return r.json();
@@ -109,9 +109,7 @@ export async function apiForgotPassword(email) {
 
 export async function apiResetPassword(token, password, confirm_password) {
   const r = await fetch(`${API_BASE}/auth/reset-password/${token}`, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ password, confirm_password })
+    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ password, confirm_password })
   });
   if (!r.ok) throw await r.json();
   return r.json();
