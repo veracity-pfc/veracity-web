@@ -9,7 +9,6 @@ export function saveToken(token, role) {
   if (role) localStorage.setItem("veracity_role", role);
   notifyAuthChange();
 }
-
 export function getToken()  { 
   return localStorage.getItem("veracity_token"); 
 }
@@ -43,10 +42,18 @@ function cleanMsg(msg){
     .trim();
 }
 
-export async function apiFetch(path, { auth=false, method="GET", body, headers } = {}) {
+export async function apiFetch(
+  path,
+  { auth=false, method="GET", body, headers } = {}
+) {
   const init = { method, headers: { "Content-Type": "application/json", ...(headers||{}) } };
-  if (auth) { const t = getToken(); if (t) init.headers.Authorization = `Bearer ${t}`; }
-  if (body !== undefined) init.body = typeof body === "string" ? body : JSON.stringify(body);
+  if (auth) {
+    const t = getToken();
+    if (t) init.headers.Authorization = `Bearer ${t}`;
+  }
+  if (body !== undefined) {
+    init.body = typeof body === "string" ? body : JSON.stringify(body);
+  }
 
   const res = await fetch(`${API_BASE}${path}`, init);
   let data = null; try { data = await res.json(); } catch {}
@@ -80,8 +87,7 @@ export const apiGetProfile   = () => apiFetch("/user/profile", { auth:true });
 
 export const apiAdminMetrics = () => apiFetch("/administration/metrics", { auth:true });
 
-export const apiAnalyzeUrl  = (url) =>
-  apiFetch("/analyses/url", { auth:true, method:"POST", body:{ url } });
+export const apiAnalyzeUrl   = (url) => apiFetch("/analyses/url", { auth:true, method:"POST", body:{ url } });
 
 export async function apiAnalyzeImage(file) {
   const fd = new FormData();
@@ -89,7 +95,6 @@ export async function apiAnalyzeImage(file) {
   const headers = {};
   const t = getToken();
   if (t) headers.Authorization = `Bearer ${t}`;
-
   const res = await fetch(`${API_BASE}/analyses/image`, { method:"POST", headers, body: fd });
   let data = null; try { data = await res.json(); } catch {}
   if (!res.ok) {

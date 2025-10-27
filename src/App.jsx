@@ -15,6 +15,8 @@ import AdminDashboard from './pages/AdminDashboard.jsx';
 import VerifyEmail from "./pages/VerifyEmail.jsx";
 import ForgotPassword from './pages/ForgotPassword.jsx';
 import ResetPassword from './pages/ResetPassword.jsx';
+import UserHistory from './pages/UserHistory.jsx';
+import UserHistoryDetail from './pages/UserHistoryDetail.jsx';
 
 export default function App() {
   return (
@@ -34,6 +36,8 @@ export default function App() {
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/user/history" element={<UserHistory />} />
+        <Route path="/user/history/:id" element={<UserHistoryDetail />} />
       </Routes>
       <Footer />
     </>
