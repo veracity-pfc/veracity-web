@@ -1,5 +1,5 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Header from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
 import Home from './pages/Home.jsx';
@@ -18,7 +18,21 @@ import ResetPassword from './pages/ResetPassword.jsx';
 import UserHistory from './pages/UserHistory.jsx';
 import UserHistoryDetail from './pages/UserHistoryDetail.jsx';
 
+import { getToken, initAuthWatch } from './api/client.js';
+
+function RequireAuth({ children }) {
+  const token = getToken();
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+}
+
 export default function App() {
+  useEffect(() => {
+    initAuthWatch();
+  }, []);
+
   return (
     <>
       <Header />
@@ -31,13 +45,14 @@ export default function App() {
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/login" element={<Login />} />
         <Route path="/sign-up" element={<Register />} />
-        <Route path="/user/profile" element={<Profile />}/>
-        <Route path="/administration" element={<AdminDashboard />}/>
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-        <Route path="/user/history" element={<UserHistory />} />
-        <Route path="/user/history/:id" element={<UserHistoryDetail />} />
+        <Route path="/user/profile" element={<RequireAuth><Profile /></RequireAuth>}/>
+        <Route path="/administration" element={<RequireAuth><AdminDashboard /></RequireAuth>}/>
+        <Route path="/user/history" element={<RequireAuth><UserHistory /></RequireAuth>}/>
+        <Route path="/user/history/:id" element={<RequireAuth><UserHistoryDetail /></RequireAuth>}/>
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Footer />
     </>

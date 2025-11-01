@@ -1,10 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import Logo from './Logo.jsx';
 import { apiLogout, clearToken, getRole, getToken } from '../api/client';
 
 export default function Header() {
-  const [open, setOpen] = useState(false);
-  const [activeKey, setActiveKey] = useState(null);
+  const [open, setOpen] = useState(false);           
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileSobreOpen, setMobileSobreOpen] = useState(false);
 
@@ -13,16 +13,9 @@ export default function Header() {
 
   const btnRef = useRef(null);
   const menuRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const path = window.location.pathname || '';
-    if (path.startsWith('/about')) setActiveKey('sobre');
-    else if (path.startsWith('/instructions')) setActiveKey('instrucoes');
-    else if (path.startsWith('/contact-us')) setActiveKey('contato');
-    else if (path.startsWith('/user/profile')) setActiveKey('perfil');
-    else if (path.startsWith('/user/history')) setActiveKey('historico');
-    else if (path.startsWith('/administration')) setActiveKey('admin');
-
     const onStorage = (e) => {
       if (e.key === 'veracity_token' || e.key === 'veracity_role') {
         setIsAuthed(!!getToken());
@@ -33,7 +26,6 @@ export default function Header() {
       setIsAuthed(!!getToken());
       setRole(getRole());
     };
-
     window.addEventListener('storage', onStorage);
     window.addEventListener('veracity-auth-changed', onAuthChanged);
     return () => {
@@ -59,12 +51,13 @@ export default function Header() {
     };
   }, []);
 
-  const handleLogout = async () => {
+  const handleLogout = async (e) => {
+    e.preventDefault();
     try { await apiLogout(); } catch {}
     clearToken();
     setIsAuthed(false);
     setRole(null);
-    window.location.assign('/');
+    navigate('/login', { replace: true });
   };
 
   const isAdmin = role === 'admin';
@@ -77,64 +70,26 @@ export default function Header() {
           role="link"
           tabIndex={0}
           style={{ cursor: 'pointer' }}
-          onClick={(e) => { e.preventDefault(); window.location.assign('/'); }}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.location.assign('/'); } }}
+          onClick={(e) => { e.preventDefault(); navigate('/'); }}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate('/'); } }}
           aria-label="Ir para a página inicial"
         >
           <Logo />
         </div>
 
         <nav className="nav-links" aria-label="Principal">
-          <a
-            className={`nav-link ${activeKey === 'perfil' ? 'is-active' : ''}`}
-            href="/user/profile"
-            onClick={() => setActiveKey('perfil')}
-          >
-            Perfil
-          </a>
+          <NavLink to="/user/profile" className="nav-link">Perfil</NavLink>
 
           {isAdmin && (
-            <a
-              className={`nav-link ${activeKey === 'admin' ? 'is-active' : ''}`}
-              href="/administration"
-              onClick={() => setActiveKey('admin')}
-            >
-              Administração
-            </a>
+            <NavLink to="/administration" className="nav-link">Administração</NavLink>
           )}
 
-          <a
-            className={`nav-link ${activeKey === 'historico' ? 'is-active' : ''}`}
-            href="/user/history"
-            onClick={() => setActiveKey('historico')}
-          >
-            Histórico de análises
-          </a>
-
-          <a
-            className={`nav-link ${activeKey === 'instrucoes' ? 'is-active' : ''}`}
-            href="/instructions"
-            onClick={() => setActiveKey('instrucoes')}
-          >
-            Instruções
-          </a>
-
-          <a
-            className={`nav-link ${activeKey === 'contato' ? 'is-active' : ''}`}
-            href="/contact-us"
-            onClick={() => setActiveKey('contato')}
-          >
-            Contato
-          </a>
+          <NavLink to="/user/history" className="nav-link">Histórico de análises</NavLink>
+          <NavLink to="/instructions" className="nav-link">Instruções</NavLink>
+          <NavLink to="/contact-us" className="nav-link" end>Contato</NavLink>
 
           <div className="about-group">
-            <a
-              href="/about"
-              className={`nav-link ${activeKey === 'sobre' ? 'is-active' : ''}`}
-              onClick={() => setActiveKey('sobre')}
-            >
-              Sobre
-            </a>
+            <NavLink to="/about" className="nav-link" end>Sobre</NavLink>
             <button
               ref={btnRef}
               type="button"
@@ -147,7 +102,7 @@ export default function Header() {
             />
             {open && (
               <div id="about-menu" ref={menuRef} role="menu" className="about-menu">
-                <a role="menuitem" tabIndex={0} href="/about" className="about-item">Conheça nossa história</a>
+                <NavLink role="menuitem" tabIndex={0} to="/about" className="about-item">Conheça nossa história</NavLink>
                 <a role="menuitem" tabIndex={0} href="/privacy-policy" className="about-item" onClick={(e)=>{e.preventDefault();window.open('/privacy-policy','_blank','noopener');}}>Política de privacidade</a>
                 <a role="menuitem" tabIndex={0} href="/terms-of-use" className="about-item" onClick={(e)=>{e.preventDefault();window.open('/terms-of-use','_blank','noopener');}}>Termos de uso</a>
               </div>
@@ -155,15 +110,9 @@ export default function Header() {
           </div>
 
           {!isAuthed ? (
-            <a href="/login" className="nav-link login-cta">Login</a>
+            <NavLink to="/login" className="nav-link login-cta">Login</NavLink>
           ) : (
-            <a
-              href="#"
-              className="nav-link login-cta"
-              onClick={(e) => { e.preventDefault(); handleLogout(); }}
-            >
-              Sair
-            </a>
+            <a href="/logout" className="nav-link login-cta" onClick={handleLogout}>Sair</a>
           )}
         </nav>
 
@@ -180,37 +129,31 @@ export default function Header() {
       <div className={`mobile-menu ${mobileOpen ? 'open' : ''}`} role="dialog" aria-modal="true">
         <div className="container">
           <div className="mobile-group">
-            <a className={`mobile-link ${activeKey === 'perfil' ? 'is-active' : ''}`} href="/user/profile" onClick={() => setMobileOpen(false)}>Perfil</a>
-            {isAdmin && <a className={`mobile-link ${activeKey === 'admin' ? 'is-active' : ''}`} href="/administration" onClick={() => setMobileOpen(false)}>Administração</a>}
-            <a className={`mobile-link ${activeKey === 'historico' ? 'is-active' : ''}`} href="/user/history" onClick={() => setMobileOpen(false)}>Histórico de análises</a>
-            <a className={`mobile-link ${activeKey === 'instrucoes' ? 'is-active' : ''}`} href="/instructions" onClick={() => setMobileOpen(false)}>Instruções</a>
-            <a className={`mobile-link ${activeKey === 'contato' ? 'is-active' : ''}`} href="/contact-us" onClick={() => setMobileOpen(false)}>Contato</a>
+            <NavLink className="mobile-link" to="/user/profile" onClick={() => setMobileOpen(false)}>Perfil</NavLink>
+            {isAdmin && <NavLink className="mobile-link" to="/administration" onClick={() => setMobileOpen(false)}>Administração</NavLink>}
+            <NavLink className="mobile-link" to="/user/history" onClick={() => setMobileOpen(false)}>Histórico de análises</NavLink>
+            <NavLink className="mobile-link" to="/instructions" onClick={() => setMobileOpen(false)}>Instruções</NavLink>
+            <NavLink className="mobile-link" to="/contact-us" onClick={() => setMobileOpen(false)} end>Contato</NavLink>
 
             <a
-              className={`mobile-link ${activeKey === 'sobre' ? 'is-active' : ''}`}
+              className="mobile-link"
               href="#"
-              onClick={(e) => { e.preventDefault(); setActiveKey('sobre'); setMobileSobreOpen(v => !v); }}
+              onClick={(e) => { e.preventDefault(); setMobileSobreOpen(v => !v); }}
             >
               Sobre ▾
             </a>
             {mobileSobreOpen && (
               <>
-                <a className="mobile-subitem" href="/about" onClick={() => setMobileOpen(false)}>Conheça nossa história</a>
+                <NavLink className="mobile-subitem" to="/about" onClick={() => setMobileOpen(false)}>Conheça nossa história</NavLink>
                 <a className="mobile-subitem" href="/privacy-policy" onClick={() => setMobileOpen(false)}>Política de privacidade</a>
                 <a className="mobile-subitem" href="/terms-of-use" onClick={() => setMobileOpen(false)}>Termos de uso</a>
               </>
             )}
 
             {!isAuthed ? (
-              <a className="mobile-login" href="/login" onClick={() => setMobileOpen(false)}>Login</a>
+              <NavLink className="mobile-login" to="/login" onClick={() => setMobileOpen(false)}>Login</NavLink>
             ) : (
-              <a
-                className="mobile-login"
-                href="#"
-                onClick={(e) => { e.preventDefault(); setMobileOpen(false); handleLogout(); }}
-              >
-                Sair
-              </a>
+              <a className="mobile-login" href="/logout" onClick={(e) => { e.preventDefault(); setMobileOpen(false); handleLogout(e); }}>Sair</a>
             )}
           </div>
         </div>

@@ -1,10 +1,35 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import Tabs from "../components/Tabs.jsx";
 import SearchForm from "../components/SearchForm.jsx";
 import ImageForm from "../components/ImageForm.jsx";
 
+// Lê o valor de tab a partir de uma query string
+function getTabFromSearch(search) {
+  const sp = new URLSearchParams(search || window.location.search);
+  const t = (sp.get("tab") || "").toLowerCase();
+  return t === "images" ? "images" : "urls";
+}
+
 export default function Home() {
-  const [activeTab, setActiveTab] = useState('urls');
+  const location = useLocation();
+
+  // estado inicial baseado na URL atual
+  const [activeTab, setActiveTab] = useState(() => getTabFromSearch(location.search));
+
+  // sempre que a query mudar (ex.: /?tab=images), atualiza o estado
+  useEffect(() => {
+    const next = getTabFromSearch(location.search);
+    setActiveTab(next);
+  }, [location.search]);
+
+  // troca de aba e persiste no ?tab= (sem recarregar)
+  const handleChange = useCallback((t) => {
+    setActiveTab(t);
+    const url = new URL(window.location.href);
+    url.searchParams.set("tab", t);
+    window.history.replaceState({}, "", url);
+  }, []);
 
   return (
     <main className="container">
@@ -14,7 +39,7 @@ export default function Home() {
 
         <Tabs
           active={activeTab}
-          onChange={setActiveTab}
+          onChange={handleChange}
           labels={{ urls: 'Análise de URL', images: 'Análise de imagem' }}
         />
 
