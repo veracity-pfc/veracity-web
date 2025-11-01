@@ -1,0 +1,52 @@
+.label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.have-account {
+  font-size: 14px;
+}
+
+.have-account a {
+  color: #5AB0FF;
+  text-decoration: underline;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.pw-policy {
+  margin: 6px 0 4px;
+  padding-left: 18px;
+  list-style: disc;
+}
+
+.pw-policy li {
+  font-size: 14px;
+  font-weight: 700;
+  transition: color .15s ease;
+}
+
+.pw-policy li.err {
+  color: #ff8c8c;
+}
+
+.pw-policy li.ok {
+  color: #66d2a5;
+}
+
+@media (max-width: 670px) {
+  .register-card {
+    padding: 22px 18px;
+  }
+  .register-container .logo-wordmark {
+    height: 52px;
+  }
+}
+
+@media (max-width: 640px) {
+  .register-card {
+    margin-bottom: clamp(24px, 9vh, 64px);
+  }
+}

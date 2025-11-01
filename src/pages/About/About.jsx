@@ -1,17 +1,24 @@
 import React from 'react';
-import cover from '../assets/about-cover.png';
+import cover from '../../assets/about-cover.png';
+import styles from './About.module.css';
+
+const cx = (...xs) => xs.filter(Boolean).join(' ');
 
 export default function About() {
   return (
     <main className="container">
-      <section className="about-section page-offset">
-        <div className="about-grid">
-          <div className="about-image-wrap">
-            <img className="about-image" src={cover} alt="Arte do projeto Veracity" />
+      <section className={cx(styles['about-section'], 'page-offset')}>
+        <div className={styles['about-grid']}>
+          <div className={styles['about-image-wrap']}>
+            <img
+              className={styles['about-image']}
+              src={cover}
+              alt="Arte do projeto Veracity"
+            />
           </div>
 
-          <div className="about-content">
-            <h2 className="about-title">Conheça nossa história</h2>
+          <div className={styles['about-content']}>
+            <h2 className={styles['about-title']}>Conheça nossa história</h2>
 
             <p>
               O <strong>Veracity</strong> nasceu como um <strong>projeto acadêmico</strong> de

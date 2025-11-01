@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
-import cover from '../assets/contact-cover.png';
-import { apiSendContact } from '../api/client';
+import cover from '../../assets/contact-cover.png';
+import { apiSendContact } from '../../api/client';
+import styles from './Contact.module.css';       
+import '../../styles/forms.css';               
+
+const cx = (...xs) => xs.filter(Boolean).join(' ');
 
 export default function Contact() {
   const [subject, setSubject] = useState('Dúvida');
@@ -11,22 +15,22 @@ export default function Contact() {
 
   return (
     <main>
-      <section className="contact-section container page-offset">
-        <div className="contact-grid">
-          <div className="contact-image-wrap">
-            <img className="contact-image" src={cover} alt="Arte ilustrativa de contato" />
+      <section className={cx(styles['contact-section'], 'container', 'page-offset')}>
+        <div className={styles['contact-grid']}>
+          <div className={styles['contact-image-wrap']}>
+            <img className={styles['contact-image']} src={cover} alt="Arte ilustrativa de contato" />
           </div>
 
-          <div className="contact-content">
-            <h2 className="contact-title">Entre em contato conosco</h2>
-            <p className="contact-subtitle">
+          <div className={styles['contact-content']}>
+            <h2 className={styles['contact-title']}>Entre em contato conosco</h2>
+            <p className={styles['contact-subtitle']}>
               Tem dúvidas, sugestões ou quer saber mais sobre como a Veracity
               funciona? Nossa equipe está pronta para atender você!
             </p>
 
             {!ok ? (
               <form
-                className="contact-form"
+                className={styles['contact-form']}
                 onSubmit={async (e) => {
                   e.preventDefault();
                   setErr('');

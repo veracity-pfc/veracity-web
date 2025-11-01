@@ -5,6 +5,8 @@ import ReturnIcon from '../assets/icon-return.png';
 import ShowPasswordIcon from '../assets/icon-show-password.png';
 import HidePasswordIcon from '../assets/icon-hide-password.png';
 import Logo from '../components/Logo.jsx';
+import '../styles/auth.css';
+import '../styles/forms.css';
 
 export default function ResetPassword() {
   const { token } = useParams();

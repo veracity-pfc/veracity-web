@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ReturnIcon from '../assets/icon-return.png';
-import Logo from '../components/Logo.jsx';
-import { apiForgotPassword } from '../api/client';
+import ReturnIcon from '../../assets/icon-return.png';
+import Logo from '../../components/Logo.jsx';
+import { apiForgotPassword } from '../../api/client';
+import styles from './ForgotPassword.module.css';
+import '../../styles/forms.css';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -44,7 +46,7 @@ export default function ForgotPassword() {
         {!sent ? (
           <>
             <h2 id="forgot-title" className="login-title">Recuperar minha conta</h2>
-            <p className="auth-sub">
+            <p className={styles["auth-sub"]}>
               Digite o endereço de e-mail da sua conta e lhe enviaremos um link de redefinição de senha.
             </p>
 
@@ -69,11 +71,11 @@ export default function ForgotPassword() {
         ) : (
           <>
             <h2 className="login-title">Recuperar minha conta</h2>
-            <p className="auth-sub">
+            <p className={styles["auth-sub"]}>
               Verifique seu e-mail para obter um link para redefinir sua senha. Se não aparecer em alguns minutos, verifique sua pasta de spam.
             </p>
-            <div className="auth-actions">
-              <a href="/login" className="forgot-link">Retornar para o login</a>
+            <div className={styles["auth-actions"]}>
+              <a href="/login" className={styles["forgot-link"]}>Retornar para o login</a>
             </div>
           </>
         )}

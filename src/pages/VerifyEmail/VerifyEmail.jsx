@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import Logo from "../components/Logo";
-import ReturnIcon from "../assets/icon-return.png";
-import { apiVerifyEmail, apiResendCode } from "../api/client";
+import Logo from "../../components/Logo";
+import ReturnIcon from "../../assets/icon-return.png";
+import { apiVerifyEmail, apiResendCode } from "../../api/client";
+import '../../styles/forms.css';
+import styles from './VerifyEmail.module.css';
 
 export default function VerifyEmail() {
   const [params] = useSearchParams();
@@ -98,12 +100,12 @@ export default function VerifyEmail() {
         </p>
 
         <form onSubmit={submit} className="verify-form">
-          <div className="code-row">
+          <div className={styles["code-row"]}>
             {code.map((c, i) => (
               <input
                 key={i}
                 ref={(el) => (inputsRef.current[i] = el)}
-                className="code-box"
+                className={styles["code-box"]}
                 inputMode="numeric"
                 autoComplete="one-time-code"
                 maxLength={1}

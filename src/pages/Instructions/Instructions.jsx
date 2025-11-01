@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import styles from './Instructions.module.css';
+
+const cx = (...xs) => xs.filter(Boolean).join(' ');
 
 const urlSteps = [
   {
@@ -42,30 +45,30 @@ function Steps({ title, steps }) {
   const [active, setActive] = useState(0);
 
   return (
-    <section className="instructions-block container">
-      <h2 className="instructions-title">{title}</h2>
+    <section className={cx(styles['instructions-block'], 'container')}>
+      <h2 className={styles['instructions-title']}>{title}</h2>
 
-      <div className="steps-wrap">
-        <div className="steps-bar">
-          {[0,1,2,3].map(i => (
+      <div className={styles['steps-wrap']}>
+        <div className={styles['steps-bar']}>
+          {[0, 1, 2, 3].map((i) => (
             <button
               key={i}
               type="button"
-              className={`step-btn ${active === i ? 'is-active' : ''}`}
+              className={cx(styles['step-btn'], active === i && styles['is-active'])}
               onClick={() => setActive(i)}
               aria-pressed={active === i}
-              aria-label={`Etapa ${i+1}: ${steps[i].title}`}
+              aria-label={`Etapa ${i + 1}: ${steps[i].title}`}
             >
               {i + 1}
             </button>
           ))}
         </div>
 
-        <div className="step-text">
-          <p className="step-heading">
+        <div className={styles['step-text']}>
+          <p className={styles['step-heading']}>
             <strong>{steps[active].title}</strong>
           </p>
-          <p className="step-body">{steps[active].text}</p>
+          <p className={styles['step-body']}>{steps[active].text}</p>
         </div>
       </div>
     </section>
@@ -76,7 +79,7 @@ export default function Instructions() {
   return (
     <main>
       <section className="hero">
-        <h1 className="instructions-h1">Como utilizar a plataforma</h1>
+        <h1 className={styles['instructions-h1']}>Como utilizar a plataforma</h1>
       </section>
       <Steps title="Análise de URLs" steps={urlSteps} />
       <Steps title="Análise de imagens" steps={imageSteps} />

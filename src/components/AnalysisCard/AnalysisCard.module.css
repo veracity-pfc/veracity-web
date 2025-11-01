@@ -1,0 +1,47 @@
+.analysis-card {
+    margin: 22px auto 0;
+    max-width: 940px;
+    background: var(--glass-dark);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 22px 24px 18px;
+    color: #EAF6F2;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, .45);
+    text-align: left;
+}
+
+.analysis-card__title {
+    margin: 0 0 6px;
+    font-size: 30px;
+    font-weight: 900;
+}
+
+.analysis-card__status {
+    margin: 0 0 14px;
+    font-weight: 800;
+}
+
+.analysis-card__section {
+    margin-top: 14px;
+}
+
+.analysis-card__section h4 {
+    margin: 0 0 8px;
+    font-size: 16px;
+    font-weight: 900;
+}
+
+.analysis-card__section p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.analysis-card__section ul {
+    margin: 8px 0 0 16px;
+    padding: 0;
+}
+
+.analysis-card__section li {
+    margin: 6px 0;
+    line-height: 1.5;
+}

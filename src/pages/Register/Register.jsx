@@ -1,10 +1,12 @@
 import { useMemo, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Logo from "../components/Logo";
-import ShowPasswordIcon from "../assets/icon-show-password.png";
-import HidePasswordIcon from "../assets/icon-hide-password.png";
-import ReturnIcon from "../assets/icon-return.png";
-import { apiRegister } from "../api/client";
+import Logo from "../../components/Logo";
+import ShowPasswordIcon from "../../assets/icon-show-password.png";
+import HidePasswordIcon from "../../assets/icon-hide-password.png";
+import ReturnIcon from "../../assets/icon-return.png";
+import { apiRegister } from "../../api/client";
+import '../../styles/forms.css';
+import styles from './Register.module.css';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const pwPolicy = (v) => ({
@@ -73,15 +75,9 @@ export default function Register() {
 
     setSubmitting(true);
     setErrTerms("");
-    setErrEmail(""); 
+    setErrEmail("");
     try {
-      await apiRegister(
-        fullName.trim(),
-        email.trim(),
-        password,
-        confirm,
-        true
-      );
+      await apiRegister(fullName.trim(), email.trim(), password, confirm, true);
       navigate(`/verify-email?email=${encodeURIComponent(email.trim())}`);
     } catch (err) {
       if (err?.status === 409) {
@@ -96,7 +92,7 @@ export default function Register() {
   };
 
   return (
-    <main className="login-container">
+    <main className="login-container register-container">
       <div className="login-logo"><Logo /></div>
 
       <section className="login-card register-card">
@@ -126,9 +122,9 @@ export default function Register() {
           />
           {errName && <small className="field-hint field-error">{errName}</small>}
 
-          <div className="label-row">
+          <div className={styles["label-row"]}>
             <label className="form-label" htmlFor="email">E-mail</label>
-            <span className="have-account">
+            <span className={styles["have-account"]}>
               Já possui uma conta? <Link to="/login">Acesse agora!</Link>
             </span>
           </div>
@@ -163,7 +159,7 @@ export default function Register() {
             </button>
           </div>
 
-          <ul className="pw-policy">
+          <ul className={styles["pw-policy"]}>
             <li className={policy.length ? "ok" : "err"}>8 a 30 caracteres</li>
             <li className={policy.upper ? "ok" : "err"}>1 letra maiúscula</li>
             <li className={policy.lower ? "ok" : "err"}>1 letra minúscula</li>

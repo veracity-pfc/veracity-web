@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import '../styles/legal.css';
 
 export default function TermsOfUse() {
   useEffect(() => {

@@ -1,9 +1,10 @@
 import React, { useCallback, useRef, useState } from "react";
-import imageIcon from "../assets/icon-image.png";
-import AnalysisCard from "./AnalysisCard";
-import { apiAnalyzeImage } from "../api/client";
+import imageIcon from "../../assets/icon-image.png";
+import AnalysisCard from "../AnalysisCard/AnalysisCard";
+import { apiAnalyzeImage } from "../../api/client";
+import styles from "./ImageForm.module.css";
 
-const MAX_BYTES = 1 * 1024 * 1024; 
+const MAX_BYTES = 1 * 1024 * 1024;
 
 export default function ImageForm() {
   const [file, setFile] = useState(null);
@@ -81,10 +82,10 @@ export default function ImageForm() {
 
   return (
     <>
-      <form className="image-form" onSubmit={submit} noValidate>
+      <form className={styles["image-form"]} onSubmit={submit} noValidate>
         {!hasFile && (
           <div
-            className="image-dropzone"
+            className={styles["image-dropzone"]}
             onDragOver={onDragOver}
             onDrop={onDrop}
             role="button"
@@ -93,12 +94,12 @@ export default function ImageForm() {
             onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onPick()}
             aria-label="Arraste e solte uma imagem ou clique para fazer upload"
           >
-            <div className="image-dropzone__icon" aria-hidden />
+            <div className={styles["image-dropzone__icon"]} aria-hidden />
             <img src={imageIcon} alt="" />
-            <p className="image-dropzone__text">
+            <p className={styles["image-dropzone__text"]}>
               Arraste e solte a imagem aqui ou clique no botão abaixo para fazer o upload
             </p>
-            <button type="button" className="image-dropzone__cta">
+            <button type="button" className={styles["image-dropzone__cta"]}>
               Escolha um arquivo para fazer upload
             </button>
 
@@ -113,21 +114,21 @@ export default function ImageForm() {
         )}
 
         {hasFile && (
-          <div className="image-capsule">
+          <div className={styles["image-capsule"]}>
             <img
               src={imageIcon}
               alt=""
-              className="image-capsule__icon-img"
+              className={styles["image-capsule__icon-img"]}
               aria-hidden
             />
 
-            <div className="image-capsule__name" title={file.name}>
+            <div className={styles["image-capsule__name"]} title={file.name}>
               {file.name}
             </div>
 
             <button
               type="button"
-              className="image-capsule__clear"
+              className={styles["image-capsule__clear"]}
               aria-label="Remover arquivo"
               onClick={clearFile}
               disabled={loading}
@@ -138,7 +139,7 @@ export default function ImageForm() {
 
             <button
               type="submit"
-              className="image-capsule__submit"
+              className={styles["image-capsule__submit"]}
               disabled={!hasFile || loading}
             >
               Verificar
@@ -147,7 +148,11 @@ export default function ImageForm() {
         )}
 
         {statusMsg && (
-          <p className={`search-form__hint ${loading ? "is-loading" : "is-error"}`}>
+          <p
+            className={`${styles["image-form__hint"]} ${
+              loading ? "is-loading" : "is-error"
+            }`}
+          >
             {statusMsg}
           </p>
         )}

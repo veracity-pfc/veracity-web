@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { apiAnalyzeUrl } from "../api/client";
-import AnalysisCard from "./AnalysisCard";
+import { apiAnalyzeUrl } from "../../api/client";
+import AnalysisCard from "../AnalysisCard/AnalysisCard";
+import styles from "./UrlForm.module.css";
 
 export default function SearchForm({ mode = "urls" }) {
   const [value, setValue] = useState("");
@@ -41,24 +42,28 @@ export default function SearchForm({ mode = "urls" }) {
 
   return (
     <>
-      <form className="search-form" onSubmit={submit} noValidate>
-        <div className="search-form__capsule">
+      <form className={styles["search-form"]} onSubmit={submit} noValidate>
+        <div className={styles["search-form__capsule"]}>
           <input
             type="text"
             inputMode="url"
             autoComplete="off"
             spellCheck={false}
-            placeholder={mode === "urls" ? "Digite a URL que deseja verificar" : "Cole aqui o link da imagem"}
+            placeholder={
+              mode === "urls"
+                ? "Digite a URL que deseja verificar"
+                : "Cole aqui o link da imagem"
+            }
             value={value}
             onChange={onChange}
-            className="search-form__input--capsule"
+            className={styles["search-form__input--capsule"]}
             aria-label="URL para análise"
           />
 
           {value && (
             <button
               type="button"
-              className="search-form__clear--inside"
+              className={styles["search-form__clear--inside"]}
               aria-label="Limpar campo"
               onClick={clear}
               disabled={loading}
@@ -70,7 +75,7 @@ export default function SearchForm({ mode = "urls" }) {
 
           <button
             type="submit"
-            className="search-form__submit--inside"
+            className={styles["search-form__submit--inside"]}
             disabled={!canSubmit || loading}
           >
             Verificar
@@ -78,7 +83,11 @@ export default function SearchForm({ mode = "urls" }) {
         </div>
 
         {statusMsg && (
-          <p className={`search-form__hint ${loading ? "is-loading" : "is-error"}`}>
+          <p
+            className={`${styles["search-form__hint"]} ${
+              loading ? "is-loading" : "is-error"
+            }`}
+          >
             {statusMsg}
           </p>
         )}

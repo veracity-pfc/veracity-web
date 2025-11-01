@@ -4,6 +4,8 @@ import HidePasswordIcon from '../assets/icon-hide-password.png';
 import ReturnIcon from '../assets/icon-return.png';
 import Logo from '../components/Logo.jsx';
 import { apiLogin, saveToken } from '../api/client';
+import '../styles/auth.css';
+import '../styles/forms.css';
 
 export default function Login() {
   const [showPwd, setShowPwd] = useState(false);
