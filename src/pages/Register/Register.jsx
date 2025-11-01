@@ -78,6 +78,7 @@ export default function Register() {
     setErrEmail("");
     try {
       await apiRegister(fullName.trim(), email.trim(), password, confirm, true);
+      localStorage.setItem('veracity_welcome_pending', '1');
       navigate(`/verify-email?email=${encodeURIComponent(email.trim())}`);
     } catch (err) {
       if (err?.status === 409) {

@@ -3,7 +3,11 @@ import { useLocation } from "react-router-dom";
 import Tabs from "../../components/Tabs/Tabs.jsx";
 import SearchForm from "../../components/UrlForm/UrlForm.jsx";
 import ImageForm from "../../components/ImageForm/ImageForm.jsx";
-import '../../styles/legal.css';
+import modalImage from "../../assets/ilust-welcome.png";
+import Modal from "../../components/Modal/Modal.jsx";
+import modalStyles from "../../components/Modal/Modal.module.css"; 
+import { getToken } from "../../api/client.js";
+import "../../styles/legal.css";
 import styles from "./Home.module.css";
 
 function getTabFromSearch(search) {
@@ -14,13 +18,22 @@ function getTabFromSearch(search) {
 
 export default function Home() {
   const location = useLocation();
-
   const [activeTab, setActiveTab] = useState(() => getTabFromSearch(location.search));
+  const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
     const next = getTabFromSearch(location.search);
     setActiveTab(next);
   }, [location.search]);
+
+  useEffect(() => {
+    const hasToken = !!getToken?.();
+    const pending = localStorage.getItem("veracity_welcome_pending") === "1";
+    if (hasToken && pending) {
+      setShowWelcome(true);
+      localStorage.removeItem("veracity_welcome_pending");
+    }
+  }, []);
 
   const handleChange = useCallback((t) => {
     setActiveTab(t);
@@ -75,6 +88,30 @@ export default function Home() {
           </p>
         </div>
       </section>
+
+      <Modal
+        open={showWelcome}
+        onClose={() => setShowWelcome(false)}
+        title="Bem vindo(a) ao Veracity!"
+        imageSrc={modalImage}
+        secondaryText={null}
+        primaryText={null}
+      >
+        <p>
+          Visite nossa página de{" "}
+          <a
+            href="/instructions"
+            className={modalStyles["modal-link"]}  
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.assign("/instructions");
+            }}
+          >
+            instruções
+          </a>{" "}
+          para mais detalhes de como realizar as análises.
+        </p>
+      </Modal>
     </main>
   );
 }
