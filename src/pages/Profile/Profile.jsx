@@ -35,6 +35,7 @@ export default function Profile() {
   const [modalDeactivatedOk, setModalDeactivatedOk] = useState(false);
 
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const dirtyRef = useRef(false);
   const pendingNavRef = useRef(null);
@@ -210,12 +211,14 @@ export default function Profile() {
 
   const confirmDelete = async () => {
     setModalDelete(false);
+    setDeleting(true);
     try {
       await apiDeleteAccount();
       clearToken();
       setModalDeletedOk(true);
     } catch (e) {
       setServerErr(e.message || "Falha ao excluir conta.");
+      setDeleting(false);
     }
   };
 
@@ -281,8 +284,9 @@ export default function Profile() {
             <button
               className={styles.btnDanger}
               onClick={() => setModalDelete(true)}
+              disabled={deleting}
             >
-              Excluir conta
+              {deleting ? "Carregando..." : "Excluir conta"}
             </button>
           </div>
         </div>
