@@ -214,7 +214,6 @@ export default function Profile() {
       await apiDeleteAccount();
       clearToken();
       setModalDeletedOk(true);
-      setTimeout(() => window.location.assign("/"), 1500);
     } catch (e) {
       setServerErr(e.message || "Falha ao excluir conta.");
     }
@@ -226,7 +225,6 @@ export default function Profile() {
       await apiInactivateAccount();
       clearToken();
       setModalDeactivatedOk(true);
-      setTimeout(() => window.location.assign("/"), 1500);
     } catch (e) {
       setServerErr(e.message || "Falha ao inativar conta.");
     }
@@ -257,7 +255,7 @@ export default function Profile() {
             onBlur={validateNameServer}
             placeholder="Nome completo"
           />
-          {errors.name && <span className={styles.err}>{errors.name}</span>}
+        {errors.name && <span className={styles.err}>{errors.name}</span>}
 
           <h3 style={{ marginTop: 18 }}>E-mail</h3>
           <input

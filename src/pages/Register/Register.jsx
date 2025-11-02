@@ -84,7 +84,6 @@ export default function Register() {
       if (err?.status === 409) {
         setErrEmail("E-mail já cadastrado.");
       } else {
-        console.error(err);
         setErrEmail(err.message || "Falha ao cadastrar.");
       }
     } finally {
@@ -161,11 +160,11 @@ export default function Register() {
           </div>
 
           <ul className={styles["pw-policy"]}>
-            <li className={policy.length ? "ok" : "err"}>8 a 30 caracteres</li>
-            <li className={policy.upper ? "ok" : "err"}>1 letra maiúscula</li>
-            <li className={policy.lower ? "ok" : "err"}>1 letra minúscula</li>
-            <li className={policy.digit ? "ok" : "err"}>1 número</li>
-            <li className={policy.symbol ? "ok" : "err"}>1 símbolo</li>
+            <li className={policy.length ? styles.ok : styles.err}>8 a 30 caracteres</li>
+            <li className={policy.upper ? styles.ok : styles.err}>1 letra maiúscula</li>
+            <li className={policy.lower ? styles.ok : styles.err}>1 letra minúscula</li>
+            <li className={policy.digit ? styles.ok : styles.err}>1 número</li>
+            <li className={policy.symbol ? styles.ok : styles.err}>1 símbolo</li>
           </ul>
 
           <label className="form-label" htmlFor="confirm">Confirme a senha</label>
