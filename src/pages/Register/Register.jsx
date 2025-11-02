@@ -5,6 +5,7 @@ import ShowPasswordIcon from "../../assets/icon-show-password.png";
 import HidePasswordIcon from "../../assets/icon-hide-password.png";
 import ReturnIcon from "../../assets/icon-return.png";
 import { apiRegister } from "../../api/client";
+import Toast, { useToast } from "../../components/Toast/Toast.jsx";
 import '../../styles/forms.css';
 import styles from './Register.module.css';
 
@@ -19,6 +20,7 @@ const pwPolicy = (v) => ({
 
 export default function Register() {
   const navigate = useNavigate();
+  const { success, error } = useToast();
 
   useEffect(() => {
     document.body.classList.add("auth-only-footer");
@@ -78,9 +80,11 @@ export default function Register() {
     setErrEmail("");
     try {
       await apiRegister(fullName.trim(), email.trim(), password, confirm, true);
+      success("Conta criada com sucesso!");
       localStorage.setItem('veracity_welcome_pending', '1');
       navigate(`/verify-email?email=${encodeURIComponent(email.trim())}`);
     } catch (err) {
+      error("Erro ao criar conta!");
       if (err?.status === 409) {
         setErrEmail("E-mail já cadastrado.");
       } else {
@@ -93,6 +97,7 @@ export default function Register() {
 
   return (
     <main className="login-container register-container">
+      <Toast />
       <div className="login-logo"><Logo /></div>
 
       <section className="login-card register-card">

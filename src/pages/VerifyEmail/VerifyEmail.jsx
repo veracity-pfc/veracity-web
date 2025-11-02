@@ -3,12 +3,14 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import Logo from "../../components/Logo";
 import ReturnIcon from "../../assets/icon-return.png";
 import { apiVerifyEmail, apiResendCode } from "../../api/client";
+import Toast, { useToast } from "../../components/Toast/Toast.jsx";
 import '../../styles/forms.css';
 import styles from './VerifyEmail.module.css';
 
 export default function VerifyEmail() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
+  const { success, error: toastError } = useToast();
   const email = (params.get("email") || "").trim();
 
   const [code, setCode] = useState(["", "", "", "", "", ""]);
@@ -61,8 +63,10 @@ export default function VerifyEmail() {
     try {
       setVerifying(true);
       await apiVerifyEmail(email, joined);
+      success("E-mail confirmado com sucesso!");
       navigate("/");
     } catch (error) {
+      toastError("Erro ao confirmar e-mail!");
       setErr(error.message || "O código inserido está inválido. Tente novamente");
     } finally {
       setVerifying(false);
@@ -85,6 +89,7 @@ export default function VerifyEmail() {
 
   return (
     <main className="login-container" onPaste={onPaste}>
+      <Toast />
       <div className="login-logo"><Logo /></div>
 
       <section className="login-card verify-card">

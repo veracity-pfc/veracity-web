@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import cover from '../../assets/contact-cover.png';
 import { apiSendContact } from '../../api/client';
+import Toast, { useToast } from '../../components/Toast/Toast.jsx';
 import styles from './Contact.module.css';       
 import '../../styles/forms.css';               
 
@@ -12,9 +13,11 @@ export default function Contact() {
   const [message, setMessage] = useState('');
   const [ok, setOk] = useState(false);
   const [err, setErr] = useState('');
+  const { success, error } = useToast();
 
   return (
     <main>
+      <Toast />
       <section className={cx(styles['contact-section'], 'container', 'page-offset')}>
         <div className={styles['contact-grid']}>
           <div className={styles['contact-image-wrap']}>
@@ -37,7 +40,9 @@ export default function Contact() {
                   try {
                     await apiSendContact(email.trim(), subject, message.trim());
                     setOk(true);
+                    success("Mensagem enviada com sucesso!");
                   } catch (e) {
+                    error("Erro ao enviar mensagem!");
                     setErr(e?.data?.detail || e.message || 'Não foi possível enviar sua mensagem.');
                   }
                 }}

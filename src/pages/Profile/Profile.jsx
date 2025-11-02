@@ -9,6 +9,7 @@ import {
   apiInactivateAccount,
   clearToken,
 } from "../../api/client";
+import Toast, { useToast } from "../../components/Toast/Toast.jsx";
 import Modal from "../../components/Modal/Modal.jsx";
 import styles from "./Profile.module.css";
 import modalSaveConfirmationImg from "../../assets/ilust-save-confirmation.png";
@@ -42,6 +43,8 @@ export default function Profile() {
 
   const modalUnsavedRef = useRef(false);
   const modalConfirmSaveRef = useRef(false);
+
+  const { success, error } = useToast();
 
   useEffect(() => {
     apiGetProfile()
@@ -172,6 +175,7 @@ export default function Profile() {
         await apiValidateEmailChange(newEmail);
         const { requires_verification } = await apiRequestEmailChange(newEmail);
         if (requires_verification) {
+          success("Solicitação de alteração de e-mail enviada com sucesso!");
           localStorage.setItem("veracity_email_change_target", newEmail);
           setInitial((p) => ({ ...(p || {}), email: newEmail }));
           setEmail(newEmail);
@@ -185,7 +189,9 @@ export default function Profile() {
       setInitial(d);
       setName(d.name || "");
       setEmail(d.email || "");
+      success("Dados do perfil alterados com sucesso!");
     } catch (e) {
+      error("Erro ao alterar dados do perfil!");
       const msg = e.message || "Falha ao salvar mudanças.";
       if (changedEmail) setErrors((p) => ({ ...p, email: msg }));
       else if (changedName) setErrors((p) => ({ ...p, name: msg }));
@@ -215,8 +221,10 @@ export default function Profile() {
     try {
       await apiDeleteAccount();
       clearToken();
+      success("Conta excluída com sucesso!");
       setModalDeletedOk(true);
     } catch (e) {
+      error("Erro ao excluir conta!");
       setServerErr(e.message || "Falha ao excluir conta.");
       setDeleting(false);
     }
@@ -227,8 +235,10 @@ export default function Profile() {
     try {
       await apiInactivateAccount();
       clearToken();
+      success("Conta inativada com sucesso!");
       setModalDeactivatedOk(true);
     } catch (e) {
+      error("Erro ao inativar conta!");
       setServerErr(e.message || "Falha ao inativar conta.");
     }
   };
@@ -243,6 +253,7 @@ export default function Profile() {
 
   return (
     <main className="container">
+      <Toast />
       <h1 className={styles.title}>Meu perfil</h1>
 
       <section className={styles.grid}>

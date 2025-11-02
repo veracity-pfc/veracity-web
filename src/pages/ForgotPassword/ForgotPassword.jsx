@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ReturnIcon from '../../assets/icon-return.png';
 import Logo from '../../components/Logo.jsx';
 import { apiForgotPassword } from '../../api/client';
+import Toast, { useToast } from '../../components/Toast/Toast.jsx';
 import styles from './ForgotPassword.module.css';
 import '../../styles/forms.css';
 
@@ -11,6 +12,7 @@ export default function ForgotPassword() {
   const [err, setErr] = useState('');
   const [sent, setSent] = useState(false);
   const navigate = useNavigate();
+  const { success, error } = useToast();
 
   useEffect(() => {
     document.body.classList.add('auth-only-footer');
@@ -23,13 +25,16 @@ export default function ForgotPassword() {
     try {
       await apiForgotPassword(email.trim());
       setSent(true);
+      success("E-mail de recuperação enviado com sucesso!");
     } catch (e) {
+      error("Erro ao enviar e-mail de recuperação!");
       setErr(e?.data?.detail || e.message || 'E-mail não encontrado. Tente novamente.');
     }
   };
 
   return (
     <main className="login-container">
+      <Toast />
       <div className="login-logo" aria-label="Veracity"><Logo /></div>
 
       <section className="login-card auth-card" aria-labelledby="forgot-title">
