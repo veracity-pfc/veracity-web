@@ -26,64 +26,37 @@ export default function Modal({
   const overlayRef = useRef(null);
   const dialogRef = useRef(null);
 
-  const safeClose = () => {
-    if (typeof onClose === "function") onClose();
-  };
+  const safeClose = () => { if (typeof onClose === "function") onClose(); };
 
   useEffect(() => {
     if (!open) return;
-
-    const onKeyCapture = (e) => {
-      if (e.key === "Escape") {
-        e.stopPropagation();
-        safeClose();
-      }
-    };
+    const onKeyCapture = (e) => { if (e.key === "Escape") { e.stopPropagation(); safeClose(); } };
     window.addEventListener("keydown", onKeyCapture, true);
-
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-
-    return () => {
-      window.removeEventListener("keydown", onKeyCapture, true);
-      document.body.style.overflow = prevOverflow || "";
-    };
-  }, [open]); 
-
-  useEffect(() => {
-    if (open) dialogRef.current?.focus();
+    return () => { window.removeEventListener("keydown", onKeyCapture, true); document.body.style.overflow = prevOverflow || ""; };
   }, [open]);
 
-  const hasActions = useMemo(
-    () => Boolean(primaryText) || Boolean(secondaryText),
-    [primaryText, secondaryText]
-  );
+  useEffect(() => { if (open) dialogRef.current?.focus(); }, [open]);
 
+  const hasActions = useMemo(() => Boolean(primaryText) || Boolean(secondaryText), [primaryText, secondaryText]);
   if (!open) return null;
 
-  const handleCardKeyDown = (e) => {
-    if (e.key === "Escape") {
-      e.stopPropagation();
-      safeClose();
-    }
-  };
-
-  const handleBackdropMouseDown = (e) => {
-    if (!closeOnOverlay) return;
-    if (e.target === overlayRef.current) {
-      safeClose();
-    }
-  };
-
+  const handleCardKeyDown = (e) => { if (e.key === "Escape") { e.stopPropagation(); safeClose(); } };
+  const handleBackdropMouseDown = (e) => { if (!closeOnOverlay) return; if (e.target === overlayRef.current) { safeClose(); } };
   const stop = (e) => e.stopPropagation();
 
+  const primaryClass = cx(
+    styles["btn"],
+    primaryVariant === "danger"
+      ? styles["btn-danger"]
+      : primaryVariant === "success"
+      ? styles["btn-success"]
+      : styles["btn-primary"]
+  );
+
   return createPortal(
-    <div
-      ref={overlayRef}
-      className={styles["modal-backdrop"]}
-      onMouseDown={handleBackdropMouseDown}
-      aria-hidden={!open}
-    >
+    <div ref={overlayRef} className={styles["modal-backdrop"]} onMouseDown={handleBackdropMouseDown} aria-hidden={!open}>
       <section
         ref={dialogRef}
         className={styles["modal"]}
@@ -96,12 +69,7 @@ export default function Modal({
         onClick={stop}
       >
         {showClose && (
-          <button
-            type="button"
-            className={styles["modal-close"]}
-            aria-label="Fechar modal"
-            onClick={safeClose}
-          >
+          <button type="button" className={styles["modal-close"]} aria-label="Fechar modal" onClick={safeClose}>
             ×
           </button>
         )}
@@ -112,36 +80,21 @@ export default function Modal({
           </figure>
         )}
 
-        {title && (
-          <h2 id="modal-title" className={styles["modal-title"]}>
-            {title}
-          </h2>
-        )}
+        {title && <h2 id="modal-title" className={styles["modal-title"]}>{title}</h2>}
 
         <div className={styles["modal-body"]}>{children}</div>
 
         {hasActions && (
           <div className={styles["modal-actions"]}>
             {primaryText && (
-              <button
-                type="button"
-                className={cx(
-                  styles["btn"],
-                  primaryVariant === "danger" ? styles["btn-danger"] : styles["btn-primary"]
-                )}
-                onClick={onPrimary}
-                disabled={primaryDisabled}
-              >
+              <button type="button" className={primaryClass} onClick={onPrimary} disabled={primaryDisabled}>
                 {primaryText}
               </button>
             )}
             {secondaryText && (
               <button
                 type="button"
-                className={cx(
-                  styles["btn"],
-                  secondaryVariant === "secondary" ? styles["btn-secondary"] : styles["btn-ghost"]
-                )}
+                className={cx(styles["btn"], secondaryVariant === "secondary" ? styles["btn-secondary"] : styles["btn-ghost"])}
                 onClick={onSecondary}
                 disabled={secondaryDisabled}
               >

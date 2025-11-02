@@ -10,7 +10,7 @@ import TermsOfUse from './pages/TermsOfUse.jsx';
 import PrivacyPolicy from './pages/PrivacyPolicy.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register/Register.jsx';
-import Profile from './pages/Profile.jsx';
+import Profile from './pages/Profile/Profile.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx';
 import VerifyEmail from "./pages/VerifyEmail/VerifyEmail.jsx";
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword.jsx';

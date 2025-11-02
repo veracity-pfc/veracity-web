@@ -96,6 +96,16 @@
     cursor: pointer;
 }
 
+.btn-success {
+    background: #2F9E7A;
+    border: 1px solid #2B8C6D;
+    color: #EAF6F2;
+}
+
+.btn-success:hover {
+    filter: brightness(1.05);
+}
+
 .modal-link {
     font-weight: 800;
     color: #5AB0FF;

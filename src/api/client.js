@@ -1,6 +1,6 @@
 const API_BASE = import.meta.env.VITE_API_BASE;
 
-const INACTIVITY_MS = 30 * 60 * 1000; 
+const INACTIVITY_MS = 30 * 60 * 1000;
 const LAST_ACTIVITY_KEY = "veracity_last_activity";
 
 function touchActivity() {
@@ -15,7 +15,9 @@ function shouldExpire() {
 
 function installActivityListeners() {
   const evts = ["click", "keydown", "mousemove", "scroll", "touchstart"];
-  evts.forEach((e) => window.addEventListener(e, touchActivity, { passive: true }));
+  evts.forEach((e) =>
+    window.addEventListener(e, touchActivity, { passive: true })
+  );
   window.addEventListener("veracity-auth-changed", touchActivity);
 }
 
@@ -121,7 +123,10 @@ export async function apiFetch(
 }
 
 export const apiLogin = async (email, password) => {
-  const data = await apiFetch("/auth/login", { method: "POST", body: { email, password } });
+  const data = await apiFetch("/auth/login", {
+    method: "POST",
+    body: { email, password },
+  });
   saveToken(data.access_token, data.role);
   return data;
 };
@@ -131,24 +136,55 @@ export const apiLogout = () =>
     .catch(() => {})
     .finally(clearToken);
 
-export const apiRegister = (name, email, password, confirm_password, accepted_terms) =>
+export const apiRegister = (
+  name,
+  email,
+  password,
+  confirm_password,
+  accepted_terms
+) =>
   apiFetch("/auth/register", {
     method: "POST",
     body: { name, email, password, confirm_password, accepted_terms },
   });
 
 export const apiVerifyEmail = async (email, code) => {
-  const data = await apiFetch("/auth/verify-email", { method: "POST", body: { email, code } });
+  const target = localStorage.getItem("veracity_email_change_target");
+  if (!email && target) {
+    const data = await apiFetch("/user/profile/email-change/confirm", {
+      auth: true,
+      method: "POST",
+      body: { email: target, code },
+    });
+    return data;
+  }
+  const data = await apiFetch("/auth/verify-email", {
+    method: "POST",
+    body: { email, code },
+  });
   saveToken(data.access_token, data.role);
   return data;
 };
 
-export const apiResendCode = (email) =>
-  apiFetch("/auth/resend-code", { method: "POST", body: { email, code: "000000" } });
+export const apiResendCode = (email) => {
+  const target = localStorage.getItem("veracity_email_change_target");
+  if (!email && target) {
+    return apiFetch("/user/profile/email-change/request", {
+      auth: true,
+      method: "POST",
+      body: { email: target },
+    });
+  }
+  return apiFetch("/auth/resend-code", {
+    method: "POST",
+    body: { email, code: "000000" },
+  });
+};
 
 export const apiGetProfile = () => apiFetch("/user/profile", { auth: true });
 
-export const apiAdminMetrics = () => apiFetch("/administration/metrics", { auth: true });
+export const apiAdminMetrics = () =>
+  apiFetch("/administration/metrics", { auth: true });
 
 export const apiAnalyzeUrl = (url) =>
   apiFetch("/analyses/url", { auth: true, method: "POST", body: { url } });
@@ -160,7 +196,11 @@ export async function apiAnalyzeImage(file) {
   const t = getToken();
   if (t) headers.Authorization = `Bearer ${t}`;
   touchActivity();
-  const res = await fetch(`${API_BASE}/analyses/image`, { method: "POST", headers, body: fd });
+  const res = await fetch(`${API_BASE}/analyses/image`, {
+    method: "POST",
+    headers,
+    body: fd,
+  });
   let data = null;
   try {
     data = await res.json();
@@ -195,4 +235,48 @@ export async function apiResetPassword(token, password, confirm_password) {
   return r.json();
 }
 export const apiSendContact = (email, subject, message) =>
-  apiFetch("/contact-us", { method: "POST", body: { email, subject, message } });
+  apiFetch("/contact-us", {
+    method: "POST",
+    body: { email, subject, message },
+  });
+
+export const apiValidateName = (name) =>
+  apiFetch("/user/profile/name?validate_only=true", {
+    auth: true,
+    method: "PATCH",
+    body: { name },
+  });
+
+export const apiUpdateName = (name) =>
+  apiFetch("/user/profile/name", {
+    auth: true,
+    method: "PATCH",
+    body: { name },
+  });
+
+export const apiValidateEmailChange = (email) =>
+  apiFetch("/user/profile/email-change/request?validate_only=true", {
+    auth: true,
+    method: "POST",
+    body: { email },
+  });
+
+export const apiRequestEmailChange = (email) =>
+  apiFetch("/user/profile/email-change/request", {
+    auth: true,
+    method: "POST",
+    body: { email },
+  });
+
+export const apiConfirmEmailChange = (email, code) =>
+  apiFetch("/user/profile/email-change/confirm", {
+    auth: true,
+    method: "POST",
+    body: { email, code },
+  });
+
+export const apiDeleteAccount = () =>
+  apiFetch("/user/account?mode=delete", { auth: true, method: "DELETE" });
+
+export const apiInactivateAccount = () =>
+  apiFetch("/user/account?mode=inactivate", { auth: true, method: "DELETE" });
