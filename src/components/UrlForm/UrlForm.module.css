@@ -33,13 +33,13 @@
     color: #9CB2AB;
 }
 
-.search-form__hint.is-loading::before {
+.search-form__hint:global(.is-loading)::before {
     content: "";
     display: inline-block;
     width: 16px;
     height: 16px;
     margin-right: 8px;
-    background: url("/public/loading.gif") no-repeat center center / contain;
+    background: url("/loading.gif") no-repeat center center / contain;
     vertical-align: -2px;
 }
 

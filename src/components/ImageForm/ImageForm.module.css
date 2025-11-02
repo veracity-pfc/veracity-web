@@ -112,6 +112,16 @@
     font-weight: 900;
 }
 
+.image-form__hint:global(.is-loading)::before {
+    content: "";
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    background: url("/loading.gif") no-repeat center center / contain;
+    vertical-align: -2px;
+}
+
 .image-capsule__submit[disabled] {
     background: var(--neutral-500);
     border-color: var(--neutral-500);

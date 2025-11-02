@@ -16,6 +16,7 @@ export default function VerifyEmail() {
   const [err, setErr] = useState("");
   const [cooldown, setCooldown] = useState(30);
   const [sending, setSending] = useState(false);
+  const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
     document.body.classList.add("auth-only-footer");
@@ -56,18 +57,21 @@ export default function VerifyEmail() {
     e.preventDefault();
     setErr("");
     const joined = code.join("");
-    if (joined.length !== 6) return;
+    if (joined.length !== 6 || verifying || sending) return;
     try {
+      setVerifying(true);
       await apiVerifyEmail(email, joined);
       navigate("/");
     } catch (error) {
       setErr(error.message || "O código inserido está inválido. Tente novamente");
+    } finally {
+      setVerifying(false);
     }
   };
 
   const resend = async (e) => {
     e.preventDefault();
-    if (cooldown > 0 || sending) return;
+    if (cooldown > 0 || sending || verifying) return;
     setSending(true);
     try {
       await apiResendCode(email);
@@ -120,13 +124,21 @@ export default function VerifyEmail() {
 
           <p className="signup-hint" style={{ marginTop: 12 }}>
             Não recebeu o código?{" "}
-            <a href="#" onClick={resend} aria-disabled={cooldown > 0}>
+            <a
+              href="#"
+              onClick={resend}
+              aria-disabled={cooldown > 0 || sending || verifying}
+            >
               Reenviar {cooldown > 0 ? `(${cooldown}s)` : ""}
             </a>
           </p>
 
-          <button className="btn-primary verify-submit" type="submit" disabled={code.join("").length !== 6}>
-            Confirmar
+          <button
+            className="btn-primary verify-submit"
+            type="submit"
+            disabled={code.join("").length !== 6 || verifying || sending}
+          >
+            {verifying ? "Carregando" : "Confirmar"}
           </button>
         </form>
       </section>
