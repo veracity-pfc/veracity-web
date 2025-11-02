@@ -10,7 +10,7 @@ import '../styles/forms.css';
 export default function Login() {
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errMsg, setErrMsg] = useState('');
+  const [errMsg, setErrMsg] = useState(null);
 
   useEffect(() => {
     document.body.classList.add('auth-only-footer');
@@ -19,7 +19,7 @@ export default function Login() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setErrMsg('');
+    setErrMsg(null);
     setLoading(true);
 
     const form = new FormData(e.currentTarget);
@@ -33,11 +33,20 @@ export default function Login() {
     }
 
     try {
-      const data = await apiLogin(email, password); 
-      saveToken(data.access_token, data.role);
-      window.location.assign('/'); 
+      const data = await apiLogin(email, password);
+      if (data?.access_token) saveToken(data.access_token, data.role);
+      window.location.assign('/');
     } catch (err) {
-      setErrMsg(err.message || 'Falha ao entrar. Tente novamente.');
+      const code = err?.code || err?.detail?.code;
+      if (code === 'ACCOUNT_INACTIVE') {
+        setErrMsg(
+          <>
+            A conta está desativada. Entre em <a id="contact-link" href="/contact-us">contato</a> para recuperar o acesso.
+          </>
+        );
+      } else {
+        setErrMsg('E-mail ou senha inválidos');
+      }
     } finally {
       setLoading(false);
     }

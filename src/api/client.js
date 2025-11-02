@@ -122,14 +122,26 @@ export async function apiFetch(
   return data;
 }
 
-export const apiLogin = async (email, password) => {
-  const data = await apiFetch("/auth/login", {
+export async function apiLogin(email, password) {
+  const r = await fetch(`${API_BASE}/auth/login`, {
     method: "POST",
-    body: { email, password },
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
   });
-  saveToken(data.access_token, data.role);
+  let data = null;
+  try {
+    data = await r.json();
+  } catch {}
+  if (!r.ok) {
+    const detail = data?.detail || data || {};
+    const err = new Error(detail?.message || "Falha no login");
+    err.status = r.status;
+    err.code = detail?.code;
+    err.detail = detail;
+    throw err;
+  }
   return data;
-};
+}
 
 export const apiLogout = () =>
   apiFetch("/auth/logout", { auth: true, method: "POST" })
@@ -275,8 +287,20 @@ export const apiConfirmEmailChange = (email, code) =>
     body: { email, code },
   });
 
-export const apiDeleteAccount = () =>
-  apiFetch("/user/account?mode=delete", { auth: true, method: "DELETE" });
+export async function apiDeleteAccount() {
+  const r = await fetch(`${API_BASE}/user/account?mode=delete`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${localStorage.getItem("veracity_token")}` },
+  });
+  if (!r.ok) throw new Error((await r.json()).detail || "Falha ao excluir conta.");
+  return r.json();
+}
 
-export const apiInactivateAccount = () =>
-  apiFetch("/user/account?mode=inactivate", { auth: true, method: "DELETE" });
+export async function apiInactivateAccount() {
+  const r = await fetch(`${API_BASE}/user/account?mode=inactivate`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${localStorage.getItem("veracity_token")}` },
+  });
+  if (!r.ok) throw new Error((await r.json()).detail || "Falha ao inativar conta.");
+  return r.json();
+}

@@ -13,6 +13,9 @@ import Modal from "../../components/Modal/Modal.jsx";
 import styles from "./Profile.module.css";
 import modalSaveConfirmationImg from "../../assets/ilust-save-confirmation.png";
 import modalExitConfirmationImg from "../../assets/ilust-exit-without-save-confirmation.png";
+import modalDeleteAccountConfirmationImg from "../../assets/ilust-delete-account-confirmation.png";
+import modalDeletedAccountImg from "../../assets/ilust-deleted-account.png";
+import modalInactiveAccountImg from "../../assets/ilust-inactive-account.png";
 
 export default function Profile() {
   const [loading, setLoading] = useState(true);
@@ -201,8 +204,7 @@ export default function Profile() {
     const pending = pendingNavRef.current;
     pendingNavRef.current = null;
     if (!pending) return;
-    if (pending.type === "url" && pending.value)
-      window.location.assign(pending.value);
+    if (pending.type === "url" && pending.value) window.location.assign(pending.value);
     else if (pending.type === "back") window.history.back();
   };
 
@@ -344,6 +346,7 @@ export default function Profile() {
         open={modalDelete}
         onClose={() => setModalDelete(false)}
         title="Excluir conta?"
+        imageSrc={modalDeleteAccountConfirmationImg}
         primaryText="Excluir"
         onPrimary={confirmDelete}
         secondaryText="Inativar"
@@ -355,21 +358,9 @@ export default function Profile() {
         secondaryVariant="secondary"
       >
         <p>
-          Recomendamos inativar ao invés de excluir. A exclusão é permanente.
+          Sugerimos inativar em vez de excluir. Ao inativar, você perde o acesso, mas pode reativar depois e manter seu histórico.
+          <br/><br/>A exclusão é permanente e não pode ser desfeita.
         </p>
-      </Modal>
-
-      <Modal
-        open={modalDeactivate}
-        onClose={() => setModalDeactivate(false)}
-        title="Inativar conta?"
-        primaryText="Inativar"
-        onPrimary={confirmDeactivate}
-        secondaryText="Cancelar"
-        onSecondary={() => setModalDeactivate(false)}
-        secondaryVariant="secondary"
-      >
-        <p>Você poderá reativar depois, mas perderá o acesso até lá.</p>
       </Modal>
 
       <Modal
@@ -378,9 +369,10 @@ export default function Profile() {
           setModalDeletedOk(false);
           window.location.assign("/");
         }}
+        imageSrc={modalDeletedAccountImg}
         title="Conta excluída"
       >
-        <p>Sua conta foi excluída com sucesso.</p>
+        <p>As informações da sua conta foram excluídas da plataforma.</p>
       </Modal>
 
       <Modal
@@ -389,6 +381,7 @@ export default function Profile() {
           setModalDeactivatedOk(false);
           window.location.assign("/");
         }}
+        imageSrc={modalInactiveAccountImg}
         title="Conta inativada"
       >
         <p>Sua conta foi inativada com sucesso.</p>

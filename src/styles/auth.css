@@ -78,6 +78,11 @@
     margin-bottom: 0;
 }
 
+#contact-link {
+    color: var(--link);
+    text-decoration: underline;
+}
+
 .forgot-link {
     font-size: 14px;
     color: var(--link);
