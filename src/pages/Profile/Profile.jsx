@@ -8,6 +8,7 @@ import {
   apiDeleteAccount,
   apiInactivateAccount,
   clearToken,
+  getToken,
 } from "../../api/client";
 import Toast, { useToast } from "../../components/Toast/Toast.jsx";
 import Modal from "../../components/Modal/Modal.jsx";
@@ -17,6 +18,25 @@ import modalExitConfirmationImg from "../../assets/ilust-exit-without-save-confi
 import modalDeleteAccountConfirmationImg from "../../assets/ilust-delete-account-confirmation.png";
 import modalDeletedAccountImg from "../../assets/ilust-deleted-account.png";
 import modalInactiveAccountImg from "../../assets/ilust-inactive-account.png";
+
+function resolveRole() {
+  const ls = (localStorage.getItem("role") || "").toLowerCase();
+  if (ls) return ls;
+  const t = typeof getToken === "function" ? getToken() : null;
+  if (!t) return "";
+  try {
+    const payload = JSON.parse(atob(t.split(".")[1] || ""));
+    return String(
+      payload.role ||
+        payload.user_role ||
+        payload["role"] ||
+        payload["userRole"] ||
+        ""
+    ).toLowerCase();
+  } catch {
+    return "";
+  }
+}
 
 export default function Profile() {
   const [loading, setLoading] = useState(true);
@@ -46,12 +66,21 @@ export default function Profile() {
 
   const { success, error } = useToast();
 
+  const [role, setRole] = useState(() => resolveRole());
+
+  useEffect(() => {
+    setRole(resolveRole());
+  }, []);
+
   useEffect(() => {
     apiGetProfile()
       .then((d) => {
         setInitial(d);
         setName(d.name || "");
         setEmail(d.email || "");
+        if (d?.role && !role) setRole(String(d.role).toLowerCase());
+        if (d?.user_role && !role) setRole(String(d.user_role).toLowerCase());
+        if (d?.is_admin === true && role !== "admin") setRole("admin");
       })
       .catch((e) => setServerErr(e.message || "Erro ao carregar perfil"))
       .finally(() => setLoading(false));
@@ -243,6 +272,11 @@ export default function Profile() {
     }
   };
 
+  const isAdmin =
+    role === "admin" ||
+    initial?.is_admin === true ||
+    String(initial?.role || initial?.user_role || "").toLowerCase() === "admin";
+
   if (loading) return <p className={styles.loading}>Carregando...</p>;
   if (serverErr)
     return (
@@ -268,8 +302,9 @@ export default function Profile() {
             }}
             onBlur={validateNameServer}
             placeholder="Nome completo"
+            disabled={isAdmin}
           />
-        {errors.name && <span className={styles.err}>{errors.name}</span>}
+          {errors.name && <span className={styles.err}>{errors.name}</span>}
 
           <h3 style={{ marginTop: 18 }}>E-mail</h3>
           <input
@@ -281,25 +316,28 @@ export default function Profile() {
             }}
             onBlur={validateEmailServer}
             placeholder="email@domino.com"
+            disabled={isAdmin}
           />
           {errors.email && <span className={styles.err}>{errors.email}</span>}
 
-          <div className={styles.actions}>
-            <button
-              className={styles.btnSave}
-              disabled={!dirty || saving}
-              onClick={handleSave}
-            >
-              {saving ? "Carregando..." : "Salvar"}
-            </button>
-            <button
-              className={styles.btnDanger}
-              onClick={() => setModalDelete(true)}
-              disabled={deleting}
-            >
-              {deleting ? "Carregando..." : "Excluir conta"}
-            </button>
-          </div>
+          {!isAdmin && (
+            <div className={styles.actions}>
+              <button
+                className={styles.btnSave}
+                disabled={!dirty || saving}
+                onClick={handleSave}
+              >
+                {saving ? "Carregando..." : "Salvar"}
+              </button>
+              <button
+                className={styles.btnDanger}
+                onClick={() => setModalDelete(true)}
+                disabled={deleting}
+              >
+                {deleting ? "Carregando..." : "Excluir conta"}
+              </button>
+            </div>
+          )}
         </div>
 
         <div className={styles.card}>
@@ -372,7 +410,7 @@ export default function Profile() {
       >
         <p>
           Sugerimos inativar em vez de excluir. Ao inativar, você perde o acesso, mas pode reativar depois e manter seu histórico.
-          <br/><br/>A exclusão é permanente e não pode ser desfeita.
+          <br /><br />A exclusão é permanente e não pode ser desfeita.
         </p>
       </Modal>
 

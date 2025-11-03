@@ -2,6 +2,7 @@ import React, { useCallback, useRef, useState } from "react";
 import imageIcon from "../../assets/icon-image.png";
 import AnalysisCard from "../AnalysisCard/AnalysisCard";
 import { apiAnalyzeImage } from "../../api/client";
+import { useToast } from "../Toast/Toast.jsx";
 import styles from "./ImageForm.module.css";
 
 const MAX_BYTES = 1 * 1024 * 1024;
@@ -12,6 +13,7 @@ export default function ImageForm() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const inputRef = useRef(null);
+  const { warn, error } = useToast();
 
   const onPick = () => inputRef.current?.click();
 
@@ -71,7 +73,15 @@ export default function ImageForm() {
       setResult(data);
       setStatusMsg("");
     } catch (err) {
-      setStatusMsg(err?.message || "Erro ao analisar a imagem.");
+      const msg = (err?.message || "").toLowerCase();
+      const isLimit = err?.status === 429 || /limite|quota|atingid/.test(msg);
+      if (isLimit) {
+        warn("Limite diário de análises de imagens atingido!");
+        setStatusMsg("Limite diário de análises de imagens atingido.");
+      } else {
+        error("Erro ao analisar imagem!");
+        setStatusMsg(err?.message || "Erro ao analisar a imagem.");
+      }
       setResult(null);
     } finally {
       setLoading(false);

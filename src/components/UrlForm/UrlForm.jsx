@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { apiAnalyzeUrl } from "../../api/client";
 import AnalysisCard from "../AnalysisCard/AnalysisCard";
+import { useToast } from "../Toast/Toast.jsx";
 import styles from "./UrlForm.module.css";
 
 export default function SearchForm({ mode = "urls" }) {
@@ -8,6 +9,7 @@ export default function SearchForm({ mode = "urls" }) {
   const [statusMsg, setStatusMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const { warn, error } = useToast();
 
   const canSubmit = mode === "urls" && value.trim().length > 0;
 
@@ -33,7 +35,15 @@ export default function SearchForm({ mode = "urls" }) {
       setResult(data);
       setStatusMsg("");
     } catch (err) {
-      setStatusMsg(err?.message || "Ocorreu um erro ao analisar a URL.");
+      const msg = (err?.message || "").toLowerCase();
+      const isLimit = err?.status === 429 || /limite|quota|atingid/.test(msg);
+      if (isLimit) {
+        warn("Limite diário de análises de URLs atingido!");
+        setStatusMsg("Limite diário de análises de URLs atingido.");
+      } else {
+        error("Erro ao analisar URL!");
+        setStatusMsg(err?.message || "Ocorreu um erro ao analisar a URL.");
+      }
       setResult(null);
     } finally {
       setLoading(false);

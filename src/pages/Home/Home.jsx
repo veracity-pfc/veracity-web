@@ -5,8 +5,9 @@ import SearchForm from "../../components/UrlForm/UrlForm.jsx";
 import ImageForm from "../../components/ImageForm/ImageForm.jsx";
 import modalImage from "../../assets/ilust-welcome.png";
 import Modal from "../../components/Modal/Modal.jsx";
-import modalStyles from "../../components/Modal/Modal.module.css"; 
+import modalStyles from "../../components/Modal/Modal.module.css";
 import { getToken } from "../../api/client.js";
+import Toast from "../../components/Toast/Toast.jsx";
 import "../../styles/legal.css";
 import styles from "./Home.module.css";
 
@@ -44,6 +45,7 @@ export default function Home() {
 
   return (
     <main className="container">
+      <Toast />
       <section className={styles.hero}>
         <h1>
           Detectando manipulações
@@ -101,7 +103,7 @@ export default function Home() {
           Visite nossa página de{" "}
           <a
             href="/instructions"
-            className={modalStyles["modal-link"]}  
+            className={modalStyles["modal-link"]}
             onClick={(e) => {
               e.preventDefault();
               window.location.assign("/instructions");
