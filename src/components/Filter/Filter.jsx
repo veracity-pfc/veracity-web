@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./Filter.module.css";
 
 export default function Filter({
@@ -16,6 +16,21 @@ export default function Filter({
   onClear,
 }) {
   const ref = useRef(null);
+
+  const [localFrom, setLocalFrom] = useState(dateFrom || "");
+  const [localTo, setLocalTo] = useState(dateTo || "");
+  const [localStatus, setLocalStatus] = useState(status || "");
+  const [localType, setLocalType] = useState(atype || "");
+
+  useEffect(() => {
+    if (open) {
+      setLocalFrom(dateFrom || "");
+      setLocalTo(dateTo || "");
+      setLocalStatus(status || "");
+      setLocalType(atype || "");
+    }
+  }, [open, dateFrom, dateTo, status, atype]);
+
   useEffect(() => {
     const h = (e) => {
       if (!open) return;
@@ -29,7 +44,24 @@ export default function Filter({
       document.removeEventListener("mousedown", h);
     };
   }, [open, onClose]);
+
   if (!open) return null;
+
+  const handleApply = () => {
+    onChangeDateFrom(localFrom || "");
+    onChangeDateTo(localTo || "");
+    onChangeStatus(localStatus || "");
+    onChangeType(localType || "");
+    if (onApply) onApply();
+  };
+
+  const handleClearLocal = () => {
+    setLocalFrom("");
+    setLocalTo("");
+    setLocalStatus("");
+    setLocalType("");
+  };
+
   return (
     <div className={styles.overlay}>
       <div className={styles.card} ref={ref}>
@@ -39,8 +71,8 @@ export default function Filter({
         <label className={styles.label}>Data inicial</label>
         <input
           type="date"
-          value={dateFrom}
-          onChange={(e) => onChangeDateFrom(e.target.value)}
+          value={localFrom}
+          onChange={(e) => setLocalFrom(e.target.value)}
           className={styles.input}
           placeholder="dd/mm/aaaa"
         />
@@ -48,16 +80,16 @@ export default function Filter({
         <label className={styles.label}>Data final</label>
         <input
           type="date"
-          value={dateTo}
-          onChange={(e) => onChangeDateTo(e.target.value)}
+          value={localTo}
+          onChange={(e) => setLocalTo(e.target.value)}
           className={styles.input}
           placeholder="dd/mm/aaaa"
         />
 
         <label className={styles.label}>Status da análise</label>
         <select
-          value={status}
-          onChange={(e) => onChangeStatus(e.target.value)}
+          value={localStatus}
+          onChange={(e) => setLocalStatus(e.target.value)}
           className={styles.select}
         >
           <option value="">Selecione uma opção</option>
@@ -69,8 +101,8 @@ export default function Filter({
 
         <label className={styles.label}>Tipo de análise</label>
         <select
-          value={atype}
-          onChange={(e) => onChangeType(e.target.value)}
+          value={localType}
+          onChange={(e) => setLocalType(e.target.value)}
           className={styles.select}
         >
           <option value="">Selecione uma opção</option>
@@ -79,8 +111,8 @@ export default function Filter({
         </select>
 
         <div className={styles.actions}>
-          <button className={styles.btnApply} onClick={onApply}>Aplicar filtros</button>
-          <button className={styles.btnClear} onClick={onClear}>Limpar filtros</button>
+          <button className={styles.btnApply} onClick={handleApply}>Aplicar filtros</button>
+          <button className={styles.btnClear} onClick={handleClearLocal}>Limpar filtros</button>
         </div>
       </div>
     </div>
