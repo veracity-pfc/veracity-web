@@ -15,8 +15,8 @@ import AdminDashboard from './pages/AdminDashboard.jsx';
 import VerifyEmail from "./pages/VerifyEmail/VerifyEmail.jsx";
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword.jsx';
 import ResetPassword from './pages/ResetPassword.jsx';
-import UserHistory from './pages/UserHistory.jsx';
-import UserHistoryDetail from './pages/UserHistoryDetail.jsx';
+import UserHistory from './pages/UserHistory/UserHistory.jsx';
+import UserHistoryDetail from './pages/UserHistoryDetail/UserHistoryDetail.jsx';
 
 import { getToken, initAuthWatch } from './api/client.js';
 
