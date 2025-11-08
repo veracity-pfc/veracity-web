@@ -51,11 +51,11 @@
 
 .nav-link.active,
 .nav-link[aria-current="page"] {
-  color: #fff;
-  background-image: linear-gradient(#fff, #fff);
-  background-repeat: no-repeat;
-  background-position: left calc(100% - 6px);
-  background-size: 100% 2px;
+    color: #fff;
+    background-image: linear-gradient(#fff, #fff);
+    background-repeat: no-repeat;
+    background-position: left calc(100% - 6px);
+    background-size: 100% 2px;
 }
 
 .login-cta {
@@ -243,4 +243,12 @@
         align-items: center;
         justify-content: center;
     }
+}
+
+.nav-link.login-cta,
+.nav-link.login-cta:hover,
+.nav-link.login-cta.active,
+.nav-link.login-cta[aria-current="page"] {
+    background-image: none !important;
+    background-size: 0 0 !important;
 }
