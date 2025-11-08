@@ -61,9 +61,6 @@ export default function Profile() {
   const dirtyRef = useRef(false);
   const pendingNavRef = useRef(null);
 
-  const modalUnsavedRef = useRef(false);
-  const modalConfirmSaveRef = useRef(false);
-
   const { success, error } = useToast();
 
   const [role, setRole] = useState(() => resolveRole());
@@ -94,17 +91,10 @@ export default function Profile() {
   useEffect(() => {
     dirtyRef.current = dirty;
   }, [dirty]);
-  useEffect(() => {
-    modalUnsavedRef.current = modalUnsaved;
-  }, [modalUnsaved]);
-  useEffect(() => {
-    modalConfirmSaveRef.current = modalConfirmSave;
-  }, [modalConfirmSave]);
 
   useEffect(() => {
     const onBeforeUnload = (e) => {
       if (!dirtyRef.current) return;
-      if (modalUnsavedRef.current || modalConfirmSaveRef.current) return;
       e.preventDefault();
       e.returnValue = "";
     };
@@ -137,7 +127,6 @@ export default function Profile() {
       e.preventDefault();
       e.stopPropagation();
 
-      if (modalConfirmSave) setModalConfirmSave(false);
       pendingNavRef.current = { type: "url", value: el.href };
       setModalUnsaved(true);
     };
@@ -145,7 +134,6 @@ export default function Profile() {
     const onPopState = () => {
       if (!dirtyRef.current) return;
       window.history.forward();
-      if (modalConfirmSave) setModalConfirmSave(false);
       pendingNavRef.current = { type: "back", value: null };
       setModalUnsaved(true);
     };
@@ -156,28 +144,7 @@ export default function Profile() {
       document.removeEventListener("click", onDocumentClickCapture, true);
       window.removeEventListener("popstate", onPopState);
     };
-  }, [modalConfirmSave]);
-
-  const validateNameServer = async () => {
-    setErrors((p) => ({ ...p, name: "" }));
-    if (!initial) return;
-    try {
-      await apiValidateName(name.trim());
-    } catch (e) {
-      setErrors((p) => ({ ...p, name: e.message || "Nome inválido." }));
-    }
-  };
-
-  const validateEmailServer = async () => {
-    setErrors((p) => ({ ...p, email: "" }));
-    if (!initial) return;
-    const newEmail = email.trim().toLowerCase();
-    try {
-      await apiValidateEmailChange(newEmail);
-    } catch (e) {
-      setErrors((p) => ({ ...p, email: e.message || "E-mail inválido." }));
-    }
-  };
+  }, []);
 
   const handleSave = () => {
     if (!dirty || saving) return;
@@ -206,8 +173,6 @@ export default function Profile() {
         if (requires_verification) {
           success("Solicitação de alteração de e-mail enviada com sucesso!");
           localStorage.setItem("veracity_email_change_target", newEmail);
-          setInitial((p) => ({ ...(p || {}), email: newEmail }));
-          setEmail(newEmail);
           dirtyRef.current = false;
           window.location.assign("/verify-email?mode=email-change");
           return;
@@ -300,7 +265,6 @@ export default function Profile() {
               setName(e.target.value);
               setErrors((p) => ({ ...p, name: "" }));
             }}
-            onBlur={validateNameServer}
             placeholder="Nome completo"
             disabled={isAdmin}
           />
@@ -314,7 +278,6 @@ export default function Profile() {
               setEmail(e.target.value);
               setErrors((p) => ({ ...p, email: "" }));
             }}
-            onBlur={validateEmailServer}
             placeholder="email@domino.com"
             disabled={isAdmin}
           />
@@ -332,9 +295,9 @@ export default function Profile() {
               <button
                 className={styles.btnDanger}
                 onClick={() => setModalDelete(true)}
-                disabled={deleting}
+                disabled={deleting || saving}
               >
-                {deleting ? "Carregando..." : "Excluir conta"}
+                Excluir conta
               </button>
             </div>
           )}
