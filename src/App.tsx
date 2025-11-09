@@ -11,13 +11,14 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import Login from './pages/Login';
 import Register from './pages/Register/Register';
 import Profile from './pages/Profile/Profile';
-import AdminDashboard from './pages/AdminDashboard';
 import VerifyEmail from "./pages/VerifyEmail/VerifyEmail";
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import UserHistory from './pages/UserHistory/UserHistory';
 import UserHistoryDetail from './pages/UserHistoryDetail/UserHistoryDetail';
 import { getToken, initAuthWatch } from './api/client';
+import Administration from './pages/Admin/Administration';
+import Toast from './components/Toast/Toast';
 
 function RequireAuth({ children }: PropsWithChildren): JSX.Element {
   const token = getToken();
@@ -47,13 +48,14 @@ export default function App(): JSX.Element {
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-        <Route path="/user/profile" element={<RequireAuth><Profile /></RequireAuth>}/>
-        <Route path="/administration" element={<RequireAuth><AdminDashboard /></RequireAuth>}/>
-        <Route path="/user/history" element={<RequireAuth><UserHistory /></RequireAuth>}/>
-        <Route path="/user/history/:id" element={<RequireAuth><UserHistoryDetail /></RequireAuth>}/>
+        <Route path="/user/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+        <Route path="/administration" element={<RequireAuth><Administration /></RequireAuth>} />
+        <Route path="/user/history" element={<RequireAuth><UserHistory /></RequireAuth>} />
+        <Route path="/user/history/:id" element={<RequireAuth><UserHistoryDetail /></RequireAuth>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Footer />
+      <Toast />
     </>
   );
 }

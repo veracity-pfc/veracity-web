@@ -326,3 +326,59 @@ export async function apiInactivateAccount(): Promise<any> {
   if (!r.ok) throw new Error(((await r.json()) as any).detail || "Falha ao inativar conta.");
   return r.json();
 }
+
+export type AdminMonthMetrics = {
+  year: number;
+  month: number;
+  reference: string;
+  bars: {
+    url_suspicious: number;
+    url_safe: number;
+    image_fake: number;
+    image_safe: number;
+  };
+  totals: {
+    total_month: number;
+    urls_month: number;
+    images_month: number;
+  };
+};
+
+export function buildAuthHeader(): Record<string, string> {
+  const token = getToken();
+  if (!token) return {};
+  const hasBearer = /^Bearer\s+/i.test(token);
+  return { Authorization: hasBearer ? token : `Bearer ${token}` };
+}
+
+export async function getAdminMonthlyMetrics(params: {
+  year?: number;
+  month?: number;
+  signal?: AbortSignal;
+}): Promise<AdminMonthMetrics> {
+  const q = new URLSearchParams();
+  if (params.year) q.set("year", String(params.year));
+  if (params.month) q.set("month", String(params.month));
+
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    ...buildAuthHeader(),
+  };
+
+  const url = `${API_BASE}/administration/metrics/month?${q.toString()}`;
+  const resp = await fetch(url, {
+    method: "GET",
+    headers,
+    credentials: "include",
+    signal: params.signal,
+  });
+
+  if (!resp.ok) {
+    if (resp.status === 401) {
+      throw new Error("Não autenticado. Faça login como administrador para ver o gráfico.");
+    }
+    const msg = await resp.text().catch(() => "");
+    throw new Error(msg || `Falha ao obter métricas (${resp.status})`);
+  }
+  return resp.json();
+}
