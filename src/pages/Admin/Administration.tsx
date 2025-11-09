@@ -267,10 +267,10 @@ export default function Administration(): JSX.Element {
                 labelFormatter={() => "Mês"}
               />
               <Legend wrapperStyle={{ color: "#fff" }} />
-              <Bar dataKey="url_suspicious" name="URL suspeita" fill="#2fd090" />
-              <Bar dataKey="url_safe" name="URL segura" fill="#7dd3ae" />
-              <Bar dataKey="image_fake" name="Imagem falsa" fill="#1fbf8a" />
-              <Bar dataKey="image_safe" name="Imagem segura" fill="#3ac49b" />
+              <Bar dataKey="url_suspicious" name="URL suspeita" fill="#008b54ff" />
+              <Bar dataKey="url_safe" name="URL segura" fill="#6ab997ff" />
+              <Bar dataKey="image_fake" name="Imagem falsa" fill="#029777ff" />
+              <Bar dataKey="image_safe" name="Imagem segura" fill="#b7ecd6ff" />
             </BarChart>
           </ResponsiveContainer>
         </div>
