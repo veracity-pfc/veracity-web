@@ -67,7 +67,7 @@ export default function Contact() {
                 >
                   <option value="Dúvida">Dúvida</option>
                   <option value="Sugestão">Sugestão</option>
-                  <option value="Solicitação">Solicitação</option>
+                  <option value="Solicitação">Solicitação de token de API</option>
                   <option value="Reclamação">Reclamação</option>
                 </select>
 
