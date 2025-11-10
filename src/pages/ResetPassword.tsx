@@ -5,6 +5,7 @@ import ReturnIcon from '../assets/icon-return.png';
 import ShowPasswordIcon from '../assets/icon-show-password.png';
 import HidePasswordIcon from '../assets/icon-hide-password.png';
 import Logo from '../components/Logo';
+import Toast, { useToast } from '../components/Toast/Toast';
 import '../styles/auth.css';
 import '../styles/forms.css';
 
@@ -16,6 +17,8 @@ export default function ResetPassword(): JSX.Element {
   const [err, setErr] = useState<string>('');
   const [show1, setShow1] = useState<boolean>(false);
   const [show2, setShow2] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false); 
+  const { success, error } = useToast(); 
 
   useEffect(() => {
     document.body.classList.add('auth-only-footer');
@@ -25,16 +28,23 @@ export default function ResetPassword(): JSX.Element {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErr('');
+    setLoading(true); 
     try {
       await apiResetPassword(token as string, pw, pw2);
+      success('Senha alterada com sucesso!'); 
       navigate('/login');
     } catch (e: any) {
-      setErr(e?.detail || 'Não foi possível alterar a senha.');
+      const msg = e?.detail || e?.data?.detail || e?.message || 'Não foi possível alterar a senha.';
+      setErr(msg);
+      error(msg);
+    } finally {
+      setLoading(false); 
     }
   };
 
   return (
     <main className="login-container">
+      <Toast /> 
       <div className="login-logo" aria-label="Veracity"><Logo /></div>
 
       <section className="login-card" aria-labelledby="reset-title">
@@ -62,12 +72,14 @@ export default function ResetPassword(): JSX.Element {
               placeholder="Informe sua senha"
               autoComplete="new-password"
               required
+              disabled={loading} 
             />
             <button
               type="button"
               className="toggle-eye"
               aria-label={show1 ? 'Ocultar senha' : 'Mostrar senha'}
               onClick={() => setShow1(v => !v)}
+              disabled={loading} 
             >
               <img
                 src={show1 ? HidePasswordIcon : ShowPasswordIcon}
@@ -88,12 +100,14 @@ export default function ResetPassword(): JSX.Element {
               placeholder="Confirme sua senha"
               autoComplete="new-password"
               required
+              disabled={loading} 
             />
             <button
               type="button"
               className="toggle-eye"
               aria-label={show2 ? 'Ocultar senha' : 'Mostrar senha'}
               onClick={() => setShow2(v => !v)}
+              disabled={loading} 
             >
               <img
                 src={show2 ? HidePasswordIcon : ShowPasswordIcon}
@@ -105,7 +119,14 @@ export default function ResetPassword(): JSX.Element {
 
           {err && <p className="error-msg" role="alert" aria-live="assertive">{err}</p>}
 
-          <button className="btn-primary login-submit" type="submit">Trocar senha</button>
+          <button
+            className="btn-primary login-submit"
+            type="submit"
+            disabled={loading}                     
+            aria-disabled={loading ? true : undefined}
+          >
+            {loading ? 'Carregando' : 'Trocar senha'} 
+          </button>
         </form>
       </section>
     </main>

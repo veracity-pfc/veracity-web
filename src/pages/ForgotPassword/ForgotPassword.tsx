@@ -11,6 +11,7 @@ export default function ForgotPassword(): JSX.Element {
   const [email, setEmail] = useState<string>('');
   const [err, setErr] = useState<string>('');
   const [sent, setSent] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false); 
   const navigate = useNavigate();
   const { success, error } = useToast();
 
@@ -22,6 +23,7 @@ export default function ForgotPassword(): JSX.Element {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErr('');
+    setLoading(true); 
     try {
       await apiForgotPassword(email.trim());
       setSent(true);
@@ -29,6 +31,8 @@ export default function ForgotPassword(): JSX.Element {
     } catch (e: any) {
       error("Erro ao enviar e-mail de recuperação!");
       setErr(e?.data?.detail || e.message || 'E-mail não encontrado. Tente novamente.');
+    } finally {
+      setLoading(false); 
     }
   };
 
@@ -66,11 +70,19 @@ export default function ForgotPassword(): JSX.Element {
                 placeholder="Informe seu e-mail"
                 autoComplete="email"
                 required
+                disabled={loading} 
               />
 
               {err && <p className="error-msg" role="alert" aria-live="assertive">{err}</p>}
 
-              <button className="btn-primary login-submit" type="submit">Enviar e-mail</button>
+              <button
+                className="btn-primary login-submit"
+                type="submit"
+                disabled={loading}            
+                aria-disabled={loading ? true : undefined}
+              >
+                {loading ? 'Carregando' : 'Enviar e-mail'} 
+              </button>
             </form>
           </>
         ) : (
