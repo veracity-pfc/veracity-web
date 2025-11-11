@@ -68,11 +68,19 @@ export default function UserHistory(): JSX.Element {
           <b>Data da análise:</b>{" "}
           {new Date(item.created_at).toLocaleDateString()}
         </p>
+
         {item.analysis_type === "image" ? (
-          <p className={styles.meta}><b>Imagem:</b> {item.source || "—"}</p>
+          <p className={styles.meta}>
+            <b>Imagem:</b>{" "}
+            <span className={styles.ellipsis}>{item.source || "—"}</span>
+          </p>
         ) : (
-          <p className={styles.meta}><b>URL:</b> {item.source || "—"}</p>
+          <p className={styles.meta}>
+            <b>URL:</b>{" "}
+            <span className={styles.ellipsis}>{item.source || "—"}</span>
+          </p>
         )}
+
         <p className={styles.meta}>
           <b>Status:</b>{" "}
           {item.label === "safe" ? "Seguro" :
@@ -117,17 +125,13 @@ export default function UserHistory(): JSX.Element {
             className={styles.pageBtn}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
-          >
-            ◄
-          </button>
+          />
           <span>Página {page} de {totalPages}</span>
           <button
             className={styles.pageBtn}
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
-          >
-            ►
-          </button>
+          />
         </div>
       )}
 

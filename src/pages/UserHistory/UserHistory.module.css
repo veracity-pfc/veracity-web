@@ -112,7 +112,11 @@
   cursor: pointer;
   transition: transform .15s ease, box-shadow .15s ease, outline-color .15s ease;
   outline: 2px solid transparent;
-  height: auto;
+  min-height: 160px;           
+  display: flex;
+  max-width: 350px;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 .card:hover {
@@ -124,6 +128,15 @@
 .meta {
   margin: 6px 0;
   line-height: 1.35;
+}
+
+.ellipsis {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
 }
 
 .pag {
@@ -179,6 +192,10 @@
 @media (max-width: 640px) {
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .card {
+    max-width: 275px;
   }
 
   .gridSingle {
