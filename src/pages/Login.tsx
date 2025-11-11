@@ -90,7 +90,7 @@ export default function Login(): JSX.Element {
           <p className="signup-hint">Não possui uma conta? <a href="/sign-up">Cadastre-se agora!</a></p>
 
           <button type="submit" className="btn-primary login-submit" disabled={loading}>
-            {loading ? 'Entrando...' : 'Login'}
+            {loading ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
       </section>
