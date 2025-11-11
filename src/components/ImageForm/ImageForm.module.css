@@ -1,3 +1,5 @@
+@import '../../styles/variables.css';
+
 .image-form {
     margin: 16px auto 0;
     max-width: 940px;
@@ -136,7 +138,7 @@
     text-align: left;
 }
 
-.image-form__hint.is-error {
+.image-form__hint:global(.is-error) {
     color: var(--danger);
 }
 

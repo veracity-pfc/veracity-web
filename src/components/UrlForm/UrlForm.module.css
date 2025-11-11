@@ -88,7 +88,7 @@
     text-align: left;
 }
 
-.search-form__hint.is-error {
+.search-form__hint:global(.is-error) {
     color: var(--danger);
 }
 
