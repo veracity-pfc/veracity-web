@@ -130,6 +130,16 @@ export default function UserHistory(): JSX.Element {
           value={q}
           onChange={(e) => { setPage(1); setQ(e.target.value); }}
         />
+        <button
+          type="button"
+          className={styles.clearBtn}
+          aria-label="Limpar busca"
+          onClick={() => { setQ(""); setPage(1); }}
+          title="Limpar"
+          disabled={!q || loading}
+        >
+          ×
+        </button>
         <button className={styles.filterBtn} onClick={() => setFiltersOpen(true)}>Filtros</button>
       </div>
 
