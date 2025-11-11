@@ -17,6 +17,15 @@ type Paged = {
   total_pages: number;
 };
 
+function onlyDate(value: string): string {
+  if (!value) return "";
+  try {
+    return new Date(value).toISOString().slice(0, 10);
+  } catch {
+    return value.slice(0, 10);
+  }
+}
+
 export default function UserHistory(): JSX.Element {
   const navigate = useNavigate();
   const [items, setItems] = useState<Item[]>([]);
@@ -37,8 +46,25 @@ export default function UserHistory(): JSX.Element {
     if (q) p.set("q", q);
     if (status) p.set("status", status);
     if (atype) p.set("analysis_type", atype);
-    if (dateFrom) p.set("date_from", new Date(dateFrom).toISOString());
-    if (dateTo) p.set("date_to", new Date(dateTo).toISOString());
+
+    const from = onlyDate(dateFrom);
+    const to = onlyDate(dateTo);
+
+    if (from && !to) {
+      p.set("date_from", from);
+    } else if (to && !from) {
+      p.set("date_to", to);
+    } else if (from && to) {
+      const f = new Date(from + "T00:00:00Z").getTime();
+      const t = new Date(to + "T00:00:00Z").getTime();
+      if (t < f) {
+        p.set("date_from", to);
+        p.set("date_to", to);
+      } else {
+        p.set("date_from", from);
+        p.set("date_to", to);
+      }
+    }
     return p.toString();
   }, [page, q, status, atype, dateFrom, dateTo]);
 
@@ -100,7 +126,7 @@ export default function UserHistory(): JSX.Element {
         <span className={styles.searchIcon}>⌕</span>
         <input
           className={styles.search}
-          placeholder="Buscar por URL, imagem ou status…"
+          placeholder="Buscar por URL ou nome da imagem"
           value={q}
           onChange={(e) => { setPage(1); setQ(e.target.value); }}
         />
@@ -142,8 +168,24 @@ export default function UserHistory(): JSX.Element {
         dateTo={dateTo}
         status={status}
         atype={atype}
-        onChangeDateFrom={(v) => { setPage(1); setDateFrom(v); }}
-        onChangeDateTo={(v) => { setPage(1); setDateTo(v); }}
+        onChangeDateFrom={(v) => {
+          setPage(1);
+          const from = onlyDate(v);
+          const to = onlyDate(dateTo);
+          if (to && from && new Date(from).getTime() > new Date(to).getTime()) {
+            setDateTo(from);
+          }
+          setDateFrom(from);
+        }}
+        onChangeDateTo={(v) => {
+          setPage(1);
+          const to = onlyDate(v);
+          const from = onlyDate(dateFrom);
+          if (from && to && new Date(to).getTime() < new Date(from).getTime()) {
+            setDateFrom(to);
+          }
+          setDateTo(to);
+        }}
         onChangeStatus={(v) => { setPage(1); setStatus(v); }}
         onChangeType={(v) => { setPage(1); setAtype(v); }}
         onApply={() => setFiltersOpen(false)}
