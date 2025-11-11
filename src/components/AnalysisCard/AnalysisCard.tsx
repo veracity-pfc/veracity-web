@@ -3,7 +3,7 @@ import styles from "./AnalysisCard.module.css";
 
 const LABEL_MAP = {
   safe: "Seguro",
-  suspicious: "Possivelmente falsificado ou fraudulento",
+  suspicious: "Suspeito",
   malicious: "Malicioso",
   fake: "Falsa",
   unknown: "Desconhecido",

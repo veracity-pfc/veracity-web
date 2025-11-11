@@ -37,7 +37,7 @@ export default function UserHistoryDetail(): JSX.Element {
     safe: "Seguro",
     suspicious: "Suspeito",
     malicious: "Malicioso",
-    fake: "Possivelmente falsificado ou fraudulento",
+    fake: "Falso",
     unknown: "Desconhecido",
   };
 
