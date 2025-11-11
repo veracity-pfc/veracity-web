@@ -1,5 +1,5 @@
 import React, { JSX, useEffect, useRef, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import Logo from '../Logo';
 import styles from './Header.module.css';
 import { apiLogout, clearToken, getRole, getToken } from '../../api/client';
@@ -13,10 +13,14 @@ export default function Header(): JSX.Element {
 
   const [isAuthed, setIsAuthed] = useState<boolean>(!!getToken());
   const [role, setRole] = useState<string | null>(getRole());
+  const [authBusy, setAuthBusy] = useState<boolean>(false);
 
   const btnRef = useRef<HTMLButtonElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const onLoginPage = location.pathname.startsWith('/login');
 
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
@@ -38,6 +42,10 @@ export default function Header(): JSX.Element {
   }, []);
 
   useEffect(() => {
+    setAuthBusy(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
     function onDocClick(e: MouseEvent) {
       if (!menuRef.current || !btnRef.current) return;
       const target = e.target as Node;
@@ -57,6 +65,8 @@ export default function Header(): JSX.Element {
 
   const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault();
+    if (authBusy) return;
+    setAuthBusy(true);
     try { await apiLogout(); } catch {}
     clearToken();
     setIsAuthed(false);
@@ -114,9 +124,30 @@ export default function Header(): JSX.Element {
           </div>
 
           {!isAuthed ? (
-            <NavLink to="/login" className={`${styles['nav-link']} ${styles['login-cta']}`}>Login</NavLink>
+            <NavLink
+              to="/login"
+              className={cx(
+                styles['nav-link'],
+                styles['login-cta'],
+                (authBusy || onLoginPage) && styles['is-disabled']
+              )}
+              aria-disabled={authBusy || onLoginPage}
+              onClick={(e) => {
+                if (authBusy || onLoginPage) { e.preventDefault(); return; }
+                setAuthBusy(true);
+              }}
+            >
+              Login
+            </NavLink>
           ) : (
-            <a href="/logout" className={`${styles['nav-link']} ${styles['login-cta']}`} onClick={handleLogout}>Sair</a>
+            <a
+              href="/logout"
+              className={cx(styles['nav-link'], styles['login-cta'], authBusy && styles['is-disabled'])}
+              aria-disabled={authBusy}
+              onClick={handleLogout}
+            >
+              Sair
+            </a>
           )}
         </nav>
 
@@ -155,9 +186,30 @@ export default function Header(): JSX.Element {
             )}
 
             {!isAuthed ? (
-              <NavLink className={styles['mobile-login']} to="/login" onClick={() => setMobileOpen(false)}>Login</NavLink>
+              <NavLink
+                className={cx(
+                  styles['mobile-login'],
+                  (authBusy || onLoginPage) && styles['is-disabled']
+                )}
+                to="/login"
+                aria-disabled={authBusy || onLoginPage}
+                onClick={(e) => {
+                  if (authBusy || onLoginPage) { e.preventDefault(); return; }
+                  setAuthBusy(true);
+                  setMobileOpen(false);
+                }}
+              >
+                Login
+              </NavLink>
             ) : (
-              <a className={styles['mobile-login']} href="/logout" onClick={(e) => { e.preventDefault(); setMobileOpen(false); handleLogout(e); }}>Sair</a>
+              <a
+                className={cx(styles['mobile-login'], authBusy && styles['is-disabled'])}
+                href="/logout"
+                aria-disabled={authBusy}
+                onClick={(e) => { if (authBusy) { e.preventDefault(); return; } setMobileOpen(false); handleLogout(e); }}
+              >
+                Sair
+              </a>
             )}
           </div>
         </div>

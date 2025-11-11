@@ -37,7 +37,7 @@
     background-repeat: no-repeat;
     background-position: left calc(100% - 6px);
     background-size: 0% 2px;
-    transition: color .18s ease, background-size .18s ease;
+    transition: color .18s ease, background-size .18s ease, opacity .18s ease, filter .18s ease;
 }
 
 .nav-link:hover {
@@ -190,6 +190,7 @@
     border-radius: 10px;
     color: var(--text-primary);
     font-weight: 800;
+    transition: opacity .18s ease, filter .18s ease;
 }
 
 .mobile-link.is-active,
@@ -230,6 +231,13 @@
     color: #EAF6F2 !important;
     font-weight: 900;
     margin-top: 6px;
+}
+
+.is-disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+    opacity: .6;
+    filter: grayscale(10%);
 }
 
 @media (max-width: 980px) {
