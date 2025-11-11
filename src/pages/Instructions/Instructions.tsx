@@ -1,4 +1,5 @@
-import React, { JSX, useState } from 'react';
+import React, { JSX, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import styles from './Instructions.module.css';
 
 const cx = (...xs: Array<string | false | null | undefined>) => xs.filter(Boolean).join(' ');
@@ -56,12 +57,40 @@ function Steps({ title, steps }: { title: string; steps: Step[] }): JSX.Element 
   );
 }
 
+function ImportantNotice(): JSX.Element {
+  return (
+    <section className={cx(styles.noticeWrap, 'container')} aria-labelledby="important-notes-title">
+      <div className={styles.notice}>
+        <div className={styles.noticeHeader}>
+          <h3 id="important-notes-title" className={styles.noticeTitle}>Observação importante</h3>
+        </div>
+        <p className={styles.noticeBody}>
+          Usuários anônimos só podem realizar <strong>2 análises de URL</strong> e <strong>1 análise de imagem</strong> por dia.{' '}
+          <Link to="/sign-up" className={styles.noticeLink}>Crie sua conta</Link> ou{' '}
+          <Link to="/login" className={styles.noticeLink}>faça login</Link> para poder realizar mais análises.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 export default function Instructions(): JSX.Element {
+  const isAnonymous = useMemo(() => {
+    try {
+      return !localStorage.getItem('veracity_token');
+    } catch {
+      return true;
+    }
+  }, []);
+
   return (
     <main>
       <section className="hero">
         <h1 className={styles['instructions-h1']}>Como utilizar a plataforma</h1>
       </section>
+
+      {isAnonymous && <ImportantNotice />}
+
       <Steps title="Análise de URLs" steps={urlSteps} />
       <Steps title="Análise de imagens" steps={imageSteps} />
     </main>

@@ -15,6 +15,53 @@
     justify-content: center;
 }
 
+.noticeWrap {
+    margin: 18px auto 28px;
+}
+
+.notice {
+
+    border-radius: 14px;
+    padding: 16px 18px;
+    background: linear-gradient(180deg, #e9b824 0%, #edda9e 100%);
+    color: #0e0e0e;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25) inset, 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.noticeHeader {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.noticeTitle {
+    margin: 0;
+    color: #2d2a2a;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.noticeBody {
+    margin: 0;
+    line-height: 1.45;
+    font-size: 14px;
+    color: #111;
+}
+
+.noticeLink {
+    text-decoration: underline;
+    font-weight: 700;
+    color: #5AB0FF;
+}
+
+.noticeLink:focus,
+.noticeLink:hover {
+    text-decoration: none;
+    opacity: .95;
+}
+
 .steps-wrap {
     border-radius: 14px;
     background: #1e1d1d;
@@ -79,9 +126,29 @@
     opacity: .95;
 }
 
+
 @media (max-width: 670px) {
     .instructions-title {
         font-size: 22px;
+    }
+
+    .instructions-h1 {
+        font-size: 36px !important;
+        text-align: center;
+        padding: 0 10px;
+    }
+
+    .notice {
+        padding: 14px;
+        border-radius: 12px;
+    }
+
+    .noticeTitle {
+        font-size: 15px;
+    }
+
+    .noticeBody {
+        font-size: 13px;
     }
 
     .step-btn {
