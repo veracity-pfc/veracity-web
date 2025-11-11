@@ -1,4 +1,4 @@
-import { JSX, useEffect, useMemo, useState } from "react";
+import { JSX, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../../api/client";
 import Filter from "../../components/Filter/Filter";
@@ -39,6 +39,8 @@ export default function UserHistory(): JSX.Element {
   const [dateTo, setDateTo] = useState<string>("");
   const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
 
+  const requestSeq = useRef(0);
+
   const params = useMemo(() => {
     const p = new URLSearchParams();
     p.set("page", page.toString());
@@ -69,15 +71,19 @@ export default function UserHistory(): JSX.Element {
   }, [page, q, status, atype, dateFrom, dateTo]);
 
   async function load() {
+    const seq = ++requestSeq.current;
     setLoading(true);
     try {
       const data = (await apiFetch(`/user/history?${params}`, { auth: true })) as Paged;
+      if (seq !== requestSeq.current) return;
       setItems(data.items);
       setTotalPages(data.total_pages);
     } catch {
+      if (seq !== requestSeq.current) return;
       setItems([]);
       setTotalPages(1);
     } finally {
+      if (seq !== requestSeq.current) return;
       setLoading(false);
     }
   }
