@@ -1,10 +1,15 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import Instructions from '@/pages/Instructions/Instructions'
 
 describe('Instructions', () => {
   it('alterna etapas ao clicar nos botões', async () => {
-    render(<Instructions />)
+    render(
+      <MemoryRouter>
+        <Instructions />
+      </MemoryRouter>
+    )
 
     const urlSection = screen
       .getByRole('heading', { name: /análise de urls/i })
