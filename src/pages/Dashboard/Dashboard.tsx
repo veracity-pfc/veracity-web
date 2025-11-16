@@ -15,7 +15,7 @@ import {
   getToken,
 } from "../../api/client";
 import { useToast } from "../../components/Toast/Toast";
-import styles from "./Administration.module.css";
+import styles from "./Dashboard.module.css";
 
 type YM = { year: number; month: number };
 type ChartRow = {

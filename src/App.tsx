@@ -16,14 +16,27 @@ import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import UserHistory from './pages/UserHistory/UserHistory';
 import UserHistoryDetail from './pages/UserHistoryDetail/UserHistoryDetail';
-import { getToken, initAuthWatch } from './api/client';
-import Administration from './pages/Admin/Administration';
+import { getToken, getRole, initAuthWatch } from './api/client';
+import Dashboard from './pages/Dashboard/Dashboard';
 import Toast from './components/Toast/Toast';
+import Requests from './pages/Requests/Requests';
 
 function RequireAuth({ children }: PropsWithChildren): JSX.Element {
   const token = getToken();
   if (!token) {
     return <Navigate to="/login" replace />;
+  }
+  return <>{children}</>;
+}
+
+function RequireAdmin({ children }: PropsWithChildren): JSX.Element {
+  const token = getToken();
+  const role = getRole();
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  if (role !== 'admin') {
+    return <Navigate to="/" replace />;
   }
   return <>{children}</>;
 }
@@ -49,9 +62,10 @@ export default function App(): JSX.Element {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/user/profile" element={<RequireAuth><Profile /></RequireAuth>} />
-        <Route path="/administration" element={<RequireAuth><Administration /></RequireAuth>} />
         <Route path="/user/history" element={<RequireAuth><UserHistory /></RequireAuth>} />
         <Route path="/user/history/:id" element={<RequireAuth><UserHistoryDetail /></RequireAuth>} />
+        <Route path="/dashboard" element={<RequireAdmin><Dashboard /></RequireAdmin>} />
+        <Route path="/request" element={<RequireAdmin><Requests /></RequireAdmin>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Footer />

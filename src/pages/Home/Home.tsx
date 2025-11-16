@@ -1,12 +1,12 @@
 import { JSX, useCallback, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Tabs from "../../components/Tabs/Tabs";
 import SearchForm from "../../components/UrlForm/UrlForm";
 import ImageForm from "../../components/ImageForm/ImageForm";
 import modalImage from "../../assets/ilust-welcome.png";
 import Modal from "../../components/Modal/Modal";
 import modalStyles from "../../components/Modal/Modal.module.css";
-import { getToken } from "../../api/client";
+import { getToken, getRole } from "../../api/client";
 import Toast from "../../components/Toast/Toast";
 import "../../styles/legal.css";
 import styles from "./Home.module.css";
@@ -21,6 +21,7 @@ function getTabFromSearch(search: string): TabKey {
 
 export default function Home(): JSX.Element {
   const location = useLocation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabKey>(() => getTabFromSearch(location.search));
   const [showWelcome, setShowWelcome] = useState<boolean>(false);
 
@@ -31,12 +32,19 @@ export default function Home(): JSX.Element {
 
   useEffect(() => {
     const hasToken = !!getToken?.();
+    const role = typeof getRole === "function" ? getRole() : null;
+
+    if (hasToken && role === "admin") {
+      navigate("/dashboard", { replace: true });
+      return;
+    }
+
     const pending = localStorage.getItem("veracity_welcome_pending") === "1";
     if (hasToken && pending) {
       setShowWelcome(true);
       localStorage.removeItem("veracity_welcome_pending");
     }
-  }, []);
+  }, [navigate]);
 
   const handleChange = useCallback((t: TabKey) => {
     setActiveTab(t);
