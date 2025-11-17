@@ -13,6 +13,7 @@ export default function Contact(): JSX.Element {
   const [message, setMessage] = useState<string>('');
   const [ok, setOk] = useState<boolean>(false);
   const [err, setErr] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
   const { success, error } = useToast();
 
   return (
@@ -36,14 +37,18 @@ export default function Contact(): JSX.Element {
                 className={styles['contact-form']}
                 onSubmit={async (e) => {
                   e.preventDefault();
+                  if (loading) return;
                   setErr('');
+                  setLoading(true);
                   try {
                     await apiSendContact(email.trim(), subject, message.trim());
                     setOk(true);
-                    success("Mensagem enviada com sucesso!");
+                    success('Mensagem enviada com sucesso!');
                   } catch (e: any) {
-                    error("Erro ao enviar mensagem!");
+                    error('Erro ao enviar mensagem!');
                     setErr(e?.data?.detail || e.message || 'Não foi possível enviar sua mensagem.');
+                  } finally {
+                    setLoading(false);
                   }
                 }}
                 noValidate
@@ -84,7 +89,9 @@ export default function Contact(): JSX.Element {
                 />
 
                 {err && <p className="error-msg" role="alert">{err}</p>}
-                <button type="submit" className="btn-primary">Enviar</button>
+                <button type="submit" className="btn-primary" disabled={loading}>
+                  {loading ? 'Carregando...' : 'Enviar'}
+                </button>
               </form>
             ) : (
               <div className="steps-wrap" style={{marginTop:12}}>
