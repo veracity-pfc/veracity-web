@@ -62,7 +62,8 @@ export default function Contact(): JSX.Element {
                   type="email"
                   placeholder="Informe seu e-mail"
                   value={email}
-                  onChange={(e)=>setEmail(e.target.value)}
+                  maxLength={60}
+                  onChange={(e) => setEmail(e.target.value.slice(0, 60))}
                 />
 
                 <label className="form-label" htmlFor="subject">Assunto</label>
@@ -85,7 +86,8 @@ export default function Contact(): JSX.Element {
                   placeholder="Descreva sua solicitação"
                   rows={6}
                   value={message}
-                  onChange={(e)=>setMessage(e.target.value)}
+                  maxLength={4000}
+                  onChange={(e) => setMessage(e.target.value.slice(0, 4000))}
                 />
 
                 {err && <p className="error-msg" role="alert">{err}</p>}
@@ -95,9 +97,9 @@ export default function Contact(): JSX.Element {
                 </button>
               </form>
             ) : (
-              <div className="steps-wrap" style={{marginTop:12}}>
-                <p style={{margin:0, fontWeight:800}}>Mensagem enviada</p>
-                <p style={{margin:'6px 0 0'}}>Obrigado pelo contato! Em breve retornaremos pelo seu e-mail.</p>
+              <div className="steps-wrap" style={{ marginTop: 12 }}>
+                <p style={{ margin: 0, fontWeight: 800 }}>Mensagem enviada</p>
+                <p style={{ margin: '6px 0 0' }}>Obrigado pelo contato! Em breve retornaremos pelo seu e-mail.</p>
               </div>
             )}
           </div>
