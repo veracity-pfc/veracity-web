@@ -79,7 +79,7 @@ export default function VerifyEmail(): JSX.Element {
         navigate("/login");
       } else {
         await apiVerifyEmail(email, joined);
-        success("E-mail confirmado com sucesso!");
+        success("Conta criada com sucesso!");
         navigate("/");
       }
     } catch (error: any) {

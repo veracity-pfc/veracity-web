@@ -80,7 +80,7 @@ export default function Register(): JSX.Element {
     setErrEmail("");
     try {
       await apiRegister(fullName.trim(), email.trim(), password, confirm, true);
-      success("Conta criada com sucesso!");
+      success("E-mail de confirmação enviado com sucesso!");
       localStorage.setItem('veracity_welcome_pending', '1');
       navigate(`/verify-email?email=${encodeURIComponent(email.trim())}`);
     } catch (err: any) {

@@ -318,13 +318,21 @@ export async function apiDeleteAccount(): Promise<any> {
   return r.json();
 }
 
-export async function apiInactivateAccount(): Promise<any> {
-  const r = await fetch(`${API_BASE}/user/account?mode=inactivate`, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${localStorage.getItem("veracity_token")}` },
+export async function apiInactivateAccount() {
+  const res = await fetch(`${API_BASE}/user/account`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`,
+    },
   });
-  if (!r.ok) throw new Error(((await r.json()) as any).detail || "Falha ao inativar conta.");
-  return r.json();
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Falha ao inativar conta.");
+  }
+
+  return res.json();
 }
 
 export type AdminMonthMetrics = {
