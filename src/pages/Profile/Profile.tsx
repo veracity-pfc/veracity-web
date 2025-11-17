@@ -233,6 +233,7 @@ export default function Profile(): JSX.Element {
 
   const confirmDeactivate = async () => {
     setModalDeactivate(false);
+    setDeleting(true);
     try {
       await apiInactivateAccount();
       clearToken();
@@ -241,6 +242,7 @@ export default function Profile(): JSX.Element {
     } catch (e: any) {
       error("Erro ao inativar conta!");
       setServerErr(e.message || "Falha ao inativar conta.");
+      setDeleting(false);
     }
   };
 
@@ -304,7 +306,7 @@ export default function Profile(): JSX.Element {
                 onClick={() => setModalDelete(true)}
                 disabled={deleting || saving}
               >
-                Excluir conta
+                {deleting || saving ? "Carregando..." : "Excluir conta"}
               </button>
             </div>
           )}
