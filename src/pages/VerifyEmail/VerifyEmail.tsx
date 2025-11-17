@@ -2,7 +2,7 @@ import { JSX, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Logo from "../../components/Logo";
 import ReturnIcon from "../../assets/icon-return.png";
-import { apiVerifyEmail, apiResendCode } from "../../api/client";
+import { apiVerifyEmail, apiResendCode, apiFetch } from "../../api/client";
 import Toast, { useToast } from "../../components/Toast/Toast";
 import "../../styles/forms.css";
 import styles from "./VerifyEmail.module.css";
@@ -11,7 +11,10 @@ export default function VerifyEmail(): JSX.Element {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { success, error: toastError } = useToast();
+
   const email = (params.get("email") || "").trim();
+  const mode = (params.get("mode") || "signup").trim();
+  const isReactivation = mode === "reactivate";
 
   const [code, setCode] = useState<string[]>(["", "", "", "", "", ""]);
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
@@ -64,15 +67,26 @@ export default function VerifyEmail(): JSX.Element {
     e.preventDefault();
     setErr("");
     const joined = code.join("");
-    if (joined.length !== 6 || verifying || sending) return;
+    if (!email || joined.length !== 6 || verifying || sending) return;
     try {
       setVerifying(true);
-      await apiVerifyEmail(email, joined);
-      success("E-mail confirmado com sucesso!");
-      navigate("/");
+      if (isReactivation) {
+        await apiFetch("/user/reactivate-account/confirm-code", {
+          method: "POST",
+          body: { email, code: joined },
+        });
+        success("Conta reativada com sucesso! Você já pode fazer login novamente.");
+        navigate("/login");
+      } else {
+        await apiVerifyEmail(email, joined);
+        success("E-mail confirmado com sucesso!");
+        navigate("/");
+      }
     } catch (error: any) {
-      toastError("Erro ao confirmar e-mail!");
-      setErr(error?.message || "O código inserido está inválido. Tente novamente");
+      toastError("Erro ao confirmar código!");
+      setErr(
+        error?.message || "O código inserido está inválido. Tente novamente"
+      );
     } finally {
       setVerifying(false);
     }
@@ -80,10 +94,17 @@ export default function VerifyEmail(): JSX.Element {
 
   const resend = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    if (cooldown > 0 || sending || verifying) return;
+    if (!email || cooldown > 0 || sending || verifying) return;
     setSending(true);
     try {
-      await apiResendCode(email);
+      if (isReactivation) {
+        await apiFetch("/user/reactivate-account/send-code", {
+          method: "POST",
+          body: { email },
+        });
+      } else {
+        await apiResendCode(email);
+      }
       setCooldown(30);
     } catch (error: any) {
       setErr(error?.message || "Falha ao reenviar código");
@@ -103,14 +124,20 @@ export default function VerifyEmail(): JSX.Element {
         <button
           type="button"
           className="login-back"
-          onClick={() => window.location.assign("/")}
+          onClick={() =>
+            window.location.assign(
+              isReactivation ? "/user/reactivate-account" : "/"
+            )
+          }
           aria-label="Voltar"
           title="Voltar"
         >
           <img src={ReturnIcon} alt="" />
         </button>
 
-        <h2 className="login-title">Confirme seu e-mail</h2>
+        <h2 className="login-title">
+          Confirme seu e-mail
+        </h2>
         <p className="signup-hint" style={{ marginTop: -8 }}>
           Preencha os campos abaixo com o código enviado para o e-mail cadastrado
         </p>

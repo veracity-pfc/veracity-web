@@ -162,6 +162,14 @@ export default function Header(): JSX.Element {
                 >
                   Conheça nossa história
                 </NavLink>
+                <NavLink
+                  role="menuitem"
+                  tabIndex={0}
+                  to="/user/reactivate-account"
+                  className={styles['about-item']}
+                >
+                  Reativar conta
+                </NavLink>
                 <a
                   role="menuitem"
                   tabIndex={0}
@@ -319,6 +327,13 @@ export default function Header(): JSX.Element {
                   onClick={() => setMobileOpen(false)}
                 >
                   Conheça nossa história
+                </NavLink>
+                <NavLink
+                  className={styles['mobile-subitem']}
+                  to="/reactivate-account"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Reativar conta
                 </NavLink>
                 <a
                   className={styles['mobile-subitem']}

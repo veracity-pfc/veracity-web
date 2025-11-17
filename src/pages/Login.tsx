@@ -41,7 +41,7 @@ export default function Login(): JSX.Element {
       if (code === 'ACCOUNT_INACTIVE') {
         setErrMsg(
           <>
-            A conta está desativada. Entre em <a id="contact-link" href="/contact-us">contato</a> para recuperar o acesso.
+            A conta está desativada. <a id="contact-link" href="/reactivate-account">Clique aqui</a> para recuperar o acesso.
           </>
         );
       } else {
@@ -88,6 +88,7 @@ export default function Login(): JSX.Element {
           {errMsg && <p className="error-msg" role="alert" aria-live="assertive">{errMsg}</p>}
 
           <p className="signup-hint">Não possui uma conta? <a href="/sign-up">Cadastre-se agora!</a></p>
+          <p className="signup-hint">Conta inativa? <a href="/reactivate-account">Reative agora!</a></p>
 
           <button type="submit" className="btn-primary login-submit" disabled={loading}>
             {loading ? 'Entrando...' : 'Entrar'}

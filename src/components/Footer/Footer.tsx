@@ -41,6 +41,7 @@ export default function Footer(): JSX.Element {
               >
                 Termos de uso
               </a>
+              <a href="/reactivate-account">Reativar conta</a>
             </div>
           </div>
 

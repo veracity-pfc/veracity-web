@@ -20,6 +20,8 @@ import { getToken, getRole, initAuthWatch } from './api/client';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Toast from './components/Toast/Toast';
 import Requests from './pages/Requests/Requests';
+import ReactivateAccount from './pages/ReactivateAccount/ReactivateAccount';
+
 
 function RequireAuth({ children }: PropsWithChildren): JSX.Element {
   const token = getToken();
@@ -55,6 +57,7 @@ export default function App(): JSX.Element {
         <Route path="/instructions" element={<Instructions />} />
         <Route path="/contact-us" element={<Contact />} />
         <Route path="/terms-of-use" element={<TermsOfUse />} />
+        <Route path="/reactivate-account" element={<ReactivateAccount />}/>
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/login" element={<Login />} />
         <Route path="/sign-up" element={<Register />} />

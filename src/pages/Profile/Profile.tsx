@@ -86,7 +86,7 @@ export default function Profile(): JSX.Element {
       })
       .catch((e: any) => setServerErr(e.message || "Erro ao carregar perfil"))
       .finally(() => setLoading(false));
-  }, []); 
+  }, []);
 
   const dirty =
     !!initial &&
@@ -380,7 +380,26 @@ export default function Profile(): JSX.Element {
       >
         <p>
           Sugerimos inativar em vez de excluir. Ao inativar, você perde o acesso, mas pode reativar depois e manter seu histórico.
-          <br /><br />A exclusão é permanente e não pode ser desfeita.
+          <br />
+          <br />
+          A exclusão é permanente e não pode ser desfeita.
+        </p>
+      </Modal>
+
+      <Modal
+        open={modalDeactivate}
+        onClose={() => setModalDeactivate(false)}
+        title="Inativar conta?"
+        imageSrc={modalInactiveAccountImg}
+        primaryText="Inativar"
+        primaryVariant="danger"
+        onPrimary={confirmDeactivate}
+        secondaryText="Cancelar"
+        onSecondary={() => setModalDeactivate(false)}
+        secondaryVariant="secondary"
+      >
+        <p>
+          Ao inativar sua conta, você perderá o acesso à plataforma, mas poderá reativá-la depois utilizando o mesmo e-mail.
         </p>
       </Modal>
 
