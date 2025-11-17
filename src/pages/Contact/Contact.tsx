@@ -1,6 +1,6 @@
 import React, { JSX, useState } from 'react';
 import cover from '../../assets/contact-cover.png';
-import { apiSendContact } from '../../api/client';
+import { apiSendContact, getToken } from '../../api/client';
 import Toast, { useToast } from '../../components/Toast/Toast';
 import styles from './Contact.module.css';
 import '../../styles/forms.css';
@@ -15,6 +15,8 @@ export default function Contact(): JSX.Element {
   const [err, setErr] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const { success, error } = useToast();
+
+  const isInvalid = !email.trim() || !message.trim();
 
   return (
     <main>
@@ -61,7 +63,6 @@ export default function Contact(): JSX.Element {
                   placeholder="Informe seu e-mail"
                   value={email}
                   onChange={(e)=>setEmail(e.target.value)}
-                  required
                 />
 
                 <label className="form-label" htmlFor="subject">Assunto</label>
@@ -73,7 +74,7 @@ export default function Contact(): JSX.Element {
                 >
                   <option value="Dúvida">Dúvida</option>
                   <option value="Sugestão">Sugestão</option>
-                  <option value="Solicitação">Solicitação de token de API</option>
+                  {getToken() && <option value="Solicitação">Solicitação de token de API</option>}
                   <option value="Reclamação">Reclamação</option>
                 </select>
 
@@ -85,11 +86,11 @@ export default function Contact(): JSX.Element {
                   rows={6}
                   value={message}
                   onChange={(e)=>setMessage(e.target.value)}
-                  required
                 />
 
                 {err && <p className="error-msg" role="alert">{err}</p>}
-                <button type="submit" className="btn-primary" disabled={loading}>
+
+                <button type="submit" className="btn-primary" disabled={loading || isInvalid}>
                   {loading ? 'Carregando...' : 'Enviar'}
                 </button>
               </form>
