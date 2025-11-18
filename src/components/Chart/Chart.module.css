@@ -18,14 +18,14 @@
 }
 
 .cardTitle {
-    font-size: 20px;
+    font-size: 30px;
     font-weight: 700;
     margin: 0;
 }
 
 .subtle {
     opacity: .8;
-    font-size: 15px;
+    font-size: 20px;
     margin: 2px 0 0 0;
 }
 
@@ -155,5 +155,245 @@
     .totals {
         flex-direction: column;
         font-size: 16px;
+    }
+}
+
+.card {
+    background: rgba(15, 27, 25, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.card+.card {
+    margin-top: 32px;
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.cardTitle {
+    font-size: 30px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.subtle {
+    opacity: 0.8;
+    font-size: 20px;
+    margin: 2px 0 0 0;
+}
+
+.actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.monthControl {
+    position: relative;
+    display: inline-block;
+    min-width: 154px;
+    height: 40px;
+}
+
+.monthButton {
+    background: #10352f;
+    color: #dff7f0;
+    border: 1px solid rgba(223, 247, 240, 0.25);
+    border-radius: 12px;
+    padding: 10px 40px 10px 14px;
+    font-weight: 700;
+    min-width: 154px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
+    outline: none;
+}
+
+.monthButton:focus-visible {
+    box-shadow: 0 0 0 3px rgba(47, 208, 144, 0.35);
+}
+
+.monthIcon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    background-image: url("/src/assets/icon-calendar.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.monthNative {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 2;
+    background: transparent;
+    border: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    pointer-events: none;
+}
+
+.focusSink {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    left: -9999px;
+    top: 0;
+}
+
+.btn {
+    background: #0fb57f;
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+/* KPIs dentro do card do gráfico */
+.kpiRow {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.kpiItem {
+    background: rgba(9, 18, 16, 0.96);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
+    transition:
+        background 0.18s ease-out,
+        border-color 0.18s ease-out,
+        box-shadow 0.18s ease-out,
+        transform 0.18s ease-out;
+}
+
+.kpiItem:hover {
+    background: rgba(20, 40, 36, 0.98);
+    border-color: #0fb57f;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.75);
+    transform: translateY(-1px);
+}
+
+.kpiLabel {
+    font-size: 20px;
+    opacity: 0.85;
+}
+
+.kpiValue {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.chartWrap {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 8px;
+}
+
+.recharts-legend-item text {
+    fill: #ffffff !important;
+}
+
+.totals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 10px;
+    font-size: 15px;
+    opacity: 0.95;
+}
+
+.totals span {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    padding: 6px 10px;
+    line-height: 1.3;
+}
+
+@media (max-width: 992px) {
+    .actions {
+        justify-content: flex-start;
+    }
+
+    .monthControl {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .monthButton {
+        width: 100%;
+    }
+
+    .kpiRow {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .card {
+        padding: 12px;
+        gap: 8px;
+    }
+
+    .chartWrap {
+        padding: 6px;
+    }
+
+    .kpiRow {
+        grid-template-columns: 1fr;
+    }
+
+    .kpiItem {
+        padding: 8px 10px;
+    }
+
+    .kpiValue {
+        font-size: 18px;
+    }
+
+    .totals {
+        flex-direction: column;
+        font-size: 14px;
+    }
+
+    .totals span {
+        width: 100%;
     }
 }

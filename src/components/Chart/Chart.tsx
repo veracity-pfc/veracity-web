@@ -1,3 +1,4 @@
+import type React from "react";
 import { JSX, useEffect, useMemo, useRef, useState } from "react";
 import {
   Bar,
@@ -9,11 +10,9 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { getAdminMonthlyMetrics, getToken } from "../../api/client.ts";
-import { useToast } from "../../components/Toast/Toast.tsx";
 import styles from "./Chart.module.css";
 
-type YM = { year: number; month: number };
+export type YM = { year: number; month: number };
 
 type ChartRow = {
   name: string;
@@ -29,7 +28,7 @@ type UsersChartRow = {
   inactive_users: number;
 };
 
-type AdminUserMetrics = {
+export type AdminUserMetrics = {
   bars: {
     active_users: number;
     inactive_users: number;
@@ -41,7 +40,7 @@ type AdminUserMetrics = {
   };
 };
 
-type AdminMonthMetrics = {
+export type AdminMonthMetrics = {
   year: number;
   month: number;
   reference: string;
@@ -61,130 +60,64 @@ type AdminMonthMetrics = {
 
 type DashboardChartProps = {
   mode: "analysis" | "users";
+  metrics: AdminMonthMetrics | null;
+  ym: YM;
+  loading: boolean;
+  onChangeMonth: (value: string) => void;
+  onRefresh: () => void;
 };
 
-function getCurrentYM(): YM {
-  const d = new Date();
-  return { year: d.getFullYear(), month: d.getMonth() + 1 };
-}
-
-export default function DashboardChart({ mode }: DashboardChartProps): JSX.Element {
-  const { warn, error, success } = useToast();
-
-  const [ym, setYm] = useState<YM>(getCurrentYM());
-  const [data, setData] = useState<AdminMonthMetrics | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const abortRef = useRef<AbortController | null>(null);
+export default function DashboardChart({
+  mode,
+  metrics,
+  ym,
+  loading,
+  onChangeMonth,
+  onRefresh,
+}: DashboardChartProps): JSX.Element {
   const monthRef = useRef<HTMLInputElement>(null);
   const focusSinkRef = useRef<HTMLSpanElement>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
 
-  const year = useMemo(
-    () => Number(ym?.year ?? new Date().getFullYear()),
-    [ym]
-  );
-  const month = useMemo(
-    () => Number(ym?.month ?? new Date().getMonth() + 1),
-    [ym]
-  );
+  const year = ym.year;
+  const month = ym.month;
 
-  const monthInputValue = useMemo(
-    () => `${year}-${String(month).padStart(2, "0")}`,
-    [year, month]
-  );
-  const periodHuman = useMemo(
-    () => `${String(month).padStart(2, "0")}/${year}`,
-    [month, year]
-  );
+  const monthInputValue = `${year}-${String(month).padStart(2, "0")}`;
+  const periodHuman = `${String(month).padStart(2, "0")}/${year}`;
 
   const chartData: Array<ChartRow | UsersChartRow> = useMemo(() => {
     if (mode === "analysis") {
-      const b = data?.bars;
+      const bars = metrics?.bars;
       return [
         {
           name: "Mês",
-          url_suspicious: Number(b?.url_suspicious ?? 0),
-          url_safe: Number(b?.url_safe ?? 0),
-          image_fake: Number(b?.image_fake ?? 0),
-          image_safe: Number(b?.image_safe ?? 0),
+          url_suspicious: Number(bars?.url_suspicious ?? 0),
+          url_safe: Number(bars?.url_safe ?? 0),
+          image_fake: Number(bars?.image_fake ?? 0),
+          image_safe: Number(bars?.image_safe ?? 0),
         },
       ];
     }
-    const b = data?.users?.bars;
+    const bars = metrics?.users?.bars;
     return [
       {
         name: "Mês",
-        active_users: Number(b?.active_users ?? 0),
-        inactive_users: Number(b?.inactive_users ?? 0),
+        active_users: Number(bars?.active_users ?? 0),
+        inactive_users: Number(bars?.inactive_users ?? 0),
       },
     ];
-  }, [data, mode]);
+  }, [metrics, mode]);
 
-  const fetchMetrics = async (y?: number, m?: number, successMsg?: string) => {
-    try {
-      const ySafe = Number(y ?? new Date().getFullYear());
-      const mSafe = Number(m ?? new Date().getMonth() + 1);
-      abortRef.current?.abort();
-      const ctrl = new AbortController();
-      abortRef.current = ctrl;
-      setLoading(true);
-      const resp = (await getAdminMonthlyMetrics({
-        year: ySafe,
-        month: mSafe,
-        signal: ctrl.signal,
-      })) as AdminMonthMetrics;
-      setData(resp);
-      if (successMsg) success(successMsg);
-    } catch (e: any) {
-      if (mode === "analysis") {
-        error(e?.message || "Erro ao carregar métricas de análises");
-      } else {
-        error(e?.message || "Erro ao carregar métricas de usuários");
-      }
-    } finally {
-      setLoading(false);
-    }
+  const analysisTotals = {
+    totalMonth: Number(metrics?.totals.total_month ?? 0),
+    urlsMonth: Number(metrics?.totals.urls_month ?? 0),
+    imagesMonth: Number(metrics?.totals.images_month ?? 0),
   };
 
-  useEffect(() => {
-    if (getToken()) fetchMetrics(year, month);
-  }, []);
-
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      if (!getToken()) return;
-      fetchMetrics(year, month);
-    }, 300000);
-    return () => window.clearInterval(id);
-  }, [year, month]);
-
-  useEffect(() => {
-    const onStorage = (ev: StorageEvent) => {
-      if (!ev.key) return;
-      if (ev.key === "veracity_token" && getToken()) {
-        fetchMetrics(year, month);
-      }
-    };
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, [year, month]);
-
-  const onChangeMonth = (v: string) => {
-    if (!/^\d{4}-\d{2}$/.test(v)) {
-      warn("Período inválido");
-      return;
-    }
-    const [yyStr, mmStr] = v.split("-") as [string, string];
-    const newYM = { year: Number(yyStr), month: Number(mmStr) };
-    setYm(newYM);
-    const human = `${mmStr}/${yyStr}`;
-    const msg =
-      mode === "analysis"
-        ? `Período de análises alterado para ${human}`
-        : `Período de usuários alterado para ${human}`;
-    fetchMetrics(newYM.year, newYM.month, msg);
-    closeMonthPicker();
+  const userTotals = {
+    totalUsers: Number(metrics?.users?.totals.total_users ?? 0),
+    activeUsers: Number(metrics?.users?.totals.active_users ?? 0),
+    inactiveUsers: Number(metrics?.users?.totals.inactive_users ?? 0),
   };
 
   const closeMonthPicker = () => {
@@ -237,17 +170,14 @@ export default function DashboardChart({ mode }: DashboardChartProps): JSX.Eleme
     }
   };
 
-  const onRefresh = () => {
-    const msg =
-      mode === "analysis"
-        ? "Gráfico de análises atualizado"
-        : "Gráfico de usuários atualizado";
-    fetchMetrics(year, month, msg);
+  const handleMonthChange = (value: string) => {
+    onChangeMonth(value);
+    closeMonthPicker();
   };
 
   const selectedPeriod =
-    data && data.month && data.year
-      ? `${String(data.month).padStart(2, "0")}/${data.year}`
+    metrics && metrics.month && metrics.year
+      ? `${String(metrics.month).padStart(2, "0")}/${metrics.year}`
       : periodHuman;
 
   const title =
@@ -288,7 +218,7 @@ export default function DashboardChart({ mode }: DashboardChartProps): JSX.Eleme
               className={styles.monthNative}
               type="month"
               value={monthInputValue}
-              onChange={(e) => onChangeMonth(e.target.value)}
+              onChange={(e) => handleMonthChange(e.target.value)}
               aria-label="Selecione o mês"
             />
             <span
@@ -309,6 +239,40 @@ export default function DashboardChart({ mode }: DashboardChartProps): JSX.Eleme
           </button>
         </div>
       </div>
+
+      {mode === "analysis" ? (
+        <div className={styles.kpiRow}>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>Análises no mês</span>
+            <span className={styles.kpiValue}>{analysisTotals.totalMonth}</span>
+          </div>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>URLs analisadas</span>
+            <span className={styles.kpiValue}>{analysisTotals.urlsMonth}</span>
+          </div>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>Imagens analisadas</span>
+            <span className={styles.kpiValue}>
+              {analysisTotals.imagesMonth}
+            </span>
+          </div>
+        </div>
+      ) : (
+        <div className={styles.kpiRow}>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>Total de usuários</span>
+            <span className={styles.kpiValue}>{userTotals.totalUsers}</span>
+          </div>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>Usuários ativos</span>
+            <span className={styles.kpiValue}>{userTotals.activeUsers}</span>
+          </div>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>Usuários inativos</span>
+            <span className={styles.kpiValue}>{userTotals.inactiveUsers}</span>
+          </div>
+        </div>
+      )}
 
       <div className={styles.chartWrap}>
         <ResponsiveContainer width="100%" height={300}>
@@ -369,35 +333,6 @@ export default function DashboardChart({ mode }: DashboardChartProps): JSX.Eleme
           </BarChart>
         </ResponsiveContainer>
       </div>
-
-      {mode === "analysis" && (
-        <div className={styles.totals}>
-          <span>
-            Total do mês: <b>{Number(data?.totals.total_month ?? 0)}</b>
-          </span>
-          <span>
-            URLs: <b>{Number(data?.totals.urls_month ?? 0)}</b>
-          </span>
-          <span>
-            Imagens: <b>{Number(data?.totals.images_month ?? 0)}</b>
-          </span>
-        </div>
-      )}
-
-      {mode === "users" && (
-        <div className={styles.totals}>
-          <span>
-            Total de usuários no período:{" "}
-            <b>{Number(data?.users?.totals.total_users ?? 0)}</b>
-          </span>
-          <span>
-            Ativos: <b>{Number(data?.users?.totals.active_users ?? 0)}</b>
-          </span>
-          <span>
-            Inativos: <b>{Number(data?.users?.totals.inactive_users ?? 0)}</b>
-          </span>
-        </div>
-      )}
     </div>
   );
 }
