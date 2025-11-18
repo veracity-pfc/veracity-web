@@ -112,7 +112,7 @@ export default function Header(): JSX.Element {
 
           {isAdmin && (
             <NavLink to="/dashboard" className={styles['nav-link']}>
-              Administração
+              Dashboard
             </NavLink>
           )}
 
@@ -266,7 +266,7 @@ export default function Header(): JSX.Element {
                 to="/dashboard"
                 onClick={() => setMobileOpen(false)}
               >
-                Administração
+                Dashboard
               </NavLink>
             )}
 
