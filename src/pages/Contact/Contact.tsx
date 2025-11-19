@@ -75,7 +75,7 @@ export default function Contact(): JSX.Element {
                 >
                   <option value="Dúvida">Dúvida</option>
                   <option value="Sugestão">Sugestão</option>
-                  {getToken() && <option value="Solicitação">Solicitação de token de API</option>}
+                  {getToken() && <option value="Solicitação de token de API">Solicitação de token de API</option>}
                   <option value="Reclamação">Reclamação</option>
                 </select>
 

@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import styles from "./Filter.module.css";
 
+type Option = {
+  value: string;
+  label: string;
+};
+
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -14,6 +19,10 @@ type Props = {
   onChangeType: (v: string) => void;
   onApply: () => void;
   onClear: () => void;
+  showStatus?: boolean;
+  showType?: boolean;
+  statusOptions?: Option[];
+  typeOptions?: Option[];
 };
 
 function onlyDate(v: string) {
@@ -33,6 +42,10 @@ export default function Filter({
   onChangeType,
   onApply,
   onClear,
+  showStatus = true,
+  showType = true,
+  statusOptions,
+  typeOptions,
 }: Props) {
   const [localFrom, setLocalFrom] = useState(onlyDate(dateFrom));
   const [localTo, setLocalTo] = useState(onlyDate(dateTo));
@@ -50,6 +63,24 @@ export default function Filter({
     const t = new Date(localTo + "T00:00:00Z").getTime();
     return t < f;
   }, [localFrom, localTo]);
+
+  const effectiveStatusOptions: Option[] =
+    statusOptions ||
+    [
+      { value: "", label: "Todos" },
+      { value: "safe", label: "Seguro" },
+      { value: "suspicious", label: "Suspeito" },
+      { value: "malicious", label: "Malicioso" },
+      { value: "fake", label: "Falso" },
+    ];
+
+  const effectiveTypeOptions: Option[] =
+    typeOptions ||
+    [
+      { value: "", label: "Todos" },
+      { value: "url", label: "URL" },
+      { value: "image", label: "Imagem" },
+    ];
 
   if (!open) return null;
 
@@ -73,7 +104,9 @@ export default function Filter({
               type="date"
               value={localFrom}
               onChange={(e) => setLocalFrom(onlyDate(e.target.value))}
-              onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker?.()}
+              onClick={(e) =>
+                (e.currentTarget as HTMLInputElement).showPicker?.()
+              }
               className={styles.dateInput}
             />
           </div>
@@ -83,7 +116,9 @@ export default function Filter({
               type="date"
               value={localTo}
               onChange={(e) => setLocalTo(onlyDate(e.target.value))}
-              onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker?.()}
+              onClick={(e) =>
+                (e.currentTarget as HTMLInputElement).showPicker?.()
+              }
               className={styles.dateInput}
             />
           </div>
@@ -95,33 +130,39 @@ export default function Filter({
         </div>
 
         <div className={`${styles.row} ${styles.rowGrid}`}>
-          <div className={styles.field}>
-            <label className={styles.label}>Status</label>
-            <select
-              className={styles.select}
-              value={localStatus}
-              onChange={(e) => setLocalStatus(e.target.value)}
-            >
-              <option value="">Todos</option>
-              <option value="safe">Seguro</option>
-              <option value="suspicious">Suspeito</option>
-              <option value="malicious">Malicioso</option>
-              <option value="fake">Falso</option>
-            </select>
-          </div>
+          {showStatus && (
+            <div className={styles.field}>
+              <label className={styles.label}>Status</label>
+              <select
+                className={styles.select}
+                value={localStatus}
+                onChange={(e) => setLocalStatus(e.target.value)}
+              >
+                {effectiveStatusOptions.map((opt) => (
+                  <option key={opt.value || "all"} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
-        <div className={styles.field}>
-            <label className={styles.label}>Tipo</label>
-            <select
-              className={styles.select}
-              value={localType}
-              onChange={(e) => setLocalType(e.target.value)}
-            >
-              <option value="">Todos</option>
-              <option value="url">URL</option>
-              <option value="image">Imagem</option>
-            </select>
-          </div>
+          {showType && (
+            <div className={styles.field}>
+              <label className={styles.label}>Tipo</label>
+              <select
+                className={styles.select}
+                value={localType}
+                onChange={(e) => setLocalType(e.target.value)}
+              >
+                {effectiveTypeOptions.map((opt) => (
+                  <option key={opt.value || "all"} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         <div className={styles.actions}>

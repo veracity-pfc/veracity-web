@@ -19,7 +19,6 @@ import HistoryDetail from './pages/HistoryDetail/HistoryDetail';
 import { getToken, getRole, initAuthWatch } from './api/client';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Toast from './components/Toast/Toast';
-import Requests from './pages/Requests/Requests';
 import ReactivateAccount from './pages/ReactivateAccount/ReactivateAccount';
 
 
@@ -68,7 +67,8 @@ export default function App(): JSX.Element {
         <Route path="/user/history" element={<RequireAuth><History /></RequireAuth>} />
         <Route path="/user/history/:id" element={<RequireAuth><HistoryDetail /></RequireAuth>} />
         <Route path="/dashboard" element={<RequireAdmin><Dashboard /></RequireAdmin>} />
-        <Route path="/request" element={<RequireAdmin><Requests /></RequireAdmin>} />
+        <Route path="/request" element={<RequireAdmin><History /></RequireAdmin>} />
+        <Route path="/request/:id" element={<RequireAuth><HistoryDetail /></RequireAuth>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Footer />

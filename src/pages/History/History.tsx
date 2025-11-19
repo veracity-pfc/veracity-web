@@ -1,15 +1,18 @@
 import { JSX, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiFetch } from "../../api/client";
+import { apiFetch, getRole } from "../../api/client";
 import Filter from "../../components/Filter/Filter";
 import styles from "./History.module.css";
 
 type Item = {
   id: string;
   created_at: string;
-  analysis_type: "url" | "image" | string;
+  analysis_type?: "url" | "image" | string;
   source?: string;
-  label: string;
+  label?: string;
+  email?: string;
+  message_preview?: string;
+  status?: string;
 };
 
 type Paged = {
@@ -26,6 +29,20 @@ function onlyDate(value: string): string {
   }
 }
 
+const analysisLabelMap: Record<string, string> = {
+  safe: "Seguro",
+  suspicious: "Suspeito",
+  malicious: "Malicioso",
+  fake: "Falso",
+  unknown: "Desconhecido",
+};
+
+const requestStatusMap: Record<string, string> = {
+  open: "Em aberto",
+  approved: "Aprovada",
+  rejected: "Rejeitada",
+};
+
 export default function History(): JSX.Element {
   const navigate = useNavigate();
   const [items, setItems] = useState<Item[]>([]);
@@ -40,14 +57,22 @@ export default function History(): JSX.Element {
   const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
 
   const requestSeq = useRef(0);
+  const role = getRole();
+  const isAdmin = role === "admin";
 
   const params = useMemo(() => {
     const p = new URLSearchParams();
     p.set("page", page.toString());
     p.set("page_size", "6");
-    if (q) p.set("q", q);
+
+    if (isAdmin) {
+      if (q) p.set("email", q);
+    } else {
+      if (q) p.set("q", q);
+      if (atype) p.set("analysis_type", atype);
+    }
+
     if (status) p.set("status", status);
-    if (atype) p.set("analysis_type", atype);
 
     const from = onlyDate(dateFrom);
     const to = onlyDate(dateTo);
@@ -68,13 +93,16 @@ export default function History(): JSX.Element {
       }
     }
     return p.toString();
-  }, [page, q, status, atype, dateFrom, dateTo]);
+  }, [page, q, status, atype, dateFrom, dateTo, isAdmin]);
 
   async function load() {
     const seq = ++requestSeq.current;
     setLoading(true);
     try {
-      const data = (await apiFetch(`/user/history?${params}`, { auth: true })) as Paged;
+      const path = isAdmin
+        ? `/administration/api/token-requests?${params}`
+        : `/user/history?${params}`;
+      const data = (await apiFetch(path, { auth: true })) as Paged;
       if (seq !== requestSeq.current) return;
       setItems(data.items);
       setTotalPages(data.total_pages);
@@ -88,9 +116,39 @@ export default function History(): JSX.Element {
     }
   }
 
-  useEffect(() => { load(); }, [params]);
+  useEffect(() => {
+    load();
+  }, [params]);
 
   function Card({ item }: { item: Item }) {
+    if (isAdmin) {
+      return (
+        <div
+          className={styles.card}
+          onClick={() => navigate(`/request/${item.id}`)}
+        >
+          <p className={styles.meta}>
+            <b>Data da solicitação:</b>{" "}
+            {new Date(item.created_at).toLocaleString()}
+          </p>
+          <p className={styles.meta}>
+            <b>E-mail:</b>{" "}
+            <span className={styles.ellipsis}>{item.email || "—"}</span>
+          </p>
+          <p className={styles.meta}>
+            <b>Mensagem:</b>{" "}
+            <span className={styles.ellipsis}>
+              {item.message_preview || "—"}
+            </span>
+          </p>
+          <p className={styles.meta}>
+            <b>Status:</b>{" "}
+            {requestStatusMap[item.status || ""] || item.status || "Desconhecido"}
+          </p>
+        </div>
+      );
+    }
+
     return (
       <div
         className={styles.card}
@@ -115,10 +173,7 @@ export default function History(): JSX.Element {
 
         <p className={styles.meta}>
           <b>Status:</b>{" "}
-          {item.label === "safe" ? "Seguro" :
-           item.label === "suspicious" ? "Suspeito" :
-           item.label === "malicious" ? "Malicioso" :
-           item.label === "fake" ? "Falso" : "Desconhecido"}
+          {analysisLabelMap[item.label || ""] || item.label || "Desconhecido"}
         </p>
       </div>
     );
@@ -126,37 +181,64 @@ export default function History(): JSX.Element {
 
   return (
     <div className={styles.wrap}>
-      <h1 className={styles.title}>Histórico</h1>
+      <h1 className={styles.title}>
+        {isAdmin ? "Solicitações de token de API" : "Histórico de análises"}
+      </h1>
 
       <div className={styles.searchRow}>
         <span className={styles.searchIcon}>⌕</span>
         <input
           className={styles.search}
-          placeholder="Buscar por URL ou nome da imagem"
+          placeholder={
+            isAdmin
+              ? "Buscar por e-mail do usuário"
+              : "Buscar por URL ou nome da imagem"
+          }
           value={q}
-          onChange={(e) => { setPage(1); setQ(e.target.value); }}
+          onChange={(e) => {
+            setPage(1);
+            setQ(e.target.value);
+          }}
         />
         <button
           type="button"
           className={styles.clearBtn}
           aria-label="Limpar busca"
-          onClick={() => { setQ(""); setPage(1); }}
+          onClick={() => {
+            setQ("");
+            setPage(1);
+          }}
           title="Limpar"
           disabled={!q || loading}
         >
           ×
         </button>
-        <button className={styles.filterBtn} onClick={() => setFiltersOpen(true)}>Filtros</button>
+        <button
+          className={styles.filterBtn}
+          onClick={() => setFiltersOpen(true)}
+        >
+          Filtros
+        </button>
       </div>
 
       <div className={styles.stage}>
         {loading ? (
           <div className={styles.loading}>Carregando…</div>
         ) : items.length === 0 ? (
-          <div className={styles.empty}>Nenhuma análise disponível para visualização.</div>
+          <div className={styles.empty}>
+            {isAdmin
+              ? "Nenhuma solicitação disponível para visualização."
+              : "Nenhuma análise disponível para visualização."}
+          </div>
         ) : (
-          <div className={`${styles.grid} ${items.length === 1 ? styles.gridSingle : ""}`}>
-            {items.map((it) => <Card key={it.id} item={it} />)}
+          <div
+            className={`${styles.grid} ${
+              items.length === 1 ? styles.gridSingle : ""
+            }`}
+          >
+            {items.map((it) => (
+              <Card key={it.id} item={it} />
+            ))}
           </div>
         )}
       </div>
@@ -168,7 +250,9 @@ export default function History(): JSX.Element {
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
           />
-          <span>Página {page} de {totalPages}</span>
+          <span>
+            Página {page} de {totalPages}
+          </span>
           <button
             className={styles.pageBtn}
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
@@ -202,8 +286,14 @@ export default function History(): JSX.Element {
           }
           setDateTo(to);
         }}
-        onChangeStatus={(v) => { setPage(1); setStatus(v); }}
-        onChangeType={(v) => { setPage(1); setAtype(v); }}
+        onChangeStatus={(v) => {
+          setPage(1);
+          setStatus(v);
+        }}
+        onChangeType={(v) => {
+          setPage(1);
+          setAtype(v);
+        }}
         onApply={() => setFiltersOpen(false)}
         onClear={() => {
           setDateFrom("");
@@ -211,6 +301,18 @@ export default function History(): JSX.Element {
           setStatus("");
           setAtype("");
         }}
+        showStatus
+        showType={!isAdmin}
+        statusOptions={
+          isAdmin
+            ? [
+                { value: "", label: "Todos" },
+                { value: "open", label: "Em aberto" },
+                { value: "approved", label: "Aprovada" },
+                { value: "rejected", label: "Rejeitada" },
+              ]
+            : undefined
+        }
       />
     </div>
   );
