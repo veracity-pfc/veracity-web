@@ -1,7 +1,7 @@
 import { JSX, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { apiFetch } from "../../api/client";
-import styles from "./UserHistoryDetail.module.css";
+import styles from "./HistoryDetail.module.css";
 
 type Detail = {
   id: string;
@@ -13,7 +13,7 @@ type Detail = {
   ai_recommendations?: string[];
 };
 
-export default function UserHistoryDetail(): JSX.Element {
+export default function HistoryDetail(): JSX.Element {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [data, setData] = useState<Detail | null>(null);

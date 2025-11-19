@@ -7,9 +7,9 @@ vi.mock('@/api/client', () => ({
 }))
 
 import { apiFetch } from '@/api/client'
-import UserHistory from '@/pages/UserHistory/UserHistory'
+import History from '@/pages/History/History'
 
-describe('UserHistory', () => {
+describe('History', () => {
   it('lista cards do histórico', async () => {
     ;(apiFetch as any).mockResolvedValue({
       items: [
@@ -21,7 +21,7 @@ describe('UserHistory', () => {
 
     render(
       <MemoryRouter>
-        <UserHistory />
+        <History />
       </MemoryRouter>
     )
 

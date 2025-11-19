@@ -2,7 +2,7 @@ import { JSX, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../../api/client";
 import Filter from "../../components/Filter/Filter";
-import styles from "./UserHistory.module.css";
+import styles from "./History.module.css";
 
 type Item = {
   id: string;
@@ -26,7 +26,7 @@ function onlyDate(value: string): string {
   }
 }
 
-export default function UserHistory(): JSX.Element {
+export default function History(): JSX.Element {
   const navigate = useNavigate();
   const [items, setItems] = useState<Item[]>([]);
   const [page, setPage] = useState<number>(1);

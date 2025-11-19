@@ -14,8 +14,8 @@ import Profile from './pages/Profile/Profile';
 import VerifyEmail from "./pages/VerifyEmail/VerifyEmail";
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
-import UserHistory from './pages/UserHistory/UserHistory';
-import UserHistoryDetail from './pages/UserHistoryDetail/UserHistoryDetail';
+import History from './pages/History/History';
+import HistoryDetail from './pages/HistoryDetail/HistoryDetail';
 import { getToken, getRole, initAuthWatch } from './api/client';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Toast from './components/Toast/Toast';
@@ -65,8 +65,8 @@ export default function App(): JSX.Element {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/user/profile" element={<RequireAuth><Profile /></RequireAuth>} />
-        <Route path="/user/history" element={<RequireAuth><UserHistory /></RequireAuth>} />
-        <Route path="/user/history/:id" element={<RequireAuth><UserHistoryDetail /></RequireAuth>} />
+        <Route path="/user/history" element={<RequireAuth><History /></RequireAuth>} />
+        <Route path="/user/history/:id" element={<RequireAuth><HistoryDetail /></RequireAuth>} />
         <Route path="/dashboard" element={<RequireAdmin><Dashboard /></RequireAdmin>} />
         <Route path="/request" element={<RequireAdmin><Requests /></RequireAdmin>} />
         <Route path="*" element={<Navigate to="/" replace />} />
