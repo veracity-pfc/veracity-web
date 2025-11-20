@@ -20,6 +20,8 @@ import modalExitConfirmationImg from "../../assets/ilust-exit-without-save-confi
 import modalDeleteAccountConfirmationImg from "../../assets/ilust-delete-account-confirmation.png";
 import modalDeletedAccountImg from "../../assets/ilust-deleted-account.png";
 import modalInactiveAccountImg from "../../assets/ilust-inactive-account.png";
+import modalRevealTokenImg  from "../../assets/ilust-warning.png";
+import modalDeleteTokenImg  from "../../assets/ilust-delete-token.png";
 
 type AnyObj = Record<string, any>;
 
@@ -82,6 +84,7 @@ export default function Profile(): JSX.Element {
   const [apiTokenLoading, setApiTokenLoading] = useState(false);
   const [apiTokenRevoking, setApiTokenRevoking] = useState(false);
   const [apiTokenValue, setApiTokenValue] = useState("");
+  
   const [apiTokenExpiresAt, setApiTokenExpiresAt] = useState<string | null>(null);
 
   const dirtyRef = useRef(false);
@@ -269,7 +272,7 @@ export default function Profile(): JSX.Element {
 
   const handleCopyFromModal = async () => {
     if (!apiTokenValue) {
-      error("Nenhum token de API disponível para cópia.");
+      error("Nenhum token disponível.");
       return;
     }
     try {
@@ -286,10 +289,9 @@ export default function Profile(): JSX.Element {
         document.execCommand("copy");
         document.body.removeChild(textarea);
       }
-      success("Token de API copiado com sucesso!");
-      setModalApiTokenReveal(false);
+      success("Token copiado com sucesso!");
     } catch {
-      error("Não foi possível copiar o token de API.");
+      error("Falha ao copiar o token.");
     }
   };
 
@@ -340,6 +342,7 @@ export default function Profile(): JSX.Element {
         setApiTokenValue(value);
         setApiTokenExpiresAt(expires);
         setModalApiTokenReveal(true);
+        
         setInitial((prev) =>
           prev
             ? {
@@ -488,7 +491,7 @@ export default function Profile(): JSX.Element {
                 ? "Carregando..."
                 : showRevokeAction
                 ? "Excluir token"
-                : "Copiar"}
+                : "Revelar token"}
             </button>
           </div>
           {tokenInfo && apiTokenExpiresLabel && (
@@ -598,8 +601,8 @@ export default function Profile(): JSX.Element {
       <Modal
         open={modalApiTokenReveal}
         onClose={() => setModalApiTokenReveal(false)}
-        imageSrc={modalSaveConfirmationImg}
-        title="Copiar token de API"
+        imageSrc={modalRevealTokenImg} 
+        title="Atenção"
         primaryText="Copiar token"
         primaryVariant="success"
         onPrimary={handleCopyFromModal}
@@ -608,32 +611,30 @@ export default function Profile(): JSX.Element {
         secondaryVariant="secondary"
       >
         <p>
-          O token de API será exibido abaixo e poderá ser copiado apenas uma vez. Guarde-o em um local seguro.
+          O token abaixo não será exibido novamente. Salve-o em um local seguro
         </p>
         <div
           style={{
             marginTop: 16,
+            marginBottom: 24,
             padding: "12px 16px",
             borderRadius: 8,
-            background: "#0f1b19",
+            background: "#fff",
+            color: "#000",
             wordBreak: "break-all",
             fontFamily: "monospace",
             fontSize: 14,
+            border: "1px solid #e0e0e0"
           }}
         >
           {apiTokenValue}
         </div>
-        {apiTokenExpiresAt && (
-          <p style={{ marginTop: 12, fontSize: 14 }}>
-            Data de expiração: <b>{formatDateTime(apiTokenExpiresAt)}</b>
-          </p>
-        )}
       </Modal>
 
       <Modal
         open={modalApiTokenRevoke}
         onClose={() => setModalApiTokenRevoke(false)}
-        imageSrc={modalDeleteAccountConfirmationImg}
+        imageSrc={modalDeleteTokenImg}
         title="Revogar token de API?"
         primaryText={apiTokenRevoking ? "Carregando..." : "Revogar"}
         primaryVariant="danger"
