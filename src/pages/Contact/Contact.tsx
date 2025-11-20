@@ -1,6 +1,6 @@
-import React, { JSX, useState } from 'react';
+import React, { JSX, useEffect, useState } from 'react';
 import cover from '../../assets/contact-cover.png';
-import { apiSendContact, getToken } from '../../api/client';
+import { apiSendContact, getToken, apiGetProfile } from '../../api/client';
 import Toast, { useToast } from '../../components/Toast/Toast';
 import styles from './Contact.module.css';
 import '../../styles/forms.css';
@@ -15,6 +15,20 @@ export default function Contact(): JSX.Element {
   const [err, setErr] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const { success, error } = useToast();
+
+  const isUserLoggedIn = !!getToken();
+
+  useEffect(() => {
+    if (isUserLoggedIn) {
+      apiGetProfile()
+        .then((data) => {
+          if (data?.email) {
+            setEmail(data.email);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [isUserLoggedIn]);
 
   const isInvalid = !email.trim() || !message.trim();
 
@@ -64,6 +78,7 @@ export default function Contact(): JSX.Element {
                   value={email}
                   maxLength={60}
                   onChange={(e) => setEmail(e.target.value.slice(0, 60))}
+                  disabled={isUserLoggedIn}
                 />
 
                 <label className="form-label" htmlFor="subject">Assunto</label>
@@ -75,7 +90,7 @@ export default function Contact(): JSX.Element {
                 >
                   <option value="Dúvida">Dúvida</option>
                   <option value="Sugestão">Sugestão</option>
-                  {getToken() && <option value="Solicitação de token de API">Solicitação de token de API</option>}
+                  {isUserLoggedIn && <option value="Solicitação de token de API">Solicitação de token de API</option>}
                   <option value="Reclamação">Reclamação</option>
                 </select>
 

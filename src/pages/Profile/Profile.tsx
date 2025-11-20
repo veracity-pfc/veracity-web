@@ -378,7 +378,11 @@ export default function Profile(): JSX.Element {
   const tokenInfo = initial?.api_token_info as AnyObj | undefined;
   const hasToken = !!tokenInfo;
   const hasActiveToken = !!tokenInfo && tokenInfo.status === "active";
-  const tokenMasked = hasToken ? String(tokenInfo.prefix || "") + "••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••" : "";
+  
+  const tokenMasked = hasToken 
+    ? String(tokenInfo.prefix || "") + "•".repeat(60) 
+    : "";
+
   const tokenPlaceholder = !hasToken
     ? "Nenhum token de API gerado"
     : tokenInfo.status === "expired"
@@ -386,7 +390,9 @@ export default function Profile(): JSX.Element {
     : tokenInfo.status === "revoked"
     ? "Token de API revogado"
     : "";
-  const primaryActionIsCopy = hasActiveToken && !tokenInfo?.revealed;
+
+  const showRevokeAction = hasActiveToken && !!tokenInfo?.revealed;
+
   const apiTokenExpiresLabel = tokenInfo?.expires_at ? formatDateTime(tokenInfo.expires_at) : "";
 
   return (
@@ -476,15 +482,13 @@ export default function Profile(): JSX.Element {
               className={styles.apiTokenCopyButton}
               onClick={handleCopyApiToken}
               disabled={!hasActiveToken || apiTokenLoading || apiTokenRevoking}
-              aria-label={primaryActionIsCopy ? "Copiar token de API" : "Revogar token de API"}
+              aria-label={!showRevokeAction ? "Copiar token de API" : "Revogar token de API"}
             >
-              {primaryActionIsCopy
-                ? apiTokenLoading
-                  ? "Carregando..."
-                  : "Copiar"
-                : apiTokenRevoking
+              {apiTokenLoading || apiTokenRevoking
                 ? "Carregando..."
-                : "Excluir token"}
+                : showRevokeAction
+                ? "Excluir token"
+                : "Copiar"}
             </button>
           </div>
           {tokenInfo && apiTokenExpiresLabel && (
