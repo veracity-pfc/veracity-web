@@ -246,6 +246,32 @@ export default function Profile(): JSX.Element {
     }
   };
 
+  const handleCopyApiToken = async () => {
+    const token = initial?.api_token_plain || "";
+    if (!token) {
+      error("Nenhum token de API disponível para cópia.");
+      return;
+    }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(token);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = token;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+      success("Token de API copiado com sucesso!");
+    } catch {
+      error("Não foi possível copiar o token de API.");
+    }
+  };
+
   const isAdmin =
     role === "admin" ||
     initial?.is_admin === true ||
@@ -330,6 +356,27 @@ export default function Profile(): JSX.Element {
           <p>
             Imagens: <b>{initial?.stats?.performed?.images ?? 0}</b>
           </p>
+        </div>
+
+        <div className={styles.apiTokenCard}>
+          <h3>Token de API</h3>
+          <div className={styles.apiTokenWrapper}>
+            <input
+              className={styles.apiTokenInput}
+              value={initial?.api_token_masked || ""}
+              readOnly
+              placeholder="Nenhum token de API gerado"
+            />
+            <button
+              type="button"
+              className={styles.apiTokenCopyButton}
+              onClick={handleCopyApiToken}
+              disabled={!initial?.api_token_masked}
+              aria-label="Copiar token de API"
+            >
+              Copiar
+            </button>
+          </div>
         </div>
       </section>
 
