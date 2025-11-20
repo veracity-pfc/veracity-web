@@ -279,7 +279,6 @@
     cursor: default;
 }
 
-/* KPIs dentro do card do gráfico */
 .kpiRow {
     margin-top: 12px;
     display: grid;

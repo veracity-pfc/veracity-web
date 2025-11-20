@@ -70,6 +70,10 @@ export default function Profile(): JSX.Element {
     email: "",
   });
 
+  const [isMobile, setIsMobile] = useState(() => 
+    typeof window !== "undefined" ? window.innerWidth <= 980 : false
+  );
+
   const [modalUnsaved, setModalUnsaved] = useState(false);
   const [modalConfirmSave, setModalConfirmSave] = useState(false);
   const [modalDelete, setModalDelete] = useState(false);
@@ -96,6 +100,12 @@ export default function Profile(): JSX.Element {
 
   useEffect(() => {
     setRole(resolveRole());
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 980);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
@@ -383,7 +393,7 @@ export default function Profile(): JSX.Element {
   const hasActiveToken = !!tokenInfo && tokenInfo.status === "active";
   
   const tokenMasked = hasToken 
-    ? String(tokenInfo.prefix || "") + "•".repeat(60) 
+    ? String(tokenInfo.prefix || "") + (isMobile ? "" : "•".repeat(35))
     : "";
 
   const tokenPlaceholder = !hasToken
