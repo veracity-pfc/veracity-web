@@ -390,3 +390,16 @@ export async function getAdminMonthlyMetrics(params: {
   }
   return resp.json();
 }
+
+
+export const apiRevealApiToken = () =>
+  apiFetch<{ token: string; expires_at: string | null }>("/user/api-token/reveal", {
+    auth: true,
+    method: "POST",
+  });
+
+export const apiRevokeApiToken = () =>
+  apiFetch("/user/api-token/revoke", {
+    auth: true,
+    method: "POST",
+  });

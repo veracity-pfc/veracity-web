@@ -9,6 +9,8 @@ import {
   apiInactivateAccount,
   clearToken,
   getToken,
+  apiRevealApiToken,
+  apiRevokeApiToken,
 } from "../../api/client";
 import Toast, { useToast } from "../../components/Toast/Toast";
 import Modal from "../../components/Modal/Modal";
@@ -40,6 +42,19 @@ function resolveRole(): string {
   }
 }
 
+function formatDateTime(iso?: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 export default function Profile(): JSX.Element {
   const [loading, setLoading] = useState(true);
   const [serverErr, setServerErr] = useState("");
@@ -59,9 +74,15 @@ export default function Profile(): JSX.Element {
   const [modalDeactivate, setModalDeactivate] = useState(false);
   const [modalDeletedOk, setModalDeletedOk] = useState(false);
   const [modalDeactivatedOk, setModalDeactivatedOk] = useState(false);
+  const [modalApiTokenReveal, setModalApiTokenReveal] = useState(false);
+  const [modalApiTokenRevoke, setModalApiTokenRevoke] = useState(false);
 
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [apiTokenLoading, setApiTokenLoading] = useState(false);
+  const [apiTokenRevoking, setApiTokenRevoking] = useState(false);
+  const [apiTokenValue, setApiTokenValue] = useState("");
+  const [apiTokenExpiresAt, setApiTokenExpiresAt] = useState<string | null>(null);
 
   const dirtyRef = useRef(false);
   const pendingNavRef = useRef<{ type: "url" | "back"; value: string | null } | null>(null);
@@ -246,18 +267,17 @@ export default function Profile(): JSX.Element {
     }
   };
 
-  const handleCopyApiToken = async () => {
-    const token = initial?.api_token_plain || "";
-    if (!token) {
+  const handleCopyFromModal = async () => {
+    if (!apiTokenValue) {
       error("Nenhum token de API disponível para cópia.");
       return;
     }
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(token);
+        await navigator.clipboard.writeText(apiTokenValue);
       } else {
         const textarea = document.createElement("textarea");
-        textarea.value = token;
+        textarea.value = apiTokenValue;
         textarea.style.position = "fixed";
         textarea.style.opacity = "0";
         document.body.appendChild(textarea);
@@ -267,9 +287,79 @@ export default function Profile(): JSX.Element {
         document.body.removeChild(textarea);
       }
       success("Token de API copiado com sucesso!");
+      setModalApiTokenReveal(false);
     } catch {
       error("Não foi possível copiar o token de API.");
     }
+  };
+
+  const confirmRevokeApiToken = async () => {
+    if (!initial?.api_token_info) {
+      setModalApiTokenRevoke(false);
+      return;
+    }
+    setApiTokenRevoking(true);
+    try {
+      await apiRevokeApiToken();
+      success("Token de API revogado com sucesso.");
+      setInitial((prev) =>
+        prev
+          ? {
+              ...prev,
+              api_token_info: null,
+            }
+          : prev
+      );
+      setModalApiTokenRevoke(false);
+    } catch (e: any) {
+      error(e?.message || "Não foi possível revogar o token de API.");
+    } finally {
+      setApiTokenRevoking(false);
+    }
+  };
+
+  const handleCopyApiToken = async () => {
+    const info = initial?.api_token_info;
+    if (!info) {
+      error("Nenhum token de API gerado.");
+      return;
+    }
+    if (info.status !== "active") {
+      error("O token de API não está ativo.");
+      return;
+    }
+    if (!info.revealed) {
+      try {
+        setApiTokenLoading(true);
+        const res = (await apiRevealApiToken()) as AnyObj;
+        const value = res.token || "";
+        const expires = res.expires_at || info.expires_at || null;
+        if (!value) {
+          throw new Error("Token de API indisponível para cópia.");
+        }
+        setApiTokenValue(value);
+        setApiTokenExpiresAt(expires);
+        setModalApiTokenReveal(true);
+        setInitial((prev) =>
+          prev
+            ? {
+                ...prev,
+                api_token_info: {
+                  ...(prev.api_token_info || info),
+                  revealed: true,
+                  expires_at: expires || info.expires_at,
+                },
+              }
+            : prev
+        );
+      } catch (e: any) {
+        error(e?.message || "Não foi possível recuperar o token de API.");
+      } finally {
+        setApiTokenLoading(false);
+      }
+      return;
+    }
+    setModalApiTokenRevoke(true);
   };
 
   const isAdmin =
@@ -284,6 +374,20 @@ export default function Profile(): JSX.Element {
         {serverErr}
       </p>
     );
+
+  const tokenInfo = initial?.api_token_info as AnyObj | undefined;
+  const hasToken = !!tokenInfo;
+  const hasActiveToken = !!tokenInfo && tokenInfo.status === "active";
+  const tokenMasked = hasToken ? String(tokenInfo.prefix || "") + "••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••" : "";
+  const tokenPlaceholder = !hasToken
+    ? "Nenhum token de API gerado"
+    : tokenInfo.status === "expired"
+    ? "Token de API expirado"
+    : tokenInfo.status === "revoked"
+    ? "Token de API revogado"
+    : "";
+  const primaryActionIsCopy = hasActiveToken && !tokenInfo?.revealed;
+  const apiTokenExpiresLabel = tokenInfo?.expires_at ? formatDateTime(tokenInfo.expires_at) : "";
 
   return (
     <main className="container">
@@ -363,20 +467,31 @@ export default function Profile(): JSX.Element {
           <div className={styles.apiTokenWrapper}>
             <input
               className={styles.apiTokenInput}
-              value={initial?.api_token_masked || ""}
+              value={tokenMasked}
               readOnly
-              placeholder="Nenhum token de API gerado"
+              placeholder={tokenPlaceholder}
             />
             <button
               type="button"
               className={styles.apiTokenCopyButton}
               onClick={handleCopyApiToken}
-              disabled={!initial?.api_token_masked}
-              aria-label="Copiar token de API"
+              disabled={!hasActiveToken || apiTokenLoading || apiTokenRevoking}
+              aria-label={primaryActionIsCopy ? "Copiar token de API" : "Revogar token de API"}
             >
-              Copiar
+              {primaryActionIsCopy
+                ? apiTokenLoading
+                  ? "Carregando..."
+                  : "Copiar"
+                : apiTokenRevoking
+                ? "Carregando..."
+                : "Excluir token"}
             </button>
           </div>
+          {tokenInfo && apiTokenExpiresLabel && (
+            <p style={{ marginTop: 8, fontSize: 12 }}>
+              Expira em: <b>{apiTokenExpiresLabel}</b>
+            </p>
+          )}
         </div>
       </section>
 
@@ -474,6 +589,58 @@ export default function Profile(): JSX.Element {
         title="Conta inativada"
       >
         <p>Sua conta foi inativada com sucesso.</p>
+      </Modal>
+
+      <Modal
+        open={modalApiTokenReveal}
+        onClose={() => setModalApiTokenReveal(false)}
+        imageSrc={modalSaveConfirmationImg}
+        title="Copiar token de API"
+        primaryText="Copiar token"
+        primaryVariant="success"
+        onPrimary={handleCopyFromModal}
+        secondaryText="Fechar"
+        onSecondary={() => setModalApiTokenReveal(false)}
+        secondaryVariant="secondary"
+      >
+        <p>
+          O token de API será exibido abaixo e poderá ser copiado apenas uma vez. Guarde-o em um local seguro.
+        </p>
+        <div
+          style={{
+            marginTop: 16,
+            padding: "12px 16px",
+            borderRadius: 8,
+            background: "#0f1b19",
+            wordBreak: "break-all",
+            fontFamily: "monospace",
+            fontSize: 14,
+          }}
+        >
+          {apiTokenValue}
+        </div>
+        {apiTokenExpiresAt && (
+          <p style={{ marginTop: 12, fontSize: 14 }}>
+            Data de expiração: <b>{formatDateTime(apiTokenExpiresAt)}</b>
+          </p>
+        )}
+      </Modal>
+
+      <Modal
+        open={modalApiTokenRevoke}
+        onClose={() => setModalApiTokenRevoke(false)}
+        imageSrc={modalDeleteAccountConfirmationImg}
+        title="Revogar token de API?"
+        primaryText={apiTokenRevoking ? "Carregando..." : "Revogar"}
+        primaryVariant="danger"
+        onPrimary={confirmRevokeApiToken}
+        secondaryText="Cancelar"
+        onSecondary={() => setModalApiTokenRevoke(false)}
+        secondaryVariant="secondary"
+      >
+        <p>
+          Após revogar o token de API ele deixará de funcionar imediatamente. Essa ação não pode ser desfeita.
+        </p>
       </Modal>
     </main>
   );
