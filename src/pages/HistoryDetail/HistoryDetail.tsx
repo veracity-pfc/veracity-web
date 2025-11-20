@@ -76,6 +76,7 @@ export default function HistoryDetail(): JSX.Element {
   const [rejectionMode, setRejectionMode] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
+  const [approveLoading, setApproveLoading] = useState(false);
 
   const role = getRole();
   const isAdmin = role === "admin";
@@ -105,6 +106,7 @@ export default function HistoryDetail(): JSX.Element {
     if (!id || !data || data.status !== "open" || actionLoading || rejectionMode)
       return;
     setActionLoading(true);
+    setApproveLoading(true);
     setActionErr("");
     try {
       await apiFetch(`/administration/api/token-requests/${id}/approve`, {
@@ -123,6 +125,7 @@ export default function HistoryDetail(): JSX.Element {
       error(msg);
     } finally {
       setActionLoading(false);
+      setApproveLoading(false);
     }
   };
 
@@ -213,7 +216,7 @@ export default function HistoryDetail(): JSX.Element {
                         ...(disablePrimaryActions ? disabledButtonStyle : {}),
                       }}
                     >
-                      Gerar token
+                      {approveLoading ? "Carregando" : "Gerar token"}
                     </button>
                     <button
                       type="button"
