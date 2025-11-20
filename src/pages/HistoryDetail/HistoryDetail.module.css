@@ -48,6 +48,12 @@
   font-weight: 900;
 }
 
+.h3Right {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 900;
+}
+
 .p {
   margin: 8px 0;
   line-height: 1.45;
@@ -68,6 +74,86 @@
 .error,
 .loading {
   padding: 28px 0;
+}
+
+/* Layout admin em duas colunas */
+
+.adminLayout {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.leftCol {
+  flex: 1 1 60%;
+  min-width: 0;
+}
+
+.rightCol {
+  flex: 0 0 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.actionsRow {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.statusValue {
+  margin-top: 4px;
+}
+
+.reasonInput {
+  width: 100%;
+  min-height: 150px;
+  border-radius: 14px;
+  border: none;
+  padding: 12px 14px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  background: #ffffff;
+  color: #111111;
+  box-shadow: 0 4px 10px rgba(0,0,0,.18);
+}
+
+.reasonBox {
+  width: 100%;
+  min-height: 120px;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.45;
+  background: #ffffff;
+  color: #111111;
+  box-shadow: 0 4px 10px rgba(0,0,0,.18);
+}
+
+.actionButtons {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+@media (max-width: 900px) {
+  .adminLayout {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .rightCol {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  .actionsRow {
+    justify-content: flex-start;
+  }
 }
 
 @media (max-width: 768px) {

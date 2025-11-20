@@ -2,6 +2,7 @@ import { JSX, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiFetch, getRole } from "../../api/client";
 import Filter from "../../components/Filter/Filter";
+import Toast, { useToast } from "../../components/Toast/Toast";
 import styles from "./History.module.css";
 
 type Item = {
@@ -59,6 +60,7 @@ export default function History(): JSX.Element {
   const requestSeq = useRef(0);
   const role = getRole();
   const isAdmin = role === "admin";
+  const { error } = useToast();
 
   const params = useMemo(() => {
     const p = new URLSearchParams();
@@ -106,10 +108,11 @@ export default function History(): JSX.Element {
       if (seq !== requestSeq.current) return;
       setItems(data.items);
       setTotalPages(data.total_pages);
-    } catch {
+    } catch (e: any) {
       if (seq !== requestSeq.current) return;
       setItems([]);
       setTotalPages(1);
+      error(e?.message || "Erro ao carregar dados.");
     } finally {
       if (seq !== requestSeq.current) return;
       setLoading(false);
@@ -125,6 +128,7 @@ export default function History(): JSX.Element {
       return (
         <div
           className={styles.card}
+          style={{ minHeight: "160px", maxHeight: "160px", overflow: "hidden" }}
           onClick={() => navigate(`/request/${item.id}`)}
         >
           <p className={styles.meta}>
@@ -135,15 +139,32 @@ export default function History(): JSX.Element {
             <b>E-mail:</b>{" "}
             <span className={styles.ellipsis}>{item.email || "—"}</span>
           </p>
-          <p className={styles.meta}>
-            <b>Mensagem:</b>{" "}
-            <span className={styles.ellipsis}>
+          <p
+            className={styles.meta}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+            }}
+          >
+            <b style={{ flexShrink: 0 }}>Mensagem:</b>
+            <span
+              className={styles.ellipsis}
+              style={{
+                flex: 1,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
               {item.message_preview || "—"}
             </span>
           </p>
           <p className={styles.meta}>
             <b>Status:</b>{" "}
-            {requestStatusMap[item.status || ""] || item.status || "Desconhecido"}
+            {requestStatusMap[item.status || ""] ||
+              item.status ||
+              "Desconhecido"}
           </p>
         </div>
       );
@@ -173,7 +194,9 @@ export default function History(): JSX.Element {
 
         <p className={styles.meta}>
           <b>Status:</b>{" "}
-          {analysisLabelMap[item.label || ""] || item.label || "Desconhecido"}
+          {analysisLabelMap[item.label || ""] ||
+            item.label ||
+            "Desconhecido"}
         </p>
       </div>
     );
@@ -181,6 +204,7 @@ export default function History(): JSX.Element {
 
   return (
     <div className={styles.wrap}>
+      <Toast />
       <h1 className={styles.title}>
         {isAdmin ? "Solicitações de token de API" : "Histórico de análises"}
       </h1>
