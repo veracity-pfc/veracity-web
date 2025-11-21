@@ -643,14 +643,16 @@ export default function Profile(): JSX.Element {
 
       <Modal
         open={modalApiTokenRevoke}
-        onClose={() => setModalApiTokenRevoke(false)}
+        onClose={() => !apiTokenRevoking && setModalApiTokenRevoke(false)}
         imageSrc={modalDeleteTokenImg}
         title="Revogar token de API?"
         primaryText={apiTokenRevoking ? "Carregando..." : "Revogar"}
         primaryVariant="danger"
+        primaryDisabled={apiTokenRevoking}
         onPrimary={confirmRevokeApiToken}
         secondaryText="Cancelar"
         onSecondary={() => setModalApiTokenRevoke(false)}
+        secondaryDisabled={apiTokenRevoking}
         secondaryVariant="secondary"
       >
         <p>
