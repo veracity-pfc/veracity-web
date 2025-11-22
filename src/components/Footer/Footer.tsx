@@ -1,13 +1,35 @@
-import React, { JSX } from 'react';
+import React, { JSX, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getToken } from '../../api/client';
 import Logo from '../Logo';
 import styles from './Footer.module.css';
 
 const cx = (...xs: Array<string | false | null | undefined>) => xs.filter(Boolean).join(' ');
 
+function resolveRole(): string {
+  const ls = (localStorage.getItem("role") || "").toLowerCase();
+  if (ls) return ls;
+  const t = typeof getToken === "function" ? getToken() : null;
+  if (!t) return "";
+  try {
+    const payload = JSON.parse(atob(t.split(".")[1] || ""));
+    return String(
+      payload.role
+    ).toLowerCase();
+  } catch {
+    return "";
+  }
+}
+
 export default function Footer(): JSX.Element {
   const year = new Date().getFullYear();
   const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const role = resolveRole();
+    setIsAdmin(role === 'admin');
+  }, []);
 
   const goHomeWithTab = (tab: 'urls' | 'images') => (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -41,16 +63,26 @@ export default function Footer(): JSX.Element {
               >
                 Termos de uso
               </a>
-              <a href="/reactivate-account">Reativar conta</a>
+              {!isAdmin && <a href="/reactivate-account">Reativar conta</a>}
             </div>
           </div>
 
           <div>
-            <div className={styles['footer-title']}>Serviços</div>
+            <div className={styles['footer-title']}>{isAdmin ? 'Administração' : 'Serviços'}</div>
             <div className={styles['footer-links']}>
-              <a href="/?tab=urls" onClick={goHomeWithTab('urls')}>Análise de URLs</a>
-              <a href="/?tab=images" onClick={goHomeWithTab('images')}>Análise de imagens</a>
-              <a href="/user/history">Histórico de análises</a>
+              {isAdmin ? (
+                <>
+                  <a href="/administration">Dashboard</a>
+                  <a href="/requests">Solicitações</a>
+                  <a href="/tokens">Tokens de API</a>
+                </>
+              ) : (
+                <>
+                  <a href="/?tab=urls" onClick={goHomeWithTab('urls')}>Análise de URLs</a>
+                  <a href="/?tab=images" onClick={goHomeWithTab('images')}>Análise de imagens</a>
+                  <a href="/user/history">Histórico de análises</a>
+                </>
+              )}
             </div>
           </div>
 
@@ -58,8 +90,12 @@ export default function Footer(): JSX.Element {
             <div className={styles['footer-title']}>Informação</div>
             <div className={styles['footer-links']}>
               <a href="/about">Conheça nossa história</a>
-              <a href="/contact-us">Entre em contato conosco</a>
-              <a href="/instructions">Como utilizar a plataforma</a>
+              {!isAdmin && (
+                <>
+                  <a href="/contact-us">Entre em contato conosco</a>
+                  <a href="/instructions">Como utilizar a plataforma</a>
+                </>
+              )}
             </div>
           </div>
         </div>

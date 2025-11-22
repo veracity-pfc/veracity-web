@@ -118,7 +118,7 @@ export default function Header(): JSX.Element {
 
           {isAdmin ? (
             <>
-              <NavLink to="/request" className={styles['nav-link']}>
+              <NavLink to="/requests" className={styles['nav-link']}>
                 Solicitações
               </NavLink>
               <NavLink to="/tokens" className={styles['nav-link']}>
@@ -279,7 +279,7 @@ export default function Header(): JSX.Element {
               <>
                 <NavLink
                   className={styles['mobile-link']}
-                  to="/request"
+                  to="/requests"
                   onClick={() => setMobileOpen(false)}
                 >
                   Solicitações

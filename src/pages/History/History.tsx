@@ -71,7 +71,7 @@ export default function History(): JSX.Element {
   const role = getRole();
   const isAdmin = role === "admin";
   const isTokenManagement = location.pathname.startsWith("/tokens");
-  const isRequestManagement = location.pathname.startsWith("/request");
+  const isRequestManagement = location.pathname.startsWith("/requests");
   
   const { error } = useToast();
 
@@ -216,7 +216,7 @@ export default function History(): JSX.Element {
         <div
           className={styles.card}
           style={{ minHeight: "160px", maxHeight: "160px", overflow: "hidden" }}
-          onClick={() => navigate(`/request/${item.id}`)}
+          onClick={() => navigate(`/requests/${item.id}`)}
         >
           <p className={styles.meta}>
             <b>Data da solicitação:</b>{" "}

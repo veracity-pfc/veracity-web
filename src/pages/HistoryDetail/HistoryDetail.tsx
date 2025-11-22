@@ -94,7 +94,7 @@ export default function HistoryDetail(): JSX.Element {
   const role = getRole();
   const isAdmin = role === "admin";
   const isTokenManagement = location.pathname.startsWith("/tokens");
-  const isRequestManagement = location.pathname.startsWith("/request");
+  const isRequestManagement = location.pathname.startsWith("/requests");
   const { success, error } = useToast();
 
   useEffect(() => {
@@ -132,7 +132,7 @@ export default function HistoryDetail(): JSX.Element {
         method: "POST",
       });
       success("Token gerado com sucesso.");
-      navigate("/request");
+      navigate("/requests");
     } catch (e: any) {
       const msg =
         e?.data?.detail ||
