@@ -63,12 +63,18 @@ export default function App(): JSX.Element {
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+        
         <Route path="/user/profile" element={<RequireAuth><Profile /></RequireAuth>} />
         <Route path="/user/history" element={<RequireAuth><History /></RequireAuth>} />
         <Route path="/user/history/:id" element={<RequireAuth><HistoryDetail /></RequireAuth>} />
+        
         <Route path="/dashboard" element={<RequireAdmin><Dashboard /></RequireAdmin>} />
         <Route path="/request" element={<RequireAdmin><History /></RequireAdmin>} />
-        <Route path="/request/:id" element={<RequireAuth><HistoryDetail /></RequireAuth>} />
+        <Route path="/request/:id" element={<RequireAdmin><HistoryDetail /></RequireAdmin>} />
+        
+        <Route path="/tokens" element={<RequireAdmin><History /></RequireAdmin>} />
+        <Route path="/tokens/:id" element={<RequireAdmin><HistoryDetail /></RequireAdmin>} />
+        
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Footer />

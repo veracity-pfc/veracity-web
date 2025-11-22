@@ -117,9 +117,14 @@ export default function Header(): JSX.Element {
           )}
 
           {isAdmin ? (
-            <NavLink to="/request" className={styles['nav-link']}>
-              Solicitações
-            </NavLink>
+            <>
+              <NavLink to="/request" className={styles['nav-link']}>
+                Solicitações
+              </NavLink>
+              <NavLink to="/tokens" className={styles['nav-link']}>
+                Tokens
+              </NavLink>
+            </>
           ) : (
             <NavLink to="/user/history" className={styles['nav-link']}>
               Histórico de análises
@@ -271,13 +276,22 @@ export default function Header(): JSX.Element {
             )}
 
             {isAdmin ? (
-              <NavLink
-                className={styles['mobile-link']}
-                to="/request"
-                onClick={() => setMobileOpen(false)}
-              >
-                Solicitações
-              </NavLink>
+              <>
+                <NavLink
+                  className={styles['mobile-link']}
+                  to="/request"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Solicitações
+                </NavLink>
+                <NavLink
+                  className={styles['mobile-link']}
+                  to="/tokens"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Tokens
+                </NavLink>
+              </>
             ) : (
               <NavLink
                 className={styles['mobile-link']}
@@ -288,6 +302,7 @@ export default function Header(): JSX.Element {
               </NavLink>
             )}
 
+            {/* ... resto do menu mobile igual ... */}
             {!isAdmin && (
               <NavLink
                 className={styles['mobile-link']}

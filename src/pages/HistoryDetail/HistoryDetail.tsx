@@ -1,5 +1,5 @@
 import { JSX, useEffect, useState, CSSProperties } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { apiFetch, getRole } from "../../api/client";
 import Toast, { useToast } from "../../components/Toast/Toast";
 import styles from "./HistoryDetail.module.css";
@@ -16,6 +16,12 @@ type Detail = {
   message?: string;
   status?: string;
   rejection_reason?: string;
+  token_prefix?: string;
+  user_email?: string;
+  expires_at?: string;
+  last_used_at?: string;
+  revoked_at?: string;
+  revoked_reason?: string;
 };
 
 const analysisLabelMap: Record<string, string> = {
@@ -30,6 +36,12 @@ const requestStatusMap: Record<string, string> = {
   open: "Em aberto",
   approved: "Aprovada",
   rejected: "Rejeitada",
+};
+
+const tokenStatusMap: Record<string, string> = {
+  active: "Ativo",
+  revoked: "Revogado",
+  expired: "Expirado",
 };
 
 const primaryButtonStyle: CSSProperties = {
@@ -70,6 +82,7 @@ const disabledButtonStyle: CSSProperties = {
 export default function HistoryDetail(): JSX.Element {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [data, setData] = useState<Detail | null>(null);
   const [err, setErr] = useState("");
   const [actionErr, setActionErr] = useState("");
@@ -80,27 +93,32 @@ export default function HistoryDetail(): JSX.Element {
 
   const role = getRole();
   const isAdmin = role === "admin";
+  const isTokenManagement = location.pathname.startsWith("/tokens");
+  const isRequestManagement = location.pathname.startsWith("/request");
   const { success, error } = useToast();
 
   useEffect(() => {
     (async () => {
       if (!id) return;
       try {
-        const path = isAdmin
-          ? `/administration/api/token-requests/${id}`
-          : `/administration/history/${id}`;
+        let path = "";
+        if (isTokenManagement) {
+          path = `/administration/api/tokens/${id}`; 
+          path = `/administration/api/tokens/${id}`; 
+        } else if (isRequestManagement) {
+          path = `/administration/api/token-requests/${id}`;
+        } else {
+          path = `/user/history/${id}`;
+        }
+
         const res = (await apiFetch(path, { auth: true })) as Detail;
         setData(res);
         setErr("");
       } catch {
-        setErr(
-          isAdmin
-            ? "Não foi possível carregar a solicitação."
-            : "Não foi possível carregar a análise."
-        );
+        setErr("Não foi possível carregar os detalhes.");
       }
     })();
-  }, [id, isAdmin]);
+  }, [id, isAdmin, isTokenManagement, isRequestManagement]);
 
   const handleApprove = async () => {
     if (!id || !data || data.status !== "open" || actionLoading || rejectionMode)
@@ -129,35 +147,45 @@ export default function HistoryDetail(): JSX.Element {
     }
   };
 
-  const handleReject = async () => {
-    if (!id || !data || data.status !== "open" || actionLoading) return;
+  const handleRejectOrRevoke = async () => {
+    if (!id || !data || actionLoading) return;
+    
     const reason = rejectionReason.trim();
     if (!reason) {
-      const msg = "Informe o motivo da rejeição.";
+      const msg = "Informe o motivo.";
       setActionErr(msg);
       error(msg);
       return;
     }
+
     setActionLoading(true);
     setActionErr("");
+    
     try {
-      const res = (await apiFetch(
-        `/administration/api/token-requests/${id}/reject`,
-        {
+      if (isTokenManagement) {
+        const res = await apiFetch(`/administration/api/tokens/${id}/revoke`, {
           auth: true,
           method: "POST",
           body: { reason },
-        }
-      )) as Detail;
-      setData(res);
+        });
+        setData(res as Detail);
+        success("Token revogado com sucesso.");
+      } else {
+        const res = await apiFetch(`/administration/api/token-requests/${id}/reject`, {
+          auth: true,
+          method: "POST",
+          body: { reason },
+        });
+        setData(res as Detail);
+        success("Solicitação rejeitada com sucesso.");
+      }
       setRejectionMode(false);
-      success("Solicitação rejeitada com sucesso.");
     } catch (e: any) {
       const msg =
         e?.data?.detail ||
         e?.detail ||
         e?.message ||
-        "Não foi possível rejeitar a solicitação.";
+        "Não foi possível concluir a ação.";
       setActionErr(msg);
       error(msg);
     } finally {
@@ -174,7 +202,9 @@ export default function HistoryDetail(): JSX.Element {
     return (
       <div className={styles.wrap}>
         <Toast />
-        <h1 className={styles.title}>Solicitações de token de API</h1>
+        <h1 className={styles.title}>
+          {isTokenManagement ? "Detalhes do Token" : "Solicitação de Token"}
+        </h1>
         <button className={styles.back} onClick={() => navigate(-1)}>
           Voltar
         </button>
@@ -183,28 +213,48 @@ export default function HistoryDetail(): JSX.Element {
           <div className={styles.adminLayout}>
             <div className={styles.leftCol}>
               <p className={styles.p}>
-                <b>Data da solicitação:</b>{" "}
+                <b>Data:</b>{" "}
                 {new Date(data.created_at).toLocaleString()}
               </p>
 
               <h3 className={styles.h3}>Status</h3>
               <p className={`${styles.p} ${styles.statusValue}`}>
-                {requestStatusMap[data.status || ""] ||
-                  data.status ||
-                  "Desconhecido"}
+                {isTokenManagement 
+                  ? (tokenStatusMap[data.status || ""] || data.status) 
+                  : (requestStatusMap[data.status || ""] || data.status)}
               </p>
 
-              <h3 className={styles.h3}>Usuário solicitante</h3>
+              <h3 className={styles.h3}>Usuário</h3>
               <p className={styles.p}>
-                <b>E-mail:</b> {data.email || "—"}
+                <b>E-mail:</b> {data.user_email || data.email || "—"}
               </p>
 
-              <h3 className={styles.h3}>Mensagem do usuário</h3>
-              <div className={styles.p}>{data.message || "—"}</div>
+              {isRequestManagement && (
+                <>
+                  <h3 className={styles.h3}>Mensagem do usuário</h3>
+                  <div className={styles.p}>{data.message || "—"}</div>
+                </>
+              )}
+
+              {isTokenManagement && (
+                <>
+                  <h3 className={styles.h3}>Informações do Token</h3>
+                  <p className={styles.p}>
+                    <b>Prefixo:</b> <span style={{fontFamily:'monospace'}}>{data.token_prefix}•••••</span>
+                  </p>
+                  <p className={styles.p}>
+                    <b>Expira em:</b> {data.expires_at ? new Date(data.expires_at).toLocaleString() : "—"}
+                  </p>
+                  <p className={styles.p}>
+                    <b>Último uso:</b> {data.last_used_at ? new Date(data.last_used_at).toLocaleString() : "Nunca"}
+                  </p>
+                </>
+              )}
             </div>
 
             <div className={styles.rightCol}>
-              {data.status === "open" && (
+              {/* Ações para Solicitações (Em aberto) */}
+              {isRequestManagement && data.status === "open" && (
                 <>
                   <div className={styles.actionsRow}>
                     <button
@@ -234,58 +284,99 @@ export default function HistoryDetail(): JSX.Element {
                       Rejeitar
                     </button>
                   </div>
-
-                  {rejectionMode && (
-                    <>
-                      <h3 className={styles.h3Right}>Motivo da rejeição</h3>
-                      <textarea
-                        className={styles.reasonInput}
-                        rows={5}
-                        maxLength={2000}
-                        placeholder="Descreva o motivo da rejeição"
-                        value={rejectionReason}
-                        onChange={(e) => setRejectionReason(e.target.value)}
-                      />
-                      <div className={styles.actionButtons}>
-                        <button
-                          type="button"
-                          onClick={handleReject}
-                          disabled={actionLoading}
-                          style={{
-                            ...primaryButtonStyle,
-                            ...(actionLoading ? disabledButtonStyle : {}),
-                          }}
-                        >
-                          Confirmar
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (actionLoading) return;
-                            setRejectionMode(false);
-                            setRejectionReason("");
-                            setActionErr("");
-                          }}
-                          disabled={actionLoading}
-                          style={{
-                            ...neutralButtonStyle,
-                            ...(actionLoading ? disabledButtonStyle : {}),
-                          }}
-                        >
-                          Cancelar
-                        </button>
-                      </div>
-                    </>
-                  )}
                 </>
               )}
 
-              {data.status === "rejected" && data.rejection_reason && (
+              {/* Ações para Tokens (Ativos) */}
+              {isTokenManagement && data.status === "active" && (
+                <>
+                  <div className={styles.actionsRow}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (actionLoading) return;
+                        setRejectionMode(true);
+                        setActionErr("");
+                      }}
+                      disabled={disablePrimaryActions}
+                      style={{
+                        ...dangerButtonStyle,
+                        ...(disablePrimaryActions ? disabledButtonStyle : {}),
+                      }}
+                    >
+                      Revogar Token
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {/* Área de Motivo (Rejeição ou Revogação) */}
+              {rejectionMode && (
+                <>
+                  <h3 className={styles.h3Right}>
+                    {isTokenManagement ? "Motivo da revogação" : "Motivo da rejeição"}
+                  </h3>
+                  <textarea
+                    className={styles.reasonInput}
+                    rows={5}
+                    maxLength={2000}
+                    placeholder={isTokenManagement ? "Por que este token está sendo revogado?" : "Descreva o motivo da rejeição"}
+                    value={rejectionReason}
+                    onChange={(e) => setRejectionReason(e.target.value)}
+                  />
+                  <div className={styles.actionButtons}>
+                    <button
+                      type="button"
+                      onClick={handleRejectOrRevoke}
+                      disabled={actionLoading}
+                      style={{
+                        ...primaryButtonStyle,
+                        ...(actionLoading ? disabledButtonStyle : {}),
+                      }}
+                    >
+                      Confirmar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (actionLoading) return;
+                        setRejectionMode(false);
+                        setRejectionReason("");
+                        setActionErr("");
+                      }}
+                      disabled={actionLoading}
+                      style={{
+                        ...neutralButtonStyle,
+                        ...(actionLoading ? disabledButtonStyle : {}),
+                      }}
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {/* Exibição de motivos passados */}
+              {isRequestManagement && data.status === "rejected" && data.rejection_reason && (
                 <>
                   <h3 className={styles.h3Right}>Motivo da rejeição</h3>
                   <div className={styles.reasonBox}>
                     {data.rejection_reason}
                   </div>
+                </>
+              )}
+
+              {isTokenManagement && data.status === "revoked" && (
+                <>
+                  <h3 className={styles.h3Right}>Detalhes da revogação</h3>
+                  <p className={styles.p}>
+                    <b>Revogado em:</b> {data.revoked_at ? new Date(data.revoked_at).toLocaleString() : "—"}
+                  </p>
+                  {data.revoked_reason && (
+                    <div className={styles.reasonBox}>
+                      <b>Motivo:</b> {data.revoked_reason}
+                    </div>
+                  )}
                 </>
               )}
             </div>
@@ -299,6 +390,7 @@ export default function HistoryDetail(): JSX.Element {
 
   return (
     <div className={styles.wrap}>
+      {/* Código existente para visão do usuário comum ... */}
       <Toast />
       <h1 className={styles.title}>Histórico</h1>
       <button className={styles.back} onClick={() => navigate(-1)}>

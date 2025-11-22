@@ -1,5 +1,5 @@
 import { JSX, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { apiFetch, getRole } from "../../api/client";
 import Filter from "../../components/Filter/Filter";
 import Toast, { useToast } from "../../components/Toast/Toast";
@@ -14,6 +14,9 @@ type Item = {
   email?: string;
   message_preview?: string;
   status?: string;
+  token_prefix?: string;
+  user_email?: string;
+  expires_at?: string;
 };
 
 type Paged = {
@@ -44,8 +47,15 @@ const requestStatusMap: Record<string, string> = {
   rejected: "Rejeitada",
 };
 
+const tokenStatusMap: Record<string, string> = {
+  active: "Ativo",
+  revoked: "Revogado",
+  expired: "Expirado",
+};
+
 export default function History(): JSX.Element {
   const navigate = useNavigate();
+  const location = useLocation();
   const [items, setItems] = useState<Item[]>([]);
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -60,7 +70,18 @@ export default function History(): JSX.Element {
   const requestSeq = useRef(0);
   const role = getRole();
   const isAdmin = role === "admin";
+  const isTokenManagement = location.pathname.startsWith("/tokens");
+  const isRequestManagement = location.pathname.startsWith("/request");
+  
   const { error } = useToast();
+
+  useEffect(() => {
+    setPage(1);
+    setQ("");
+    setStatus("");
+    setDateFrom("");
+    setDateTo("");
+  }, [location.pathname]);
 
   const params = useMemo(() => {
     const p = new URLSearchParams();
@@ -101,9 +122,15 @@ export default function History(): JSX.Element {
     const seq = ++requestSeq.current;
     setLoading(true);
     try {
-      const path = isAdmin
-        ? `/administration/api/token-requests?${params}`
-        : `/user/history?${params}`;
+      let path = "";
+      if (isTokenManagement) {
+        path = `/administration/api/tokens?${params}`;
+      } else if (isRequestManagement) {
+        path = `/administration/api/token-requests?${params}`;
+      } else {
+        path = `/user/history?${params}`;
+      }
+
       const data = (await apiFetch(path, { auth: true })) as Paged;
       if (seq !== requestSeq.current) return;
       setItems(data.items);
@@ -121,10 +148,70 @@ export default function History(): JSX.Element {
 
   useEffect(() => {
     load();
-  }, [params]);
+  }, [params, location.pathname]);
+
+  function getTitle() {
+    if (isTokenManagement) return "Gestão de Tokens";
+    if (isRequestManagement) return "Solicitações de token de API";
+    return "Histórico de análises";
+  }
+
+  function getPlaceholder() {
+    if (isTokenManagement || isRequestManagement) return "Buscar por e-mail do usuário";
+    return "Buscar por URL ou nome da imagem";
+  }
+
+  function getStatusOptions() {
+    if (isTokenManagement) {
+      return [
+        { value: "", label: "Todos" },
+        { value: "active", label: "Ativo" },
+        { value: "revoked", label: "Revogado" },
+        { value: "expired", label: "Expirado" },
+      ];
+    }
+    if (isRequestManagement) {
+      return [
+        { value: "", label: "Todos" },
+        { value: "open", label: "Em aberto" },
+        { value: "approved", label: "Aprovada" },
+        { value: "rejected", label: "Rejeitada" },
+      ];
+    }
+    return undefined;
+  }
 
   function Card({ item }: { item: Item }) {
-    if (isAdmin) {
+    if (isTokenManagement) {
+      return (
+        <div
+          className={styles.card}
+          style={{ minHeight: "160px", maxHeight: "160px", overflow: "hidden" }}
+          onClick={() => navigate(`/tokens/${item.id}`)}
+        >
+          <p className={styles.meta}>
+            <b>Criado em:</b>{" "}
+            {new Date(item.created_at).toLocaleDateString()}
+          </p>
+          <p className={styles.meta}>
+            <b>Usuário:</b>{" "}
+            <span className={styles.ellipsis}>{item.user_email || "—"}</span>
+          </p>
+          <p className={styles.meta}>
+            <b>Token:</b>{" "}
+            <span style={{ fontFamily: "monospace" }}>
+              {item.token_prefix}•••••
+            </span>
+          </p>
+          <p className={styles.meta}>
+            <b>Status:</b>{" "}
+            {tokenStatusMap[item.status || ""] || item.status || "Desconhecido"}
+          </p>
+        </div>
+      );
+    }
+
+    if (isRequestManagement) {
       return (
         <div
           className={styles.card}
@@ -205,19 +292,13 @@ export default function History(): JSX.Element {
   return (
     <div className={styles.wrap}>
       <Toast />
-      <h1 className={styles.title}>
-        {isAdmin ? "Solicitações de token de API" : "Histórico de análises"}
-      </h1>
+      <h1 className={styles.title}>{getTitle()}</h1>
 
       <div className={styles.searchRow}>
         <span className={styles.searchIcon}>⌕</span>
         <input
           className={styles.search}
-          placeholder={
-            isAdmin
-              ? "Buscar por e-mail do usuário"
-              : "Buscar por URL ou nome da imagem"
-          }
+          placeholder={getPlaceholder()}
           value={q}
           onChange={(e) => {
             setPage(1);
@@ -250,9 +331,7 @@ export default function History(): JSX.Element {
           <div className={styles.loading}>Carregando…</div>
         ) : items.length === 0 ? (
           <div className={styles.empty}>
-            {isAdmin
-              ? "Nenhuma solicitação disponível para visualização."
-              : "Nenhuma análise disponível para visualização."}
+            Nenhum registro encontrado.
           </div>
         ) : (
           <div
@@ -327,16 +406,7 @@ export default function History(): JSX.Element {
         }}
         showStatus
         showType={!isAdmin}
-        statusOptions={
-          isAdmin
-            ? [
-                { value: "", label: "Todos" },
-                { value: "open", label: "Em aberto" },
-                { value: "approved", label: "Aprovada" },
-                { value: "rejected", label: "Rejeitada" },
-              ]
-            : undefined
-        }
+        statusOptions={getStatusOptions()}
       />
     </div>
   );

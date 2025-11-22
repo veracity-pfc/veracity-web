@@ -44,8 +44,11 @@ function resolveRole(): string {
   }
 }
 
-function formatDateTime(iso?: string | null): string {
+function formatDateTime(iso?: any): string {
   if (!iso) return "";
+  if (typeof iso !== 'string' && typeof iso !== 'number' && !(iso instanceof Date)) {
+      return ""; 
+  }
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
   return d.toLocaleString("pt-BR", {
@@ -91,6 +94,8 @@ export default function Profile(): JSX.Element {
   
   const [apiTokenExpiresAt, setApiTokenExpiresAt] = useState<string | null>(null);
 
+  const [pendingRevealSuccess, setPendingRevealSuccess] = useState(false);
+
   const dirtyRef = useRef(false);
   const pendingNavRef = useRef<{ type: "url" | "back"; value: string | null } | null>(null);
 
@@ -107,6 +112,13 @@ export default function Profile(): JSX.Element {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  const refreshProfile = async () => {
+    try {
+      const d = (await apiGetProfile()) as AnyObj;
+      setInitial(d);
+    } catch {}
+  };
 
   useEffect(() => {
     apiGetProfile()
@@ -352,27 +364,38 @@ export default function Profile(): JSX.Element {
         setApiTokenValue(value);
         setApiTokenExpiresAt(expires);
         setModalApiTokenReveal(true);
-        
-        setInitial((prev) =>
-          prev
-            ? {
-                ...prev,
-                api_token_info: {
-                  ...(prev.api_token_info || info),
-                  revealed: true,
-                  expires_at: expires || info.expires_at,
-                },
-              }
-            : prev
-        );
+        setPendingRevealSuccess(true); 
       } catch (e: any) {
-        error(e?.message || "Não foi possível recuperar o token de API.");
+        const msg = e?.message || "Não foi possível recuperar o token de API.";
+        error(msg);
+        if (msg.toLowerCase().includes("já foi revelado") || msg.toLowerCase().includes("revealed")) {
+          await refreshProfile();
+        }
       } finally {
         setApiTokenLoading(false);
       }
       return;
     }
     setModalApiTokenRevoke(true);
+  };
+
+  const handleCloseRevealModal = () => {
+    setModalApiTokenReveal(false);
+    if (pendingRevealSuccess) {
+      setInitial((prev) => {
+        if (!prev) return prev;
+        const currentInfo = prev.api_token_info || {};
+        return {
+          ...prev,
+          api_token_info: {
+            ...currentInfo,
+            revealed: true,
+            expires_at: apiTokenExpiresAt || currentInfo.expires_at,
+          },
+        };
+      });
+      setPendingRevealSuccess(false);
+    }
   };
 
   const isAdmin =
@@ -610,14 +633,14 @@ export default function Profile(): JSX.Element {
 
       <Modal
         open={modalApiTokenReveal}
-        onClose={() => setModalApiTokenReveal(false)}
+        onClose={handleCloseRevealModal}
         imageSrc={modalRevealTokenImg} 
         title="Atenção"
         primaryText="Copiar token"
         primaryVariant="success"
         onPrimary={handleCopyFromModal}
         secondaryText="Fechar"
-        onSecondary={() => setModalApiTokenReveal(false)}
+        onSecondary={handleCloseRevealModal}
         secondaryVariant="secondary"
       >
         <p>
