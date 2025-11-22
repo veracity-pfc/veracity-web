@@ -7,6 +7,13 @@ import '../../styles/forms.css';
 
 const cx = (...xs: Array<string | false | null | undefined>) => xs.filter(Boolean).join(' ');
 
+const subjectToCategory: Record<string, string> = {
+  "Dúvida": "doubt",
+  "Sugestão": "suggestion",
+  "Reclamação": "complaint",
+  "Solicitação de token de API": "token_request"
+};
+
 export default function Contact(): JSX.Element {
   const [subject, setSubject] = useState<string>('Dúvida');
   const [email, setEmail] = useState<string>('');
@@ -30,7 +37,7 @@ export default function Contact(): JSX.Element {
     }
   }, [isUserLoggedIn]);
 
-  const isInvalid = !email.trim() || !message.trim();
+  const isInvalid = !email.trim() || message.trim().length < 10;
 
   return (
     <main>
@@ -54,10 +61,18 @@ export default function Contact(): JSX.Element {
                 onSubmit={async (e) => {
                   e.preventDefault();
                   if (loading) return;
+                  
+                  if (message.trim().length < 10) {
+                    setErr("A mensagem deve ter no mínimo 10 caracteres.");
+                    return;
+                  }
+
                   setErr('');
                   setLoading(true);
                   try {
-                    await apiSendContact(email.trim(), subject, message.trim());
+                    const category = subjectToCategory[subject] || 'doubt';
+                    
+                    await apiSendContact(email.trim(), subject, message.trim(), category);
                     setOk(true);
                     success('Mensagem enviada com sucesso!');
                   } catch (e: any) {
@@ -98,12 +113,17 @@ export default function Contact(): JSX.Element {
                 <textarea
                   id="message"
                   className="form-control textarea"
-                  placeholder="Descreva sua solicitação"
+                  placeholder="Descreva sua solicitação (mínimo 10 caracteres)"
                   rows={6}
                   value={message}
                   maxLength={4000}
                   onChange={(e) => setMessage(e.target.value.slice(0, 4000))}
                 />
+                {message.length > 0 && message.length < 10 && (
+                   <span style={{fontSize: 12, color: '#fca5a5'}}>
+                     Faltam {10 - message.length} caracteres
+                   </span>
+                )}
 
                 {err && <p className="error-msg" role="alert">{err}</p>}
 

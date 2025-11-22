@@ -149,7 +149,7 @@ export default function Filter({
 
           {showType && (
             <div className={styles.field}>
-              <label className={styles.label}>Tipo</label>
+              <label className={styles.label}>Categoria</label>
               <select
                 className={styles.select}
                 value={localType}

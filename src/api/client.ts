@@ -268,11 +268,17 @@ export async function apiResetPassword(token: string, password: string, confirm_
   return r.json();
 }
 
-export const apiSendContact = (email: string, subject: string, message: string) =>
-  apiFetch("/contact-us", {
-    method: "POST",
-    body: { email, subject, message },
+export async function apiSendContact(email: string, subject: string, message: string, category: string) {
+  return apiFetch('/contact-us', {
+    method: 'POST',
+    body: { 
+      email, 
+      subject, 
+      message, 
+      category 
+    },
   });
+}
 
 export const apiValidateName = (name: string) =>
   apiFetch("/user/profile/name?validate_only=true", {

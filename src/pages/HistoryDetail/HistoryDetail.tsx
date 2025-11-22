@@ -7,6 +7,7 @@ import styles from "./HistoryDetail.module.css";
 type Detail = {
   id: string;
   created_at: string;
+  seq_id?: number;
   analysis_type?: "url" | "image" | string;
   source?: string;
   label?: string;
@@ -22,6 +23,10 @@ type Detail = {
   last_used_at?: string;
   revoked_at?: string;
   revoked_reason?: string;
+  category?: string;
+  subject?: string;
+  admin_reply?: string;
+  replied_at?: string;
 };
 
 const analysisLabelMap: Record<string, string> = {
@@ -36,12 +41,20 @@ const requestStatusMap: Record<string, string> = {
   open: "Em aberto",
   approved: "Aprovada",
   rejected: "Rejeitada",
+  answered: "Respondida",
 };
 
 const tokenStatusMap: Record<string, string> = {
   active: "Ativo",
   revoked: "Revogado",
   expired: "Expirado",
+};
+
+const categoryMap: Record<string, string> = {
+  doubt: "Dúvida",
+  suggestion: "Sugestão",
+  complaint: "Reclamação",
+  token_request: "Solicitação de Token",
 };
 
 const primaryButtonStyle: CSSProperties = {
@@ -52,6 +65,7 @@ const primaryButtonStyle: CSSProperties = {
   fontWeight: 900,
   color: "var(--text-primary)",
   cursor: "pointer",
+  textAlign: "center",
 };
 
 const dangerButtonStyle: CSSProperties = {
@@ -62,6 +76,7 @@ const dangerButtonStyle: CSSProperties = {
   fontWeight: 900,
   color: "#fff",
   cursor: "pointer",
+  textAlign: "center",
 };
 
 const neutralButtonStyle: CSSProperties = {
@@ -72,6 +87,7 @@ const neutralButtonStyle: CSSProperties = {
   fontWeight: 900,
   color: "#f5f5f5",
   cursor: "pointer",
+  textAlign: "center",
 };
 
 const disabledButtonStyle: CSSProperties = {
@@ -86,8 +102,13 @@ export default function HistoryDetail(): JSX.Element {
   const [data, setData] = useState<Detail | null>(null);
   const [err, setErr] = useState("");
   const [actionErr, setActionErr] = useState("");
+  
   const [rejectionMode, setRejectionMode] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
+  
+  const [replyMode, setReplyMode] = useState(false); 
+  const [replyMessage, setReplyMessage] = useState("");
+
   const [actionLoading, setActionLoading] = useState(false);
   const [approveLoading, setApproveLoading] = useState(false);
 
@@ -104,9 +125,8 @@ export default function HistoryDetail(): JSX.Element {
         let path = "";
         if (isTokenManagement) {
           path = `/administration/api/tokens/${id}`; 
-          path = `/administration/api/tokens/${id}`; 
         } else if (isRequestManagement) {
-          path = `/administration/api/token-requests/${id}`;
+          path = `/administration/contact-requests/${id}`; 
         } else {
           path = `/user/history/${id}`;
         }
@@ -134,11 +154,7 @@ export default function HistoryDetail(): JSX.Element {
       success("Token gerado com sucesso.");
       navigate("/requests");
     } catch (e: any) {
-      const msg =
-        e?.data?.detail ||
-        e?.detail ||
-        e?.message ||
-        "Não foi possível gerar o token.";
+      const msg = e?.data?.detail || e?.message || "Não foi possível gerar o token.";
       setActionErr(msg);
       error(msg);
     } finally {
@@ -147,14 +163,40 @@ export default function HistoryDetail(): JSX.Element {
     }
   };
 
+  const handleReplyContact = async () => {
+    if (!id || !data || actionLoading) return;
+    
+    if (!replyMessage.trim() || replyMessage.length < 5) {
+      setActionErr("A resposta deve ter pelo menos 5 caracteres.");
+      return;
+    }
+
+    setActionLoading(true);
+    setActionErr("");
+    try {
+      await apiFetch(`/administration/contact-requests/${id}/reply`, {
+        auth: true,
+        method: "POST",
+        body: { reply_message: replyMessage }
+      });
+      success("Resposta enviada com sucesso!");
+      setReplyMode(false); 
+      navigate("/requests");
+    } catch (e: any) {
+      const msg = e?.data?.detail || e?.message || "Falha ao enviar resposta.";
+      setActionErr(msg);
+      error(msg);
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
   const handleRejectOrRevoke = async () => {
     if (!id || !data || actionLoading) return;
     
     const reason = rejectionReason.trim();
     if (!reason) {
-      const msg = "Informe o motivo.";
-      setActionErr(msg);
-      error(msg);
+      setActionErr("Informe o motivo.");
       return;
     }
 
@@ -181,11 +223,7 @@ export default function HistoryDetail(): JSX.Element {
       }
       setRejectionMode(false);
     } catch (e: any) {
-      const msg =
-        e?.data?.detail ||
-        e?.detail ||
-        e?.message ||
-        "Não foi possível concluir a ação.";
+      const msg = e?.data?.detail || e?.message || "Não foi possível concluir a ação.";
       setActionErr(msg);
       error(msg);
     } finally {
@@ -193,7 +231,11 @@ export default function HistoryDetail(): JSX.Element {
     }
   };
 
-  const disablePrimaryActions = actionLoading || rejectionMode;
+  const disablePrimaryActions = actionLoading || rejectionMode || replyMode;
+
+  const isTokenRequest = data?.category === 'token_request' || (!data?.category && data?.status === 'approved'); 
+  const isContact = data?.category && ['doubt', 'suggestion', 'complaint'].includes(data.category);
+  const canReply = isContact && data?.status === 'open' && ['doubt', 'suggestion'].includes(data?.category || '');
 
   if (err) return <div className={styles.error}>{err}</div>;
   if (!data) return <div className={styles.loading}>Carregando…</div>;
@@ -203,7 +245,11 @@ export default function HistoryDetail(): JSX.Element {
       <div className={styles.wrap}>
         <Toast />
         <h1 className={styles.title}>
-          {isTokenManagement ? "Detalhes do Token" : "Solicitação de Token"}
+          {isTokenManagement 
+            ? "Detalhes do Token" 
+            : data?.seq_id 
+              ? `Solicitação #${data.seq_id}` 
+              : "Solicitação"}
         </h1>
         <button className={styles.back} onClick={() => navigate(-1)}>
           Voltar
@@ -231,8 +277,23 @@ export default function HistoryDetail(): JSX.Element {
 
               {isRequestManagement && (
                 <>
-                  <h3 className={styles.h3}>Mensagem do usuário</h3>
-                  <div className={styles.p}>{data.message || "—"}</div>
+                  <h3 className={styles.h3}>
+                    {isContact ? categoryMap[data.category || ''] || "Mensagem" : "Mensagem do usuário"}
+                  </h3>
+                  {data.subject && <p className={styles.p}><b>Assunto:</b> {data.subject}</p>}
+                  <div className={styles.reasonBox} style={{marginTop: 8}}>{data.message || "—"}</div>
+                </>
+              )}
+              
+              {data.admin_reply && (
+                <>
+                   <h3 className={styles.h3} style={{color:'var(--accent)'}}>Resposta enviada</h3>
+                   <p className={styles.p} style={{fontSize:12, opacity:0.7}}>
+                     Em: {data.replied_at ? new Date(data.replied_at).toLocaleString() : '-'}
+                   </p>
+                   <div className={styles.reasonBox} style={{borderColor:'var(--accent)'}}>
+                     {data.admin_reply}
+                   </div>
                 </>
               )}
 
@@ -253,58 +314,110 @@ export default function HistoryDetail(): JSX.Element {
             </div>
 
             <div className={styles.rightCol}>
-              {isRequestManagement && data.status === "open" && (
+              {isRequestManagement && isTokenRequest && data.status === "open" && (
                 <>
-                  <div className={styles.actionsRow}>
-                    <button
-                      type="button"
-                      onClick={handleApprove}
-                      disabled={disablePrimaryActions}
-                      style={{
-                        ...primaryButtonStyle,
-                        ...(disablePrimaryActions ? disabledButtonStyle : {}),
-                      }}
-                    >
-                      {approveLoading ? "Carregando" : "Gerar token"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (actionLoading) return;
-                        setRejectionMode(true);
-                        setActionErr("");
-                      }}
-                      disabled={disablePrimaryActions}
-                      style={{
-                        ...dangerButtonStyle,
-                        ...(disablePrimaryActions ? disabledButtonStyle : {}),
-                      }}
-                    >
-                      Rejeitar
-                    </button>
-                  </div>
+                  {!rejectionMode && (
+                    <div className={styles.actionsRow}>
+                      <button
+                        type="button"
+                        onClick={handleApprove}
+                        disabled={disablePrimaryActions}
+                        style={{...primaryButtonStyle, ...(disablePrimaryActions ? disabledButtonStyle : {})}}
+                      >
+                        {approveLoading ? "Carregando" : "Gerar token"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (actionLoading) return;
+                          setRejectionMode(true);
+                          setActionErr("");
+                        }}
+                        disabled={disablePrimaryActions}
+                        style={{...dangerButtonStyle, ...(disablePrimaryActions ? disabledButtonStyle : {})}}
+                      >
+                        Rejeitar
+                      </button>
+                    </div>
+                  )}
                 </>
+              )}
+              
+              {isRequestManagement && canReply && (
+                <div style={{width: '100%'}}>
+                  {!replyMode && (
+                    <div className={styles.actionsRow}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setReplyMode(true);
+                          setActionErr("");
+                        }}
+                        disabled={disablePrimaryActions}
+                        style={{...primaryButtonStyle, ...(disablePrimaryActions ? disabledButtonStyle : {})}}
+                      >
+                        Responder
+                      </button>
+                    </div>
+                  )}
+
+                  {replyMode && (
+                    <>
+                      <h3 className={styles.h3Right}>Enviar resposta</h3>
+                      <textarea 
+                        className={styles.reasonInput}
+                        rows={6}
+                        maxLength={4000}
+                        placeholder="Escreva a resposta que será enviada por e-mail ao usuário..."
+                        value={replyMessage}
+                        onChange={(e) => setReplyMessage(e.target.value)}
+                      />
+                      <div className={styles.actionButtons}>
+                        <button
+                          type="button"
+                          onClick={handleReplyContact}
+                          disabled={actionLoading || !replyMessage.trim()}
+                          style={{...primaryButtonStyle, ...(actionLoading ? disabledButtonStyle : {})}}
+                        >
+                          {actionLoading ? "Enviando..." : "Confirmar"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (actionLoading) return;
+                            setReplyMode(false);
+                            setReplyMessage("");
+                            setActionErr("");
+                          }}
+                          disabled={actionLoading}
+                          style={{...neutralButtonStyle, ...(actionLoading ? disabledButtonStyle : {})}}
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
               )}
 
               {isTokenManagement && data.status === "active" && (
                 <>
-                  <div className={styles.actionsRow}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (actionLoading) return;
-                        setRejectionMode(true);
-                        setActionErr("");
-                      }}
-                      disabled={disablePrimaryActions}
-                      style={{
-                        ...dangerButtonStyle,
-                        ...(disablePrimaryActions ? disabledButtonStyle : {}),
-                      }}
-                    >
-                      Revogar Token
-                    </button>
-                  </div>
+                  {!rejectionMode && (
+                    <div className={styles.actionsRow}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (actionLoading) return;
+                          setRejectionMode(true);
+                          setActionErr("");
+                        }}
+                        disabled={disablePrimaryActions}
+                        style={{...dangerButtonStyle, ...(disablePrimaryActions ? disabledButtonStyle : {})}}
+                      >
+                        Revogar Token
+                      </button>
+                    </div>
+                  )}
                 </>
               )}
 
@@ -326,10 +439,7 @@ export default function HistoryDetail(): JSX.Element {
                       type="button"
                       onClick={handleRejectOrRevoke}
                       disabled={actionLoading}
-                      style={{
-                        ...primaryButtonStyle,
-                        ...(actionLoading ? disabledButtonStyle : {}),
-                      }}
+                      style={{...primaryButtonStyle, ...(actionLoading ? disabledButtonStyle : {})}}
                     >
                       Confirmar
                     </button>
@@ -342,10 +452,7 @@ export default function HistoryDetail(): JSX.Element {
                         setActionErr("");
                       }}
                       disabled={actionLoading}
-                      style={{
-                        ...neutralButtonStyle,
-                        ...(actionLoading ? disabledButtonStyle : {}),
-                      }}
+                      style={{...neutralButtonStyle, ...(actionLoading ? disabledButtonStyle : {})}}
                     >
                       Cancelar
                     </button>

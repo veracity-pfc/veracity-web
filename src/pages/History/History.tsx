@@ -13,10 +13,13 @@ type Item = {
   label?: string;
   email?: string;
   message_preview?: string;
+  message?: string;
   status?: string;
   token_prefix?: string;
   user_email?: string;
   expires_at?: string;
+  category?: string;
+  subject?: string;
 };
 
 type Paged = {
@@ -45,12 +48,20 @@ const requestStatusMap: Record<string, string> = {
   open: "Em aberto",
   approved: "Aprovada",
   rejected: "Rejeitada",
+  answered: "Respondida",
 };
 
 const tokenStatusMap: Record<string, string> = {
   active: "Ativo",
   revoked: "Revogado",
   expired: "Expirado",
+};
+
+const categoryMap: Record<string, string> = {
+  doubt: "Dúvida",
+  suggestion: "Sugestão",
+  complaint: "Reclamação",
+  token_request: "Solicitação de Token",
 };
 
 export default function History(): JSX.Element {
@@ -60,9 +71,10 @@ export default function History(): JSX.Element {
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
+  
   const [q, setQ] = useState<string>("");
   const [status, setStatus] = useState<string>("");
-  const [atype, setAtype] = useState<string>("");
+  const [atype, setAtype] = useState<string>(""); 
   const [dateFrom, setDateFrom] = useState<string>("");
   const [dateTo, setDateTo] = useState<string>("");
   const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
@@ -70,8 +82,9 @@ export default function History(): JSX.Element {
   const requestSeq = useRef(0);
   const role = getRole();
   const isAdmin = role === "admin";
+  
   const isTokenManagement = location.pathname.startsWith("/tokens");
-  const isRequestManagement = location.pathname.startsWith("/requests");
+  const isRequestManagement = location.pathname.startsWith("/requests"); 
   
   const { error } = useToast();
 
@@ -79,6 +92,7 @@ export default function History(): JSX.Element {
     setPage(1);
     setQ("");
     setStatus("");
+    setAtype("");
     setDateFrom("");
     setDateTo("");
   }, [location.pathname]);
@@ -93,6 +107,10 @@ export default function History(): JSX.Element {
     } else {
       if (q) p.set("q", q);
       if (atype) p.set("analysis_type", atype);
+    }
+
+    if (isRequestManagement && atype) {
+      p.set("category", atype);
     }
 
     if (status) p.set("status", status);
@@ -116,7 +134,7 @@ export default function History(): JSX.Element {
       }
     }
     return p.toString();
-  }, [page, q, status, atype, dateFrom, dateTo, isAdmin]);
+  }, [page, q, status, atype, dateFrom, dateTo, isAdmin, isRequestManagement]);
 
   async function load() {
     const seq = ++requestSeq.current;
@@ -126,7 +144,7 @@ export default function History(): JSX.Element {
       if (isTokenManagement) {
         path = `/administration/api/tokens?${params}`;
       } else if (isRequestManagement) {
-        path = `/administration/api/token-requests?${params}`;
+        path = `/administration/contact-requests?${params}`; 
       } else {
         path = `/user/history?${params}`;
       }
@@ -152,12 +170,13 @@ export default function History(): JSX.Element {
 
   function getTitle() {
     if (isTokenManagement) return "Gestão de Tokens";
-    if (isRequestManagement) return "Solicitações de token de API";
+    if (isRequestManagement) return "Solicitações recebidas";
     return "Histórico de análises";
   }
 
   function getPlaceholder() {
-    if (isTokenManagement || isRequestManagement) return "Buscar por e-mail do usuário";
+    if (isTokenManagement) return "Buscar por e-mail";
+    if (isRequestManagement) return "Buscar por e-mail ou assunto";
     return "Buscar por URL ou nome da imagem";
   }
 
@@ -174,11 +193,29 @@ export default function History(): JSX.Element {
       return [
         { value: "", label: "Todos" },
         { value: "open", label: "Em aberto" },
+        { value: "answered", label: "Respondida" },
         { value: "approved", label: "Aprovada" },
         { value: "rejected", label: "Rejeitada" },
       ];
     }
     return undefined;
+  }
+
+  function getTypeOptions() {
+    if (isRequestManagement) {
+      return [
+        { value: "", label: "Todos" },
+        { value: "doubt", label: "Dúvida" },
+        { value: "suggestion", label: "Sugestão" },
+        { value: "complaint", label: "Reclamação" },
+        { value: "token_request", label: "Solicitação de Token API" },
+      ];
+    }
+    return [
+      { value: "", label: "Todos" },
+      { value: "url", label: "URL" },
+      { value: "image", label: "Imagem" },
+    ];
   }
 
   function Card({ item }: { item: Item }) {
@@ -212,41 +249,28 @@ export default function History(): JSX.Element {
     }
 
     if (isRequestManagement) {
+      const categoryLabel = categoryMap[item.category || ""] || item.category || "Geral";
       return (
         <div
           className={styles.card}
           style={{ minHeight: "160px", maxHeight: "160px", overflow: "hidden" }}
           onClick={() => navigate(`/requests/${item.id}`)}
         >
-          <p className={styles.meta}>
-            <b>Data da solicitação:</b>{" "}
-            {new Date(item.created_at).toLocaleString()}
-          </p>
-          <p className={styles.meta}>
-            <b>E-mail:</b>{" "}
+          <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start'}}>
+            <span className={styles.tag}><b>{categoryLabel}</b></span>
+            <span style={{fontSize: 12, opacity: 0.6}}>{new Date(item.created_at).toLocaleDateString()}</span>
+          </div>
+          
+          <p className={styles.meta} style={{marginTop: 8}}>
+            <b>De:</b>{" "}
             <span className={styles.ellipsis}>{item.email || "—"}</span>
           </p>
-          <p
-            className={styles.meta}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 4,
-            }}
-          >
-            <b style={{ flexShrink: 0 }}>Mensagem:</b>
-            <span
-              className={styles.ellipsis}
-              style={{
-                flex: 1,
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {item.message_preview || "—"}
-            </span>
+          
+          <p className={styles.meta}>
+            <b>Assunto:</b>{" "}
+            <span className={styles.ellipsis}>{item.subject || "Solicitação de Token"}</span>
           </p>
+
           <p className={styles.meta}>
             <b>Status:</b>{" "}
             {requestStatusMap[item.status || ""] ||
@@ -405,8 +429,9 @@ export default function History(): JSX.Element {
           setAtype("");
         }}
         showStatus
-        showType={!isAdmin}
+        showType={!isAdmin || isRequestManagement} 
         statusOptions={getStatusOptions()}
+        typeOptions={getTypeOptions()}
       />
     </div>
   );
