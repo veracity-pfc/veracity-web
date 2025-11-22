@@ -16,30 +16,22 @@ export default function Dashboard(): JSX.Element {
   const { warn, error, success } = useToast();
 
   const [analysisYm, setAnalysisYm] = useState<YM>(getCurrentYM());
-  const [usersYm, setUsersYm] = useState<YM>(getCurrentYM());
-
-  const [analysisMetrics, setAnalysisMetrics] =
-    useState<AdminMonthMetrics | null>(null);
-  const [usersMetrics, setUsersMetrics] =
-    useState<AdminMonthMetrics | null>(null);
-
+  const [analysisMetrics, setAnalysisMetrics] = useState<AdminMonthMetrics | null>(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
-  const [usersLoading, setUsersLoading] = useState(false);
-
   const [analysisFollowCurrent, setAnalysisFollowCurrent] = useState(true);
-  const [usersFollowCurrent, setUsersFollowCurrent] = useState(true);
-
   const analysisAbortRef = useRef<AbortController | null>(null);
+
+  const [usersYm, setUsersYm] = useState<YM>(getCurrentYM());
+  const [usersMetrics, setUsersMetrics] = useState<AdminMonthMetrics | null>(null);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [usersFollowCurrent, setUsersFollowCurrent] = useState(true);
   const usersAbortRef = useRef<AbortController | null>(null);
 
-  const analysisPeriodHuman = `${String(analysisYm.month).padStart(
-    2,
-    "0",
-  )}/${analysisYm.year}`;
-  const usersPeriodHuman = `${String(usersYm.month).padStart(
-    2,
-    "0",
-  )}/${usersYm.year}`;
+  const [tokensYm, setTokensYm] = useState<YM>(getCurrentYM());
+  const [tokensMetrics, setTokensMetrics] = useState<AdminMonthMetrics | null>(null);
+  const [tokensLoading, setTokensLoading] = useState(false);
+  const [tokensFollowCurrent, setTokensFollowCurrent] = useState(true);
+  const tokensAbortRef = useRef<AbortController | null>(null);
 
   const fetchAnalysisMetrics = async (
     y?: number,
@@ -95,10 +87,38 @@ export default function Dashboard(): JSX.Element {
     }
   };
 
+  const fetchTokensMetrics = async (
+    y?: number,
+    m?: number,
+    successMsg?: string,
+  ) => {
+    try {
+      const ySafe = Number(y ?? new Date().getFullYear());
+      const mSafe = Number(m ?? new Date().getMonth() + 1);
+      tokensAbortRef.current?.abort();
+      const ctrl = new AbortController();
+      tokensAbortRef.current = ctrl;
+      setTokensLoading(true);
+      const resp = (await getAdminMonthlyMetrics({
+        year: ySafe,
+        month: mSafe,
+        signal: ctrl.signal,
+      })) as AdminMonthMetrics;
+      setTokensMetrics(resp);
+      if (successMsg) success(successMsg);
+    } catch (e: any) {
+      if (e?.name === "AbortError") return;
+      error(e?.message || "Erro ao carregar métricas de tokens");
+    } finally {
+      setTokensLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!getToken()) return;
     fetchAnalysisMetrics(analysisYm.year, analysisYm.month);
     fetchUsersMetrics(usersYm.year, usersYm.month);
+    fetchTokensMetrics(tokensYm.year, tokensYm.month);
   }, []);
 
   useEffect(() => {
@@ -130,16 +150,24 @@ export default function Dashboard(): JSX.Element {
       } else {
         fetchUsersMetrics(usersYm.year, usersYm.month);
       }
-    }, 300000);
+
+      if (tokensFollowCurrent) {
+        if (tokensYm.year !== current.year || tokensYm.month !== current.month) {
+          setTokensYm(current);
+          fetchTokensMetrics(current.year, current.month);
+        } else {
+          fetchTokensMetrics(tokensYm.year, tokensYm.month);
+        }
+      } else {
+        fetchTokensMetrics(tokensYm.year, tokensYm.month);
+      }
+
+    }, 300000); 
 
     return () => window.clearInterval(id);
   }, [
-    analysisYm.year,
-    analysisYm.month,
-    usersYm.year,
-    usersYm.month,
-    analysisFollowCurrent,
-    usersFollowCurrent,
+    analysisYm, usersYm, tokensYm,
+    analysisFollowCurrent, usersFollowCurrent, tokensFollowCurrent
   ]);
 
   useEffect(() => {
@@ -147,66 +175,41 @@ export default function Dashboard(): JSX.Element {
       if (ev.key === "veracity_token" && getToken()) {
         fetchAnalysisMetrics(analysisYm.year, analysisYm.month);
         fetchUsersMetrics(usersYm.year, usersYm.month);
+        fetchTokensMetrics(tokensYm.year, tokensYm.month);
       }
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
-  }, [analysisYm.year, analysisYm.month, usersYm.year, usersYm.month]);
+  }, [analysisYm, usersYm, tokensYm]);
 
   const handleAnalysisMonthChange = (value: string) => {
-    if (!/^\d{4}-\d{2}$/.test(value)) {
-      warn("Período inválido");
-      return;
-    }
+    if (!/^\d{4}-\d{2}$/.test(value)) { warn("Período inválido"); return; }
     const [yyStr, mmStr] = value.split("-") as [string, string];
     const nextYm: YM = { year: Number(yyStr), month: Number(mmStr) };
     setAnalysisYm(nextYm);
     const current = getCurrentYM();
-    const follow =
-      nextYm.year === current.year && nextYm.month === current.month;
-    setAnalysisFollowCurrent(follow);
-    const human = `${mmStr}/${yyStr}`;
-    fetchAnalysisMetrics(
-      nextYm.year,
-      nextYm.month,
-      `Período do gráfico de análises alterado para ${human}`,
-    );
+    setAnalysisFollowCurrent(nextYm.year === current.year && nextYm.month === current.month);
+    fetchAnalysisMetrics(nextYm.year, nextYm.month, `Período do gráfico de análises alterado para ${mmStr}/${yyStr}`);
   };
 
   const handleUsersMonthChange = (value: string) => {
-    if (!/^\d{4}-\d{2}$/.test(value)) {
-      warn("Período inválido");
-      return;
-    }
+    if (!/^\d{4}-\d{2}$/.test(value)) { warn("Período inválido"); return; }
     const [yyStr, mmStr] = value.split("-") as [string, string];
     const nextYm: YM = { year: Number(yyStr), month: Number(mmStr) };
     setUsersYm(nextYm);
     const current = getCurrentYM();
-    const follow =
-      nextYm.year === current.year && nextYm.month === current.month;
-    setUsersFollowCurrent(follow);
-    const human = `${mmStr}/${yyStr}`;
-    fetchUsersMetrics(
-      nextYm.year,
-      nextYm.month,
-      `Período do gráfico de usuários alterado para ${human}`,
-    );
+    setUsersFollowCurrent(nextYm.year === current.year && nextYm.month === current.month);
+    fetchUsersMetrics(nextYm.year, nextYm.month, `Período do gráfico de usuários alterado para ${mmStr}/${yyStr}`);
   };
 
-  const handleAnalysisRefresh = () => {
-    fetchAnalysisMetrics(
-      analysisYm.year,
-      analysisYm.month,
-      "Gráfico de análises atualizado",
-    );
-  };
-
-  const handleUsersRefresh = () => {
-    fetchUsersMetrics(
-      usersYm.year,
-      usersYm.month,
-      "Gráfico de usuários atualizado",
-    );
+  const handleTokensMonthChange = (value: string) => {
+    if (!/^\d{4}-\d{2}$/.test(value)) { warn("Período inválido"); return; }
+    const [yyStr, mmStr] = value.split("-") as [string, string];
+    const nextYm: YM = { year: Number(yyStr), month: Number(mmStr) };
+    setTokensYm(nextYm);
+    const current = getCurrentYM();
+    setTokensFollowCurrent(nextYm.year === current.year && nextYm.month === current.month);
+    fetchTokensMetrics(nextYm.year, nextYm.month, `Período do gráfico de tokens alterado para ${mmStr}/${yyStr}`);
   };
 
   return (
@@ -224,7 +227,7 @@ export default function Dashboard(): JSX.Element {
           ym={analysisYm}
           loading={analysisLoading}
           onChangeMonth={handleAnalysisMonthChange}
-          onRefresh={handleAnalysisRefresh}
+          onRefresh={() => fetchAnalysisMetrics(analysisYm.year, analysisYm.month, "Gráfico de análises atualizado")}
         />
 
         <Chart
@@ -233,7 +236,16 @@ export default function Dashboard(): JSX.Element {
           ym={usersYm}
           loading={usersLoading}
           onChangeMonth={handleUsersMonthChange}
-          onRefresh={handleUsersRefresh}
+          onRefresh={() => fetchUsersMetrics(usersYm.year, usersYm.month, "Gráfico de usuários atualizado")}
+        />
+
+        <Chart
+          mode="tokens"
+          metrics={tokensMetrics}
+          ym={tokensYm}
+          loading={tokensLoading}
+          onChangeMonth={handleTokensMonthChange}
+          onRefresh={() => fetchTokensMetrics(tokensYm.year, tokensYm.month, "Gráfico de tokens atualizado")}
         />
       </section>
     </div>

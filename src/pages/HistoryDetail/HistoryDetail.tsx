@@ -253,7 +253,6 @@ export default function HistoryDetail(): JSX.Element {
             </div>
 
             <div className={styles.rightCol}>
-              {/* Ações para Solicitações (Em aberto) */}
               {isRequestManagement && data.status === "open" && (
                 <>
                   <div className={styles.actionsRow}>
@@ -287,7 +286,6 @@ export default function HistoryDetail(): JSX.Element {
                 </>
               )}
 
-              {/* Ações para Tokens (Ativos) */}
               {isTokenManagement && data.status === "active" && (
                 <>
                   <div className={styles.actionsRow}>
@@ -310,7 +308,6 @@ export default function HistoryDetail(): JSX.Element {
                 </>
               )}
 
-              {/* Área de Motivo (Rejeição ou Revogação) */}
               {rejectionMode && (
                 <>
                   <h3 className={styles.h3Right}>
@@ -356,7 +353,6 @@ export default function HistoryDetail(): JSX.Element {
                 </>
               )}
 
-              {/* Exibição de motivos passados */}
               {isRequestManagement && data.status === "rejected" && data.rejection_reason && (
                 <>
                   <h3 className={styles.h3Right}>Motivo da rejeição</h3>
@@ -390,7 +386,6 @@ export default function HistoryDetail(): JSX.Element {
 
   return (
     <div className={styles.wrap}>
-      {/* Código existente para visão do usuário comum ... */}
       <Toast />
       <h1 className={styles.title}>Histórico</h1>
       <button className={styles.back} onClick={() => navigate(-1)}>

@@ -302,7 +302,6 @@ export default function Header(): JSX.Element {
               </NavLink>
             )}
 
-            {/* ... resto do menu mobile igual ... */}
             {!isAdmin && (
               <NavLink
                 className={styles['mobile-link']}

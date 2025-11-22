@@ -28,6 +28,13 @@ type UsersChartRow = {
   inactive_users: number;
 };
 
+type TokensChartRow = {
+  name: string;
+  active: number;
+  expired: number;
+  revoked: number;
+};
+
 export type AdminUserMetrics = {
   bars: {
     active_users: number;
@@ -37,6 +44,20 @@ export type AdminUserMetrics = {
     total_users: number;
     active_users: number;
     inactive_users: number;
+  };
+};
+
+export type AdminTokenMetrics = {
+  bars: {
+    active: number;
+    expired: number;
+    revoked: number;
+  };
+  totals: {
+    total: number;
+    active: number;
+    expired: number;
+    revoked: number;
   };
 };
 
@@ -56,10 +77,11 @@ export type AdminMonthMetrics = {
     images_month: number;
   };
   users?: AdminUserMetrics;
+  tokens?: AdminTokenMetrics;
 };
 
 type DashboardChartProps = {
-  mode: "analysis" | "users";
+  mode: "analysis" | "users" | "tokens";
   metrics: AdminMonthMetrics | null;
   ym: YM;
   loading: boolean;
@@ -85,7 +107,7 @@ export default function DashboardChart({
   const monthInputValue = `${year}-${String(month).padStart(2, "0")}`;
   const periodHuman = `${String(month).padStart(2, "0")}/${year}`;
 
-  const chartData: Array<ChartRow | UsersChartRow> = useMemo(() => {
+  const chartData: Array<ChartRow | UsersChartRow | TokensChartRow> = useMemo(() => {
     if (mode === "analysis") {
       const bars = metrics?.bars;
       return [
@@ -98,12 +120,23 @@ export default function DashboardChart({
         },
       ];
     }
-    const bars = metrics?.users?.bars;
+    if (mode === "users") {
+      const bars = metrics?.users?.bars;
+      return [
+        {
+          name: "Mês",
+          active_users: Number(bars?.active_users ?? 0),
+          inactive_users: Number(bars?.inactive_users ?? 0),
+        },
+      ];
+    }
+    const bars = metrics?.tokens?.bars;
     return [
       {
         name: "Mês",
-        active_users: Number(bars?.active_users ?? 0),
-        inactive_users: Number(bars?.inactive_users ?? 0),
+        active: Number(bars?.active ?? 0),
+        expired: Number(bars?.expired ?? 0),
+        revoked: Number(bars?.revoked ?? 0),
       },
     ];
   }, [metrics, mode]);
@@ -118,6 +151,13 @@ export default function DashboardChart({
     totalUsers: Number(metrics?.users?.totals.total_users ?? 0),
     activeUsers: Number(metrics?.users?.totals.active_users ?? 0),
     inactiveUsers: Number(metrics?.users?.totals.inactive_users ?? 0),
+  };
+
+  const tokenTotals = {
+    total: Number(metrics?.tokens?.totals.total ?? 0),
+    active: Number(metrics?.tokens?.totals.active ?? 0),
+    expired: Number(metrics?.tokens?.totals.expired ?? 0),
+    revoked: Number(metrics?.tokens?.totals.revoked ?? 0),
   };
 
   const closeMonthPicker = () => {
@@ -180,15 +220,110 @@ export default function DashboardChart({
       ? `${String(metrics.month).padStart(2, "0")}/${metrics.year}`
       : periodHuman;
 
-  const title =
-    mode === "analysis"
-      ? "Total de análises (mês atual/ano atual)"
-      : "Usuários por status (mês atual/ano atual)";
+  let title = "";
+  let buttonAria = "";
 
-  const buttonAria =
-    mode === "analysis"
-      ? "Atualizar gráfico de análises"
-      : "Atualizar gráfico de usuários";
+  if (mode === "analysis") {
+    title = "Total de análises (mês atual/ano atual)";
+    buttonAria = "Atualizar gráfico de análises";
+  } else if (mode === "users") {
+    title = "Usuários por status (mês atual/ano atual)";
+    buttonAria = "Atualizar gráfico de usuários";
+  } else {
+    title = "Tokens de API por status (Total)";
+    buttonAria = "Atualizar gráfico de tokens";
+  }
+
+  const renderKpis = () => {
+    if (mode === "analysis") {
+      return (
+        <div className={styles.kpiRow}>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>Análises no mês</span>
+            <span className={styles.kpiValue}>{analysisTotals.totalMonth}</span>
+          </div>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>URLs analisadas</span>
+            <span className={styles.kpiValue}>{analysisTotals.urlsMonth}</span>
+          </div>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>Imagens analisadas</span>
+            <span className={styles.kpiValue}>{analysisTotals.imagesMonth}</span>
+          </div>
+        </div>
+      );
+    }
+    if (mode === "users") {
+      return (
+        <div className={styles.kpiRow}>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>Total de usuários</span>
+            <span className={styles.kpiValue}>{userTotals.totalUsers}</span>
+          </div>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>Usuários ativos</span>
+            <span className={styles.kpiValue}>{userTotals.activeUsers}</span>
+          </div>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>Usuários inativos</span>
+            <span className={styles.kpiValue}>{userTotals.inactiveUsers}</span>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className={styles.kpiRow}>
+        <div className={styles.kpiItem}>
+          <span className={styles.kpiLabel}>Total de tokens</span>
+          <span className={styles.kpiValue}>{tokenTotals.total}</span>
+        </div>
+        <div className={styles.kpiItem}>
+          <span className={styles.kpiLabel}>Ativos</span>
+          <span className={styles.kpiValue}>{tokenTotals.active}</span>
+        </div>
+        <div className={styles.kpiItem}>
+          <span className={styles.kpiLabel}>Revogados</span>
+          <span className={styles.kpiValue}>{tokenTotals.revoked}</span>
+        </div>
+        <div className={styles.kpiItem}>
+          <span className={styles.kpiLabel}>Expirados</span>
+          <span className={styles.kpiValue}>{tokenTotals.expired}</span>
+        </div>
+      </div>
+    );
+  };
+
+  const renderBars = () => {
+    if (mode === "analysis") {
+      return (
+        <>
+          <Bar dataKey="url_suspicious" name="URL suspeita" fill="#008b54ff" />
+          <Bar dataKey="url_safe" name="URL segura" fill="#6ab997ff" />
+          <Bar dataKey="image_fake" name="Imagem falsa" fill="#029777ff" />
+          <Bar dataKey="image_safe" name="Imagem segura" fill="#b7ecd6ff" />
+        </>
+      );
+    }
+    if (mode === "users") {
+      return (
+        <>
+          <Bar dataKey="active_users" name="Usuários ativos" fill="#6ab997ff" />
+          <Bar
+            dataKey="inactive_users"
+            name="Usuários inativos"
+            fill="#008b54ff"
+          />
+        </>
+      );
+    }
+    return (
+      <>
+        <Bar dataKey="active" name="Ativos" fill="#6ab997ff" />
+        <Bar dataKey="revoked" name="Revogados" fill="#008b54ff" />
+        <Bar dataKey="expired" name="Expirados" fill="#029777ff" />
+      </>
+    );
+  };
 
   return (
     <div className={styles.card}>
@@ -240,39 +375,7 @@ export default function DashboardChart({
         </div>
       </div>
 
-      {mode === "analysis" ? (
-        <div className={styles.kpiRow}>
-          <div className={styles.kpiItem}>
-            <span className={styles.kpiLabel}>Análises no mês</span>
-            <span className={styles.kpiValue}>{analysisTotals.totalMonth}</span>
-          </div>
-          <div className={styles.kpiItem}>
-            <span className={styles.kpiLabel}>URLs analisadas</span>
-            <span className={styles.kpiValue}>{analysisTotals.urlsMonth}</span>
-          </div>
-          <div className={styles.kpiItem}>
-            <span className={styles.kpiLabel}>Imagens analisadas</span>
-            <span className={styles.kpiValue}>
-              {analysisTotals.imagesMonth}
-            </span>
-          </div>
-        </div>
-      ) : (
-        <div className={styles.kpiRow}>
-          <div className={styles.kpiItem}>
-            <span className={styles.kpiLabel}>Total de usuários</span>
-            <span className={styles.kpiValue}>{userTotals.totalUsers}</span>
-          </div>
-          <div className={styles.kpiItem}>
-            <span className={styles.kpiLabel}>Usuários ativos</span>
-            <span className={styles.kpiValue}>{userTotals.activeUsers}</span>
-          </div>
-          <div className={styles.kpiItem}>
-            <span className={styles.kpiLabel}>Usuários inativos</span>
-            <span className={styles.kpiValue}>{userTotals.inactiveUsers}</span>
-          </div>
-        </div>
-      )}
+      {renderKpis()}
 
       <div className={styles.chartWrap}>
         <ResponsiveContainer width="100%" height={300}>
@@ -297,39 +400,7 @@ export default function DashboardChart({
               labelFormatter={() => "Mês"}
             />
             <Legend wrapperStyle={{ color: "#fff" }} />
-            {mode === "analysis" ? (
-              <>
-                <Bar
-                  dataKey="url_suspicious"
-                  name="URL suspeita"
-                  fill="#008b54ff"
-                />
-                <Bar dataKey="url_safe" name="URL segura" fill="#6ab997ff" />
-                <Bar
-                  dataKey="image_fake"
-                  name="Imagem falsa"
-                  fill="#029777ff"
-                />
-                <Bar
-                  dataKey="image_safe"
-                  name="Imagem segura"
-                  fill="#b7ecd6ff"
-                />
-              </>
-            ) : (
-              <>
-                <Bar
-                  dataKey="active_users"
-                  name="Usuários ativos"
-                  fill="#6ab997ff"
-                />
-                <Bar
-                  dataKey="inactive_users"
-                  name="Usuários inativos"
-                  fill="#008b54ff"
-                />
-              </>
-            )}
+            {renderBars()}
           </BarChart>
         </ResponsiveContainer>
       </div>
