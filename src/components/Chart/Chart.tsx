@@ -35,6 +35,14 @@ type TokensChartRow = {
   revoked: number;
 };
 
+type RequestsChartRow = {
+  name: string;
+  doubt: number;
+  suggestion: number;
+  token_request: number;
+  complaint: number;
+};
+
 export type AdminUserMetrics = {
   bars: {
     active_users: number;
@@ -61,6 +69,18 @@ export type AdminTokenMetrics = {
   };
 };
 
+export type AdminRequestMetrics = {
+  bars: {
+    doubt: number;
+    suggestion: number;
+    token_request: number;
+    complaint: number;
+  };
+  totals: {
+    total: number;
+  };
+};
+
 export type AdminMonthMetrics = {
   year: number;
   month: number;
@@ -78,10 +98,11 @@ export type AdminMonthMetrics = {
   };
   users?: AdminUserMetrics;
   tokens?: AdminTokenMetrics;
+  requests?: AdminRequestMetrics; 
 };
 
 type DashboardChartProps = {
-  mode: "analysis" | "users" | "tokens";
+  mode: "analysis" | "users" | "tokens" | "requests";
   metrics: AdminMonthMetrics | null;
   ym: YM;
   loading: boolean;
@@ -107,7 +128,7 @@ export default function DashboardChart({
   const monthInputValue = `${year}-${String(month).padStart(2, "0")}`;
   const periodHuman = `${String(month).padStart(2, "0")}/${year}`;
 
-  const chartData: Array<ChartRow | UsersChartRow | TokensChartRow> = useMemo(() => {
+  const chartData: Array<ChartRow | UsersChartRow | TokensChartRow | RequestsChartRow> = useMemo(() => {
     if (mode === "analysis") {
       const bars = metrics?.bars;
       return [
@@ -130,14 +151,26 @@ export default function DashboardChart({
         },
       ];
     }
-    const bars = metrics?.tokens?.bars;
+    if (mode === "tokens") {
+      const bars = metrics?.tokens?.bars;
+      return [
+        {
+          name: "Mês",
+          active: Number(bars?.active ?? 0),
+          expired: Number(bars?.expired ?? 0),
+          revoked: Number(bars?.revoked ?? 0),
+        },
+      ];
+    }
+    const bars = metrics?.requests?.bars;
     return [
-      {
-        name: "Mês",
-        active: Number(bars?.active ?? 0),
-        expired: Number(bars?.expired ?? 0),
-        revoked: Number(bars?.revoked ?? 0),
-      },
+        {
+            name: "Mês",
+            doubt: Number(bars?.doubt ?? 0),
+            suggestion: Number(bars?.suggestion ?? 0),
+            token_request: Number(bars?.token_request ?? 0),
+            complaint: Number(bars?.complaint ?? 0),
+        }
     ];
   }, [metrics, mode]);
 
@@ -158,6 +191,15 @@ export default function DashboardChart({
     active: Number(metrics?.tokens?.totals.active ?? 0),
     expired: Number(metrics?.tokens?.totals.expired ?? 0),
     revoked: Number(metrics?.tokens?.totals.revoked ?? 0),
+  };
+
+  const requestBars = metrics?.requests?.bars;
+  const requestTotals = {
+      total: Number(metrics?.requests?.totals.total ?? 0),
+      doubt: Number(requestBars?.doubt ?? 0),
+      suggestion: Number(requestBars?.suggestion ?? 0),
+      token_request: Number(requestBars?.token_request ?? 0),
+      complaint: Number(requestBars?.complaint ?? 0),
   };
 
   const closeMonthPicker = () => {
@@ -227,11 +269,14 @@ export default function DashboardChart({
     title = "Total de análises (mês atual/ano atual)";
     buttonAria = "Atualizar gráfico de análises";
   } else if (mode === "users") {
-    title = "Usuários por status (mês atual/ano atual)";
+    title = "Usuários na plataforma (mês atual/ano atual)";
     buttonAria = "Atualizar gráfico de usuários";
-  } else {
-    title = "Tokens de API por status (Total)";
+  } else if (mode === "tokens") {
+    title = "Tokens de API criados (mês atual/ano atual)";
     buttonAria = "Atualizar gráfico de tokens";
+  } else {
+    title = "Solicitações recebidas (mês atual/ano atual)";
+    buttonAria = "Atualizar gráfico de solicitações";
   }
 
   const renderKpis = () => {
@@ -271,23 +316,49 @@ export default function DashboardChart({
         </div>
       );
     }
+    if (mode === "tokens") {
+      return (
+        <div className={styles.kpiRow}>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>Total de tokens</span>
+            <span className={styles.kpiValue}>{tokenTotals.total}</span>
+          </div>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>Ativos</span>
+            <span className={styles.kpiValue}>{tokenTotals.active}</span>
+          </div>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>Revogados</span>
+            <span className={styles.kpiValue}>{tokenTotals.revoked}</span>
+          </div>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>Expirados</span>
+            <span className={styles.kpiValue}>{tokenTotals.expired}</span>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className={styles.kpiRow}>
         <div className={styles.kpiItem}>
-          <span className={styles.kpiLabel}>Total de tokens</span>
-          <span className={styles.kpiValue}>{tokenTotals.total}</span>
+          <span className={styles.kpiLabel}>Total de solicitações</span>
+          <span className={styles.kpiValue}>{requestTotals.total}</span>
         </div>
         <div className={styles.kpiItem}>
-          <span className={styles.kpiLabel}>Ativos</span>
-          <span className={styles.kpiValue}>{tokenTotals.active}</span>
+          <span className={styles.kpiLabel}>Dúvidas</span>
+          <span className={styles.kpiValue}>{requestTotals.doubt}</span>
         </div>
         <div className={styles.kpiItem}>
-          <span className={styles.kpiLabel}>Revogados</span>
-          <span className={styles.kpiValue}>{tokenTotals.revoked}</span>
+          <span className={styles.kpiLabel}>Sugestões</span>
+          <span className={styles.kpiValue}>{requestTotals.suggestion}</span>
         </div>
         <div className={styles.kpiItem}>
-          <span className={styles.kpiLabel}>Expirados</span>
-          <span className={styles.kpiValue}>{tokenTotals.expired}</span>
+          <span className={styles.kpiLabel}>Tokens</span>
+          <span className={styles.kpiValue}>{requestTotals.token_request}</span>
+        </div>
+        <div className={styles.kpiItem}>
+          <span className={styles.kpiLabel}>Reclamações</span>
+          <span className={styles.kpiValue}>{requestTotals.complaint}</span>
         </div>
       </div>
     );
@@ -316,11 +387,21 @@ export default function DashboardChart({
         </>
       );
     }
+    if (mode === "tokens") {
+      return (
+        <>
+          <Bar dataKey="active" name="Ativos" fill="#6ab997ff" />
+          <Bar dataKey="revoked" name="Revogados" fill="#008b54ff" />
+          <Bar dataKey="expired" name="Expirados" fill="#029777ff" />
+        </>
+      );
+    }
     return (
       <>
-        <Bar dataKey="active" name="Ativos" fill="#6ab997ff" />
-        <Bar dataKey="revoked" name="Revogados" fill="#008b54ff" />
-        <Bar dataKey="expired" name="Expirados" fill="#029777ff" />
+        <Bar dataKey="doubt" name="Dúvidas" fill="#008b54ff" />
+        <Bar dataKey="suggestion" name="Sugestões" fill="#6ab997ff" />
+        <Bar dataKey="token_request" name="Solic. Token" fill="#029777ff" />
+        <Bar dataKey="complaint" name="Reclamações" fill="#b7ecd6ff" />
       </>
     );
   };

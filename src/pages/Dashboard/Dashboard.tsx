@@ -33,11 +33,13 @@ export default function Dashboard(): JSX.Element {
   const [tokensFollowCurrent, setTokensFollowCurrent] = useState(true);
   const tokensAbortRef = useRef<AbortController | null>(null);
 
-  const fetchAnalysisMetrics = async (
-    y?: number,
-    m?: number,
-    successMsg?: string,
-  ) => {
+  const [requestsYm, setRequestsYm] = useState<YM>(getCurrentYM());
+  const [requestsMetrics, setRequestsMetrics] = useState<AdminMonthMetrics | null>(null);
+  const [requestsLoading, setRequestsLoading] = useState(false);
+  const [requestsFollowCurrent, setRequestsFollowCurrent] = useState(true);
+  const requestsAbortRef = useRef<AbortController | null>(null);
+
+  const fetchAnalysisMetrics = async (y?: number, m?: number, successMsg?: string) => {
     try {
       const ySafe = Number(y ?? new Date().getFullYear());
       const mSafe = Number(m ?? new Date().getMonth() + 1);
@@ -60,11 +62,7 @@ export default function Dashboard(): JSX.Element {
     }
   };
 
-  const fetchUsersMetrics = async (
-    y?: number,
-    m?: number,
-    successMsg?: string,
-  ) => {
+  const fetchUsersMetrics = async (y?: number, m?: number, successMsg?: string) => {
     try {
       const ySafe = Number(y ?? new Date().getFullYear());
       const mSafe = Number(m ?? new Date().getMonth() + 1);
@@ -87,11 +85,7 @@ export default function Dashboard(): JSX.Element {
     }
   };
 
-  const fetchTokensMetrics = async (
-    y?: number,
-    m?: number,
-    successMsg?: string,
-  ) => {
+  const fetchTokensMetrics = async (y?: number, m?: number, successMsg?: string) => {
     try {
       const ySafe = Number(y ?? new Date().getFullYear());
       const mSafe = Number(m ?? new Date().getMonth() + 1);
@@ -114,11 +108,35 @@ export default function Dashboard(): JSX.Element {
     }
   };
 
+  const fetchRequestsMetrics = async (y?: number, m?: number, successMsg?: string) => {
+    try {
+      const ySafe = Number(y ?? new Date().getFullYear());
+      const mSafe = Number(m ?? new Date().getMonth() + 1);
+      requestsAbortRef.current?.abort();
+      const ctrl = new AbortController();
+      requestsAbortRef.current = ctrl;
+      setRequestsLoading(true);
+      const resp = (await getAdminMonthlyMetrics({
+        year: ySafe,
+        month: mSafe,
+        signal: ctrl.signal,
+      })) as AdminMonthMetrics;
+      setRequestsMetrics(resp);
+      if (successMsg) success(successMsg);
+    } catch (e: any) {
+      if (e?.name === "AbortError") return;
+      error(e?.message || "Erro ao carregar métricas de solicitações");
+    } finally {
+      setRequestsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!getToken()) return;
     fetchAnalysisMetrics(analysisYm.year, analysisYm.month);
     fetchUsersMetrics(usersYm.year, usersYm.month);
     fetchTokensMetrics(tokensYm.year, tokensYm.month);
+    fetchRequestsMetrics(requestsYm.year, requestsYm.month);
   }, []);
 
   useEffect(() => {
@@ -127,10 +145,7 @@ export default function Dashboard(): JSX.Element {
       const current = getCurrentYM();
 
       if (analysisFollowCurrent) {
-        if (
-          analysisYm.year !== current.year ||
-          analysisYm.month !== current.month
-        ) {
+        if (analysisYm.year !== current.year || analysisYm.month !== current.month) {
           setAnalysisYm(current);
           fetchAnalysisMetrics(current.year, current.month);
         } else {
@@ -162,12 +177,23 @@ export default function Dashboard(): JSX.Element {
         fetchTokensMetrics(tokensYm.year, tokensYm.month);
       }
 
+      if (requestsFollowCurrent) {
+        if (requestsYm.year !== current.year || requestsYm.month !== current.month) {
+          setRequestsYm(current);
+          fetchRequestsMetrics(current.year, current.month);
+        } else {
+          fetchRequestsMetrics(requestsYm.year, requestsYm.month);
+        }
+      } else {
+        fetchRequestsMetrics(requestsYm.year, requestsYm.month);
+      }
+
     }, 300000); 
 
     return () => window.clearInterval(id);
   }, [
-    analysisYm, usersYm, tokensYm,
-    analysisFollowCurrent, usersFollowCurrent, tokensFollowCurrent
+    analysisYm, usersYm, tokensYm, requestsYm,
+    analysisFollowCurrent, usersFollowCurrent, tokensFollowCurrent, requestsFollowCurrent
   ]);
 
   useEffect(() => {
@@ -176,11 +202,12 @@ export default function Dashboard(): JSX.Element {
         fetchAnalysisMetrics(analysisYm.year, analysisYm.month);
         fetchUsersMetrics(usersYm.year, usersYm.month);
         fetchTokensMetrics(tokensYm.year, tokensYm.month);
+        fetchRequestsMetrics(requestsYm.year, requestsYm.month);
       }
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
-  }, [analysisYm, usersYm, tokensYm]);
+  }, [analysisYm, usersYm, tokensYm, requestsYm]);
 
   const handleAnalysisMonthChange = (value: string) => {
     if (!/^\d{4}-\d{2}$/.test(value)) { warn("Período inválido"); return; }
@@ -210,6 +237,16 @@ export default function Dashboard(): JSX.Element {
     const current = getCurrentYM();
     setTokensFollowCurrent(nextYm.year === current.year && nextYm.month === current.month);
     fetchTokensMetrics(nextYm.year, nextYm.month, `Período do gráfico de tokens alterado para ${mmStr}/${yyStr}`);
+  };
+
+  const handleRequestsMonthChange = (value: string) => {
+    if (!/^\d{4}-\d{2}$/.test(value)) { warn("Período inválido"); return; }
+    const [yyStr, mmStr] = value.split("-") as [string, string];
+    const nextYm: YM = { year: Number(yyStr), month: Number(mmStr) };
+    setRequestsYm(nextYm);
+    const current = getCurrentYM();
+    setRequestsFollowCurrent(nextYm.year === current.year && nextYm.month === current.month);
+    fetchRequestsMetrics(nextYm.year, nextYm.month, `Período do gráfico de solicitações alterado para ${mmStr}/${yyStr}`);
   };
 
   return (
@@ -246,6 +283,15 @@ export default function Dashboard(): JSX.Element {
           loading={tokensLoading}
           onChangeMonth={handleTokensMonthChange}
           onRefresh={() => fetchTokensMetrics(tokensYm.year, tokensYm.month, "Gráfico de tokens atualizado")}
+        />
+
+        <Chart
+          mode="requests"
+          metrics={requestsMetrics}
+          ym={requestsYm}
+          loading={requestsLoading}
+          onChangeMonth={handleRequestsMonthChange}
+          onRefresh={() => fetchRequestsMetrics(requestsYm.year, requestsYm.month, "Gráfico de solicitações atualizado")}
         />
       </section>
     </div>
