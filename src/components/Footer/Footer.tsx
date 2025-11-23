@@ -7,17 +7,15 @@ import styles from './Footer.module.css';
 const cx = (...xs: Array<string | false | null | undefined>) => xs.filter(Boolean).join(' ');
 
 function resolveRole(): string {
-  const ls = (localStorage.getItem("role") || "").toLowerCase();
+  const ls = (localStorage.getItem('role') || '').toLowerCase();
   if (ls) return ls;
-  const t = typeof getToken === "function" ? getToken() : null;
-  if (!t) return "";
+  const t = typeof getToken === 'function' ? getToken() : null;
+  if (!t) return '';
   try {
-    const payload = JSON.parse(atob(t.split(".")[1] || ""));
-    return String(
-      payload.role
-    ).toLowerCase();
+    const payload = JSON.parse(atob(t.split('.')[1] || ''));
+    return String(payload.role).toLowerCase();
   } catch {
-    return "";
+    return '';
   }
 }
 
@@ -25,10 +23,12 @@ export default function Footer(): JSX.Element {
   const year = new Date().getFullYear();
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const role = resolveRole();
     setIsAdmin(role === 'admin');
+    setIsLoggedIn(!!role);
   }, []);
 
   const goHomeWithTab = (tab: 'urls' | 'images') => (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -63,7 +63,7 @@ export default function Footer(): JSX.Element {
               >
                 Termos de uso
               </a>
-              {!isAdmin && <a href="/reactivate-account">Reativar conta</a>}
+              {!isLoggedIn && <a href="/reactivate-account">Reativar conta</a>}
             </div>
           </div>
 
@@ -78,8 +78,12 @@ export default function Footer(): JSX.Element {
                 </>
               ) : (
                 <>
-                  <a href="/?tab=urls" onClick={goHomeWithTab('urls')}>Análise de URLs</a>
-                  <a href="/?tab=images" onClick={goHomeWithTab('images')}>Análise de imagens</a>
+                  <a href="/?tab=urls" onClick={goHomeWithTab('urls')}>
+                    Análise de URLs
+                  </a>
+                  <a href="/?tab=images" onClick={goHomeWithTab('images')}>
+                    Análise de imagens
+                  </a>
                   <a href="/user/history">Histórico de análises</a>
                 </>
               )}
