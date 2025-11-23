@@ -20,8 +20,8 @@ import modalExitConfirmationImg from "../../assets/ilust-exit-without-save-confi
 import modalDeleteAccountConfirmationImg from "../../assets/ilust-delete-account-confirmation.png";
 import modalDeletedAccountImg from "../../assets/ilust-deleted-account.png";
 import modalInactiveAccountImg from "../../assets/ilust-inactive-account.png";
-import modalRevealTokenImg  from "../../assets/ilust-warning.png";
-import modalDeleteTokenImg  from "../../assets/ilust-delete-token.png";
+import modalRevealTokenImg from "../../assets/ilust-warning.png";
+import modalDeleteTokenImg from "../../assets/ilust-delete-token.png";
 
 type AnyObj = Record<string, any>;
 
@@ -46,8 +46,8 @@ function resolveRole(): string {
 
 function formatDateTime(iso?: any): string {
   if (!iso) return "";
-  if (typeof iso !== 'string' && typeof iso !== 'number' && !(iso instanceof Date)) {
-      return ""; 
+  if (typeof iso !== "string" && typeof iso !== "number" && !(iso instanceof Date)) {
+    return "";
   }
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
@@ -73,8 +73,8 @@ export default function Profile(): JSX.Element {
     email: "",
   });
 
-  const [isMobile, setIsMobile] = useState(() => 
-    typeof window !== "undefined" ? window.innerWidth <= 980 : false
+  const [isMobile, setIsMobile] = useState(
+    () => (typeof window !== "undefined" ? window.innerWidth <= 980 : false)
   );
 
   const [modalUnsaved, setModalUnsaved] = useState(false);
@@ -91,13 +91,15 @@ export default function Profile(): JSX.Element {
   const [apiTokenLoading, setApiTokenLoading] = useState(false);
   const [apiTokenRevoking, setApiTokenRevoking] = useState(false);
   const [apiTokenValue, setApiTokenValue] = useState("");
-  
+
   const [apiTokenExpiresAt, setApiTokenExpiresAt] = useState<string | null>(null);
 
   const [pendingRevealSuccess, setPendingRevealSuccess] = useState(false);
 
   const dirtyRef = useRef(false);
-  const pendingNavRef = useRef<{ type: "url" | "back"; value: string | null } | null>(null);
+  const pendingNavRef = useRef<{ type: "url" | "back"; value: string | null } | null>(
+    null
+  );
 
   const { success, error } = useToast();
 
@@ -221,7 +223,9 @@ export default function Profile(): JSX.Element {
       if (changedEmail) {
         const newEmail = email.trim().toLowerCase();
         await apiValidateEmailChange(newEmail);
-        const { requires_verification } = (await apiRequestEmailChange(newEmail)) as AnyObj;
+        const { requires_verification } = (await apiRequestEmailChange(
+          newEmail
+        )) as AnyObj;
         if (requires_verification) {
           success("Solicitação de alteração de e-mail enviada com sucesso!");
           localStorage.setItem("veracity_email_change_target", newEmail);
@@ -257,8 +261,7 @@ export default function Profile(): JSX.Element {
     const pending = pendingNavRef.current;
     pendingNavRef.current = null;
     if (!pending) return;
-    if (pending.type === "url" && pending.value)
-      window.location.assign(pending.value);
+    if (pending.type === "url" && pending.value) window.location.assign(pending.value);
     else if (pending.type === "back") window.history.back();
   };
 
@@ -364,11 +367,14 @@ export default function Profile(): JSX.Element {
         setApiTokenValue(value);
         setApiTokenExpiresAt(expires);
         setModalApiTokenReveal(true);
-        setPendingRevealSuccess(true); 
+        setPendingRevealSuccess(true);
       } catch (e: any) {
         const msg = e?.message || "Não foi possível recuperar o token de API.";
         error(msg);
-        if (msg.toLowerCase().includes("já foi revelado") || msg.toLowerCase().includes("revealed")) {
+        if (
+          msg.toLowerCase().includes("já foi revelado") ||
+          msg.toLowerCase().includes("revealed")
+        ) {
           await refreshProfile();
         }
       } finally {
@@ -414,8 +420,8 @@ export default function Profile(): JSX.Element {
   const tokenInfo = initial?.api_token_info as AnyObj | undefined;
   const hasToken = !!tokenInfo;
   const hasActiveToken = !!tokenInfo && tokenInfo.status === "active";
-  
-  const tokenMasked = hasToken 
+
+  const tokenMasked = hasToken
     ? String(tokenInfo.prefix || "") + (isMobile ? "" : "•".repeat(35))
     : "";
 
@@ -429,7 +435,9 @@ export default function Profile(): JSX.Element {
 
   const showRevokeAction = hasActiveToken && !!tokenInfo?.revealed;
 
-  const apiTokenExpiresLabel = tokenInfo?.expires_at ? formatDateTime(tokenInfo.expires_at) : "";
+  const apiTokenExpiresLabel = tokenInfo?.expires_at
+    ? formatDateTime(tokenInfo.expires_at)
+    : "";
 
   return (
     <main className="container">
@@ -478,7 +486,7 @@ export default function Profile(): JSX.Element {
                 onClick={() => setModalDelete(true)}
                 disabled={deleting || saving}
               >
-                {deleting || saving ? "Carregando..." : "Excluir conta"}
+                {deleting ? "Carregando..." : "Excluir conta"}
               </button>
             </div>
           )}
@@ -583,7 +591,8 @@ export default function Profile(): JSX.Element {
         secondaryVariant="secondary"
       >
         <p>
-          Sugerimos inativar em vez de excluir. Ao inativar, você perde o acesso, mas pode reativar depois e manter seu histórico.
+          Sugerimos inativar em vez de excluir. Ao inativar, você perde o acesso,
+          mas pode reativar depois e manter seu histórico.
           <br />
           <br />
           A exclusão é permanente e não pode ser desfeita.
@@ -603,7 +612,8 @@ export default function Profile(): JSX.Element {
         secondaryVariant="secondary"
       >
         <p>
-          Ao inativar sua conta, você perderá o acesso à plataforma, mas poderá reativá-la depois utilizando o mesmo e-mail.
+          Ao inativar sua conta, você perderá o acesso à plataforma, mas poderá
+          reativá-la depois utilizando o mesmo e-mail.
         </p>
       </Modal>
 
@@ -634,7 +644,7 @@ export default function Profile(): JSX.Element {
       <Modal
         open={modalApiTokenReveal}
         onClose={handleCloseRevealModal}
-        imageSrc={modalRevealTokenImg} 
+        imageSrc={modalRevealTokenImg}
         title="Atenção"
         primaryText="Copiar token"
         primaryVariant="success"
@@ -657,7 +667,7 @@ export default function Profile(): JSX.Element {
             wordBreak: "break-all",
             fontFamily: "monospace",
             fontSize: 14,
-            border: "1px solid #e0e0e0"
+            border: "1px solid #e0e0e0",
           }}
         >
           {apiTokenValue}
@@ -679,7 +689,8 @@ export default function Profile(): JSX.Element {
         secondaryVariant="secondary"
       >
         <p>
-          Após revogar o token de API ele deixará de funcionar imediatamente. Essa ação não pode ser desfeita.
+          Após revogar o token de API ele deixará de funcionar imediatamente.
+          Essa ação não pode ser desfeita.
         </p>
       </Modal>
     </main>

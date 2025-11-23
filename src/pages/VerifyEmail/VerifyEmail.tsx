@@ -2,19 +2,28 @@ import { JSX, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Logo from "../../components/Logo";
 import ReturnIcon from "../../assets/icon-return.png";
-import { apiVerifyEmail, apiResendCode, apiFetch } from "../../api/client";
+import { apiVerifyEmail, apiResendCode, apiFetch, getToken } from "../../api/client";
 import Toast, { useToast } from "../../components/Toast/Toast";
 import "../../styles/forms.css";
 import styles from "./VerifyEmail.module.css";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE || "";
 
 export default function VerifyEmail(): JSX.Element {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { success, error: toastError } = useToast();
 
-  const email = (params.get("email") || "").trim();
   const mode = (params.get("mode") || "signup").trim();
   const isReactivation = mode === "reactivate";
+  const isEmailChange = mode === "email-change";
+
+  const urlEmail = (params.get("email") || "").trim();
+  const storedEmail =
+    typeof window !== "undefined"
+      ? (localStorage.getItem("veracity_email_change_target") || "").trim()
+      : "";
+  const email = (isEmailChange ? storedEmail || urlEmail : urlEmail).trim();
 
   const [code, setCode] = useState<string[]>(["", "", "", "", "", ""]);
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
@@ -73,9 +82,19 @@ export default function VerifyEmail(): JSX.Element {
       if (isReactivation) {
         await apiFetch("/v1/user/reactivate-account/confirm-code", {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: { email, code: joined },
         });
         success("Conta reativada com sucesso! Você já pode fazer login novamente.");
+        navigate("/login");
+      } else if (isEmailChange) {
+        await apiFetch("/v1/user/profile/email-change/confirm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: { email, code: joined },
+        });
+        localStorage.removeItem("veracity_email_change_target");
+        success("E-mail alterado com sucesso! Faça login novamente com o novo endereço.");
         navigate("/login");
       } else {
         await apiVerifyEmail(email, joined);
@@ -83,10 +102,12 @@ export default function VerifyEmail(): JSX.Element {
         navigate("/");
       }
     } catch (error: any) {
-      toastError("Erro ao confirmar código!");
-      setErr(
-        error?.message || "O código inserido está inválido. Tente novamente"
-      );
+      if (error?.name !== "AbortError") {
+        toastError("Erro ao confirmar código!");
+        setErr(
+          error?.message || "O código inserido está inválido. Tente novamente"
+        );
+      }
     } finally {
       setVerifying(false);
     }
@@ -96,17 +117,52 @@ export default function VerifyEmail(): JSX.Element {
     e.preventDefault();
     if (!email || cooldown > 0 || sending || verifying) return;
     setSending(true);
+    setErr("");
     try {
       if (isReactivation) {
         await apiFetch("/v1/user/reactivate-account/send-code", {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: { email },
         });
+      } else if (isEmailChange) {
+        const token = getToken();
+        if (!token) {
+          toastError("Sessão expirada. Faça login para solicitar novamente.");
+          setErr("Sua sessão expirou. Faça login novamente para alterar o e-mail.");
+          setSending(false);
+          return;
+        }
+        const res = await fetch(
+          `${API_BASE_URL}/v1/user/profile/email-change/request`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ email }),
+          }
+        );
+        if (!res.ok) {
+          if (res.status === 401) {
+            toastError("Sessão expirada. Faça login para solicitar novamente.");
+            setErr("Sua sessão expirou. Faça login novamente para alterar o e-mail.");
+            setSending(false);
+            return;
+          }
+          const data = await res.json().catch(() => null);
+          throw new Error(data?.detail || "Falha ao reenviar código");
+        }
       } else {
         await apiResendCode(email);
       }
       setCooldown(30);
+      success("Código reenviado com sucesso!");
     } catch (error: any) {
+      if (!(isEmailChange && (error?.status === 401 || error?.statusCode === 401))) {
+        toastError("Falha ao reenviar código.");
+      }
       setErr(error?.message || "Falha ao reenviar código");
     } finally {
       setSending(false);
@@ -126,7 +182,7 @@ export default function VerifyEmail(): JSX.Element {
           className="login-back"
           onClick={() =>
             window.location.assign(
-              isReactivation ? "/v1/user/reactivate-account" : "/"
+              isReactivation ? "/reactivate-account" : "/"
             )
           }
           aria-label="Voltar"
