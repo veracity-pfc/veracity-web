@@ -10,14 +10,15 @@ function getCurrentYM(): YM {
 }
 
 export default function Dashboard(): JSX.Element {
-  const { error, success } = useToast();
+  const { error, success, warn } = useToast();
   
   const [ym, setYm] = useState<YM>(getCurrentYM());
   const [metrics, setMetrics] = useState<AdminMonthMetrics | null>(null);
   const [loading, setLoading] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+  const monthRef = useRef<HTMLInputElement | null>(null);
 
-  const fetchMetrics = async (y: number, m: number) => {
+  const fetchMetrics = async (y: number, m: number, successMsg?: string) => {
     try {
       if (abortRef.current) abortRef.current.abort();
       const ctrl = new AbortController();
@@ -26,6 +27,7 @@ export default function Dashboard(): JSX.Element {
       setLoading(true);
       const data = await getAdminMonthlyMetrics({ year: y, month: m, signal: ctrl.signal });
       setMetrics(data);
+      if (successMsg) success(successMsg);
     } catch (e: any) {
       if (e.name !== "AbortError") {
         error(e.message || "Erro ao carregar dashboard");
@@ -39,7 +41,7 @@ export default function Dashboard(): JSX.Element {
     if (getToken()) {
       fetchMetrics(ym.year, ym.month);
     }
-  }, [ym]);
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -50,15 +52,24 @@ export default function Dashboard(): JSX.Element {
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    if (!val) return;
+    if (!val) {
+      warn("Período inválido");
+      return;
+    }
     
     const [yearStr = "", monthStr = ""] = val.split("-");
     const y = parseInt(yearStr, 10);
     const m = parseInt(monthStr, 10);
 
-    if (!isNaN(y) && !isNaN(m)) {
-      setYm({ year: y, month: m });
+    if (!y || !m || isNaN(y) || isNaN(m)) {
+      warn("Período inválido");
+      return;
     }
+
+    const newYm = { year: y, month: m };
+    setYm(newYm);
+    const human = `${String(m).padStart(2, "0")}/${y}`;
+    fetchMetrics(newYm.year, newYm.month, `Período alterado para ${human}`);
   };
 
   const dateValue = `${ym.year}-${String(ym.month).padStart(2, '0')}`;
@@ -72,27 +83,32 @@ export default function Dashboard(): JSX.Element {
         </div>
         
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <div style={{ position: 'relative', background: '#10352f', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)' }}>
+          <div
+            className={styles.monthControl}
+            onClick={() => {
+              const el = monthRef.current;
+              if (!el) return;
+              const anyEl = el as any;
+              if (typeof anyEl.showPicker === "function") {
+                anyEl.showPicker();
+              } else {
+                el.focus();
+                el.click();
+              }
+            }}
+          >
             <input 
+              ref={monthRef}
               type="month" 
               value={dateValue} 
               onChange={handleDateChange}
-              style={{ 
-                background: 'transparent', 
-                border: 'none', 
-                color: '#fff', 
-                padding: '10px 16px', 
-                fontWeight: 'bold',
-                fontFamily: 'inherit',
-                cursor: 'pointer',
-                outline: 'none'
-              }} 
+              className={styles.monthInput}
+              aria-label="Selecionar período"
             />
           </div>
           <button 
             onClick={() => {
-              fetchMetrics(ym.year, ym.month);
-              success("Dados atualizados");
+              fetchMetrics(ym.year, ym.month, "Dados atualizados");
             }}
             disabled={loading}
             style={{
