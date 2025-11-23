@@ -211,8 +211,10 @@ export default function VerifyEmail(): JSX.Element {
                 autoComplete="one-time-code"
                 maxLength={1}
                 value={c}
-                onChange={(e) => onChange(i, e.target.value.replace(/\D/g, ""))}
-                onKeyDown={(e) => onKeyDown(i, e)}
+                onChange={(event) =>
+                  onChange(i, event.target.value.replace(/\D/g, ""))
+                }
+                onKeyDown={(event) => onKeyDown(i, event)}
               />
             ))}
           </div>
@@ -239,7 +241,7 @@ export default function VerifyEmail(): JSX.Element {
             type="submit"
             disabled={code.join("").length !== 6 || verifying || sending}
           >
-            {verifying ? "Carregando" : "Confirmar"}
+            {verifying || sending ? "Carregando" : "Confirmar"}
           </button>
         </form>
       </section>
