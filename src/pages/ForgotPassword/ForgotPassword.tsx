@@ -7,46 +7,77 @@ import Toast, { useToast } from '../../components/Toast/Toast';
 import styles from './ForgotPassword.module.css';
 import '../../styles/forms.css';
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function ForgotPassword(): JSX.Element {
   const [email, setEmail] = useState<string>('');
   const [err, setErr] = useState<string>('');
   const [sent, setSent] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false); 
+  const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
-  const { success, error } = useToast();
+  const { success, error: showErrorToast } = useToast();
 
   useEffect(() => {
     document.body.classList.add('auth-only-footer');
     return () => document.body.classList.remove('auth-only-footer');
   }, []);
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const normalizedEmail = email.trim().toLowerCase();
+  const isValidEmail =
+    normalizedEmail.length > 0 &&
+    normalizedEmail.length <= 60 &&
+    emailRegex.test(normalizedEmail);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setErr('');
-    setLoading(true); 
+
+    if (!isValidEmail) {
+      setErr('O e-mail digitado não é válido. Tente novamente.');
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      await apiForgotPassword(email.trim());
+      await apiForgotPassword(normalizedEmail);
       setSent(true);
-      success("E-mail de recuperação enviado com sucesso!");
-    } catch (e: any) {
-      error("Erro ao enviar e-mail de recuperação!");
-      setErr(e?.data?.detail || e.message || 'E-mail não encontrado. Tente novamente.');
+      success('E-mail de recuperação enviado com sucesso!');
+    } catch (error: any) {
+      const backendMessage =
+        error?.response?.data?.detail ||
+        error?.response?.data?.message ||
+        error?.data?.detail ||
+        error?.data?.message ||
+        error?.detail ||
+        error?.message;
+
+      if (backendMessage) {
+        setErr(backendMessage);
+      } else {
+        setErr('Ocorreu um erro ao tentar recuperar a senha.');
+      }
+
+      showErrorToast('Não foi possível enviar o e-mail de recuperação.');
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
   return (
     <main className="login-container">
       <Toast />
-      <div className="login-logo" aria-label="Veracity"><Logo /></div>
+
+      <div className="login-logo" aria-label="Veracity">
+        <Logo />
+      </div>
 
       <section className="login-card auth-card" aria-labelledby="forgot-title">
         <button
           type="button"
           className="login-back"
-          onClick={() => window.location.assign('/')}
-          aria-label="Voltar para a página inicial"
+          onClick={() => navigate(-1)}
+          aria-label="Voltar para a página anterior"
           title="Voltar"
         >
           <img src={ReturnIcon} alt="" />
@@ -54,45 +85,61 @@ export default function ForgotPassword(): JSX.Element {
 
         {!sent ? (
           <>
-            <h2 id="forgot-title" className="login-title">Recuperar minha conta</h2>
-            <p className={styles["auth-sub"]}>
-              Digite o endereço de e-mail da sua conta e lhe enviaremos um link de redefinição de senha.
+            <h2 id="forgot-title" className="login-title">
+              Recuperar minha conta
+            </h2>
+            <p className={styles['auth-sub']}>
+              Digite o endereço de e-mail da sua conta e lhe enviaremos um link
+              de redefinição de senha.
             </p>
 
-            <form className="login-form" onSubmit={onSubmit} noValidate>
-              <label className="form-label" htmlFor="email">E-mail</label>
+            <form className="login-form" onSubmit={handleSubmit} noValidate>
+              <label className="form-label" htmlFor="email">
+                E-mail
+              </label>
               <input
                 id="email"
                 className="form-control"
                 type="email"
                 value={email}
-                onChange={(e)=>setEmail(e.target.value)}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  setErr('');
+                }}
                 placeholder="Informe seu e-mail"
                 autoComplete="email"
                 required
-                disabled={loading} 
+                disabled={loading}
+                maxLength={60}
               />
 
-              {err && <p className="error-msg" role="alert" aria-live="assertive">{err}</p>}
+              {err && (
+                <p className="error-msg" role="alert" aria-live="assertive">
+                  {err}
+                </p>
+              )}
 
               <button
                 className="btn-primary login-submit"
                 type="submit"
-                disabled={loading}            
-                aria-disabled={loading ? true : undefined}
+                disabled={loading || !isValidEmail}
+                aria-disabled={loading || !isValidEmail ? true : undefined}
               >
-                {loading ? 'Carregando' : 'Enviar e-mail'} 
+                {loading ? 'Carregando' : 'Enviar e-mail'}
               </button>
             </form>
           </>
         ) : (
           <>
             <h2 className="login-title">Recuperar minha conta</h2>
-            <p className={styles["auth-sub"]}>
-              Verifique seu e-mail para obter um link para redefinir sua senha. Se não aparecer em alguns minutos, verifique sua pasta de spam.
+            <p className={styles['auth-sub']}>
+              Verifique seu e-mail para obter um link para redefinir sua senha.
+              Se não aparecer em alguns minutos, verifique sua pasta de spam.
             </p>
-            <div className={styles["auth-actions"]}>
-              <a href="/login" className={styles["forgot-link"]}>Retornar para o login</a>
+            <div className={styles['auth-actions']}>
+              <a href="/login" className={styles['forgot-link']}>
+                Retornar para o login
+              </a>
             </div>
           </>
         )}

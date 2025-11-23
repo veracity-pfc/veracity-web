@@ -33,7 +33,7 @@ export default function ReactivateAccount(): JSX.Element {
     if (!value) return;
     setValidating(true);
     try {
-      await apiFetch("/user/reactivate-account/validate", {
+      await apiFetch("/v1/user/reactivate-account/validate", {
         method: "POST",
         body: { email: value },
       });
@@ -58,7 +58,7 @@ export default function ReactivateAccount(): JSX.Element {
     setSubmitting(true);
     setErr("");
     try {
-      await apiFetch("/user/reactivate-account/send-code", {
+      await apiFetch("/v1/user/reactivate-account/send-code", {
         method: "POST",
         body: { email: value },
       });

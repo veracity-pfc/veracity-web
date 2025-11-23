@@ -170,7 +170,7 @@ export default function Header(): JSX.Element {
                 <NavLink
                   role="menuitem"
                   tabIndex={0}
-                  to="/user/reactivate-account"
+                  to="/v1/user/reactivate-account"
                   className={styles['about-item']}
                 >
                   Reativar conta

@@ -71,7 +71,7 @@ export default function VerifyEmail(): JSX.Element {
     try {
       setVerifying(true);
       if (isReactivation) {
-        await apiFetch("/user/reactivate-account/confirm-code", {
+        await apiFetch("/v1/user/reactivate-account/confirm-code", {
           method: "POST",
           body: { email, code: joined },
         });
@@ -98,7 +98,7 @@ export default function VerifyEmail(): JSX.Element {
     setSending(true);
     try {
       if (isReactivation) {
-        await apiFetch("/user/reactivate-account/send-code", {
+        await apiFetch("/v1/user/reactivate-account/send-code", {
           method: "POST",
           body: { email },
         });
@@ -126,7 +126,7 @@ export default function VerifyEmail(): JSX.Element {
           className="login-back"
           onClick={() =>
             window.location.assign(
-              isReactivation ? "/user/reactivate-account" : "/"
+              isReactivation ? "/v1/user/reactivate-account" : "/"
             )
           }
           aria-label="Voltar"
