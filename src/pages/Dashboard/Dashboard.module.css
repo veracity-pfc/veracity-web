@@ -26,9 +26,13 @@
 
 .chartsSection {
   margin-top: 32px;
-  display: flex;
-  flex-direction: column;
+}
+
+.gridContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
   gap: 24px;
+  align-items: stretch;
 }
 
 @media (max-width: 600px) {
@@ -43,5 +47,9 @@
 
   .title {
     font-size: 24px;
+  }
+
+  .gridContainer {
+    grid-template-columns: 1fr;
   }
 }

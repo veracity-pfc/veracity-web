@@ -142,11 +142,11 @@ export default function History(): JSX.Element {
     try {
       let path = "";
       if (isTokenManagement) {
-        path = `/administration/api/tokens?${params}`;
+        path = `/v1/administration/api/tokens?${params}`;
       } else if (isRequestManagement) {
-        path = `/administration/contact-requests?${params}`; 
+        path = `/v1/administration/contact-requests?${params}`; 
       } else {
-        path = `/user/history?${params}`;
+        path = `/v1/user/history?${params}`;
       }
 
       const data = (await apiFetch(path, { auth: true })) as Paged;

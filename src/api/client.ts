@@ -143,7 +143,7 @@ export async function apiFetch<T = any>(
 }
 
 export async function apiLogin(email: string, password: string): Promise<any> {
-  const r = await fetch(`${API_BASE}/auth/login`, {
+  const r = await fetch(`${API_BASE}/v1/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
@@ -164,7 +164,7 @@ export async function apiLogin(email: string, password: string): Promise<any> {
 }
 
 export const apiLogout = () =>
-  apiFetch("/auth/logout", { auth: true, method: "POST" })
+  apiFetch("/v1/auth/logout", { auth: true, method: "POST" })
     .catch(() => {})
     .finally(clearToken);
 
@@ -175,7 +175,7 @@ export const apiRegister = (
   confirm_password: string,
   accepted_terms: boolean
 ) =>
-  apiFetch("/auth/register", {
+  apiFetch("/v1/auth/register", {
     method: "POST",
     body: { name, email, password, confirm_password, accepted_terms },
   });
@@ -183,14 +183,14 @@ export const apiRegister = (
 export const apiVerifyEmail = async (email: string | null, code: string) => {
   const target = localStorage.getItem("veracity_email_change_target");
   if (!email && target) {
-    const data = await apiFetch("/user/profile/email-change/confirm", {
+    const data = await apiFetch("/v1/user/profile/email-change/confirm", {
       auth: true,
       method: "POST",
       body: { email: target, code },
     });
     return data;
   }
-  const data = await apiFetch<any>("/auth/verify-email", {
+  const data = await apiFetch<any>("/v1/auth/verify-email", {
     method: "POST",
     body: { email, code },
   });
@@ -201,25 +201,116 @@ export const apiVerifyEmail = async (email: string | null, code: string) => {
 export const apiResendCode = (email: string | null) => {
   const target = localStorage.getItem("veracity_email_change_target");
   if (!email && target) {
-    return apiFetch("/user/profile/email-change/request", {
+    return apiFetch("/v1/user/profile/email-change/request", {
       auth: true,
       method: "POST",
       body: { email: target },
     });
   }
-  return apiFetch("/auth/resend-code", {
+  return apiFetch("/v1/auth/resend-code", {
     method: "POST",
     body: { email, code: "000000" },
   });
 };
 
-export const apiGetProfile = () => apiFetch("/user/profile", { auth: true });
+export const apiGetProfile = () => apiFetch("/v1/user/profile", { auth: true });
 
 export const apiAdminMetrics = () =>
-  apiFetch("/administration/metrics", { auth: true });
+  apiFetch("/v1/administration/metrics/month", { auth: true });
+
+export const apiListUnifiedRequests = (
+  page: number = 1,
+  pageSize: number = 10,
+  status?: string,
+  category?: string,
+  email?: string
+) => {
+  const q = new URLSearchParams();
+  q.set("page", String(page));
+  q.set("page_size", String(pageSize));
+  if (status) q.set("status", status);
+  if (category) q.set("category", category);
+  if (email) q.set("email", email);
+
+  return apiFetch(`/v1/administration/contact-requests?${q.toString()}`, { auth: true });
+};
+
+export const apiGetUnifiedRequestDetail = (requestId: string) =>
+  apiFetch(`/v1/administration/contact-requests/${requestId}`, { auth: true });
+
+export const apiReplyContactRequest = (requestId: string, replyMessage: string) =>
+  apiFetch(`/v1/administration/contact-requests/${requestId}/reply`, {
+    auth: true,
+    method: "POST",
+    body: { reply_message: replyMessage },
+  });
+
+export const apiListTokenRequests = (
+  page: number = 1,
+  pageSize: number = 10,
+  status?: string,
+  email?: string,
+  dateFrom?: string,
+  dateTo?: string
+) => {
+  const q = new URLSearchParams();
+  q.set("page", String(page));
+  q.set("page_size", String(pageSize));
+  if (status) q.set("status", status);
+  if (email) q.set("email", email);
+  if (dateFrom) q.set("date_from", dateFrom);
+  if (dateTo) q.set("date_to", dateTo);
+
+  return apiFetch(`/v1/administration/api/token-requests?${q.toString()}`, { auth: true });
+};
+
+export const apiGetTokenRequest = (requestId: string) =>
+  apiFetch(`/v1/administration/api/token-requests/${requestId}`, { auth: true });
+
+export const apiApproveTokenRequest = (requestId: string) =>
+  apiFetch(`/v1/administration/api/token-requests/${requestId}/approve`, {
+    auth: true,
+    method: "POST",
+  });
+
+export const apiRejectTokenRequest = (requestId: string, reason: string) =>
+  apiFetch(`/v1/administration/api/token-requests/${requestId}/reject`, {
+    auth: true,
+    method: "POST",
+    body: { reason },
+  });
+
+export const apiListTokens = (
+  page: number = 1,
+  pageSize: number = 10,
+  status?: string,
+  email?: string,
+  dateFrom?: string,
+  dateTo?: string
+) => {
+  const q = new URLSearchParams();
+  q.set("page", String(page));
+  q.set("page_size", String(pageSize));
+  if (status) q.set("status", status);
+  if (email) q.set("email", email);
+  if (dateFrom) q.set("date_from", dateFrom);
+  if (dateTo) q.set("date_to", dateTo);
+
+  return apiFetch(`/v1/administration/api/tokens?${q.toString()}`, { auth: true });
+};
+
+export const apiRevokeTokenAdmin = (tokenId: string, reason?: string) =>
+  apiFetch(`/v1/administration/api/tokens/${tokenId}/revoke`, {
+    auth: true,
+    method: "POST",
+    body: { reason },
+  });
+
+export const apiGetTokenDetailAdmin = (tokenId: string) =>
+  apiFetch(`/v1/administration/api/tokens/${tokenId}`, { auth: true });
 
 export const apiAnalyzeUrl = (url: string) =>
-  apiFetch("/analyses/url", { auth: true, method: "POST", body: { url } });
+  apiFetch("/v1/analyses/url", { auth: true, method: "POST", body: { url } });
 
 export async function apiAnalyzeImage(file: File): Promise<any> {
   const fd = new FormData();
@@ -228,7 +319,7 @@ export async function apiAnalyzeImage(file: File): Promise<any> {
   const t = getToken();
   if (t) headers.Authorization = `Bearer ${t}`;
   touchActivity();
-  const res = await fetch(`${API_BASE}/analyses/image`, {
+  const res = await fetch(`${API_BASE}/v1/analyses/image`, {
     method: "POST",
     headers,
     body: fd,
@@ -249,7 +340,7 @@ export async function apiAnalyzeImage(file: File): Promise<any> {
 }
 
 export async function apiForgotPassword(email: string): Promise<any> {
-  const r = await fetch(`${API_BASE}/auth/forgot-password`, {
+  const r = await fetch(`${API_BASE}/v1/auth/forgot-password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
@@ -259,7 +350,7 @@ export async function apiForgotPassword(email: string): Promise<any> {
 }
 
 export async function apiResetPassword(token: string, password: string, confirm_password: string): Promise<any> {
-  const r = await fetch(`${API_BASE}/auth/reset-password/${token}`, {
+  const r = await fetch(`${API_BASE}/v1/auth/reset-password/${token}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ password, confirm_password }),
@@ -269,7 +360,7 @@ export async function apiResetPassword(token: string, password: string, confirm_
 }
 
 export async function apiSendContact(email: string, subject: string, message: string, category: string) {
-  return apiFetch('/contact-us', {
+  return apiFetch('/v1/contact-us', {
     method: 'POST',
     body: { 
       email, 
@@ -281,42 +372,42 @@ export async function apiSendContact(email: string, subject: string, message: st
 }
 
 export const apiValidateName = (name: string) =>
-  apiFetch("/user/profile/name?validate_only=true", {
+  apiFetch("/v1/user/profile/name?validate_only=true", {
     auth: true,
     method: "PATCH",
     body: { name },
   });
 
 export const apiUpdateName = (name: string) =>
-  apiFetch("/user/profile/name", {
+  apiFetch("/v1/user/profile/name", {
     auth: true,
     method: "PATCH",
     body: { name },
   });
 
 export const apiValidateEmailChange = (email: string) =>
-  apiFetch("/user/profile/email-change/request?validate_only=true", {
+  apiFetch("/v1/user/profile/email-change/request?validate_only=true", {
     auth: true,
     method: "POST",
     body: { email },
   });
 
 export const apiRequestEmailChange = (email: string) =>
-  apiFetch("/user/profile/email-change/request", {
+  apiFetch("/v1/user/profile/email-change/request", {
     auth: true,
     method: "POST",
     body: { email },
   });
 
 export const apiConfirmEmailChange = (email: string, code: string) =>
-  apiFetch("/user/profile/email-change/confirm", {
+  apiFetch("/v1/user/profile/email-change/confirm", {
     auth: true,
     method: "POST",
     body: { email, code },
   });
 
 export async function apiDeleteAccount(): Promise<any> {
-  const r = await fetch(`${API_BASE}/user/account?mode=delete`, {
+  const r = await fetch(`${API_BASE}/v1/user/account`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${localStorage.getItem("veracity_token")}` },
   });
@@ -325,7 +416,7 @@ export async function apiDeleteAccount(): Promise<any> {
 }
 
 export async function apiInactivateAccount() {
-  const res = await fetch(`${API_BASE}/user/account`, {
+  const res = await fetch(`${API_BASE}/v1/user/account`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -345,16 +436,56 @@ export type AdminMonthMetrics = {
   year: number;
   month: number;
   reference: string;
-  bars: {
-    url_suspicious: number;
-    url_safe: number;
-    image_fake: number;
-    image_safe: number;
+  analyses: {
+    bars: {
+      url_suspicious: number;
+      url_safe: number;
+      image_fake: number;
+      image_safe: number;
+    };
+    totals: {
+      total_month: number;
+      urls_month: number;
+      images_month: number;
+    };
   };
-  totals: {
-    total_month: number;
-    urls_month: number;
-    images_month: number;
+  users: {
+    bars: {
+      active_users: number;
+      inactive_users: number;
+    };
+    totals: {
+      total_users: number;
+      active_users: number;
+      inactive_users: number;
+    };
+  };
+  tokens: {
+    bars: {
+      active: number;
+      expired: number;
+      revoked: number;
+    };
+    totals: {
+      total_tokens: number;
+      active: number;
+      revoked: number;
+    };
+  };
+  requests: {
+    bars: {
+      doubt: number;
+      suggestion: number;
+      complaint: number;
+      token_request: number;
+    };
+    totals: {
+      total_requests: number;
+      doubt: number;
+      suggestion: number;
+      complaint: number;
+      token_request: number;
+    };
   };
 };
 
@@ -379,7 +510,7 @@ export async function getAdminMonthlyMetrics(params: {
     ...buildAuthHeader(),
   };
 
-  const url = `${API_BASE}/administration/metrics/month?${q.toString()}`;
+  const url = `${API_BASE}/v1/administration/metrics/month?${q.toString()}`;
   const resp = await fetch(url, {
     method: "GET",
     headers,
@@ -397,15 +528,14 @@ export async function getAdminMonthlyMetrics(params: {
   return resp.json();
 }
 
-
 export const apiRevealApiToken = () =>
-  apiFetch<{ token: string; expires_at: string | null }>("/user/api-token/reveal", {
+  apiFetch<{ token: string; expires_at: string | null }>("/v1/user/api-token/reveal", {
     auth: true,
     method: "POST",
   });
 
 export const apiRevokeApiToken = () =>
-  apiFetch("/user/api-token/revoke", {
+  apiFetch("/v1/user/api-token/revoke", {
     auth: true,
     method: "POST",
   });

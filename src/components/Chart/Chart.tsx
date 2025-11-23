@@ -1,10 +1,8 @@
-import type React from "react";
-import { JSX, useEffect, useMemo, useRef, useState } from "react";
+import { JSX } from "react";
 import {
   Bar,
   BarChart,
   CartesianGrid,
-  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -12,478 +10,249 @@ import {
 } from "recharts";
 import styles from "./Chart.module.css";
 
-export type YM = { year: number; month: number };
-
-type ChartRow = {
-  name: string;
-  url_suspicious: number;
-  url_safe: number;
-  image_fake: number;
-  image_safe: number;
-};
-
-type UsersChartRow = {
-  name: string;
-  active_users: number;
-  inactive_users: number;
-};
-
-type TokensChartRow = {
-  name: string;
-  active: number;
-  expired: number;
-  revoked: number;
-};
-
-type RequestsChartRow = {
-  name: string;
-  doubt: number;
-  suggestion: number;
-  token_request: number;
-  complaint: number;
-};
-
-export type AdminUserMetrics = {
-  bars: {
-    active_users: number;
-    inactive_users: number;
-  };
-  totals: {
-    total_users: number;
-    active_users: number;
-    inactive_users: number;
-  };
-};
-
-export type AdminTokenMetrics = {
-  bars: {
-    active: number;
-    expired: number;
-    revoked: number;
-  };
-  totals: {
-    total: number;
-    active: number;
-    expired: number;
-    revoked: number;
-  };
-};
-
-export type AdminRequestMetrics = {
-  bars: {
-    doubt: number;
-    suggestion: number;
-    token_request: number;
-    complaint: number;
-  };
-  totals: {
-    total: number;
-  };
-};
-
 export type AdminMonthMetrics = {
   year: number;
   month: number;
   reference: string;
-  bars: {
-    url_suspicious: number;
-    url_safe: number;
-    image_fake: number;
-    image_safe: number;
-  };
-  totals: {
-    total_month: number;
-    urls_month: number;
-    images_month: number;
-  };
-  users?: AdminUserMetrics;
-  tokens?: AdminTokenMetrics;
-  requests?: AdminRequestMetrics; 
-};
-
-type DashboardChartProps = {
-  mode: "analysis" | "users" | "tokens" | "requests";
-  metrics: AdminMonthMetrics | null;
-  ym: YM;
-  loading: boolean;
-  onChangeMonth: (value: string) => void;
-  onRefresh: () => void;
-};
-
-export default function DashboardChart({
-  mode,
-  metrics,
-  ym,
-  loading,
-  onChangeMonth,
-  onRefresh,
-}: DashboardChartProps): JSX.Element {
-  const monthRef = useRef<HTMLInputElement>(null);
-  const focusSinkRef = useRef<HTMLSpanElement>(null);
-  const [pickerOpen, setPickerOpen] = useState(false);
-
-  const year = ym.year;
-  const month = ym.month;
-
-  const monthInputValue = `${year}-${String(month).padStart(2, "0")}`;
-  const periodHuman = `${String(month).padStart(2, "0")}/${year}`;
-
-  const chartData: Array<ChartRow | UsersChartRow | TokensChartRow | RequestsChartRow> = useMemo(() => {
-    if (mode === "analysis") {
-      const bars = metrics?.bars;
-      return [
-        {
-          name: "Mês",
-          url_suspicious: Number(bars?.url_suspicious ?? 0),
-          url_safe: Number(bars?.url_safe ?? 0),
-          image_fake: Number(bars?.image_fake ?? 0),
-          image_safe: Number(bars?.image_safe ?? 0),
-        },
-      ];
-    }
-    if (mode === "users") {
-      const bars = metrics?.users?.bars;
-      return [
-        {
-          name: "Mês",
-          active_users: Number(bars?.active_users ?? 0),
-          inactive_users: Number(bars?.inactive_users ?? 0),
-        },
-      ];
-    }
-    if (mode === "tokens") {
-      const bars = metrics?.tokens?.bars;
-      return [
-        {
-          name: "Mês",
-          active: Number(bars?.active ?? 0),
-          expired: Number(bars?.expired ?? 0),
-          revoked: Number(bars?.revoked ?? 0),
-        },
-      ];
-    }
-    const bars = metrics?.requests?.bars;
-    return [
-        {
-            name: "Mês",
-            doubt: Number(bars?.doubt ?? 0),
-            suggestion: Number(bars?.suggestion ?? 0),
-            token_request: Number(bars?.token_request ?? 0),
-            complaint: Number(bars?.complaint ?? 0),
-        }
-    ];
-  }, [metrics, mode]);
-
-  const analysisTotals = {
-    totalMonth: Number(metrics?.totals.total_month ?? 0),
-    urlsMonth: Number(metrics?.totals.urls_month ?? 0),
-    imagesMonth: Number(metrics?.totals.images_month ?? 0),
-  };
-
-  const userTotals = {
-    totalUsers: Number(metrics?.users?.totals.total_users ?? 0),
-    activeUsers: Number(metrics?.users?.totals.active_users ?? 0),
-    inactiveUsers: Number(metrics?.users?.totals.inactive_users ?? 0),
-  };
-
-  const tokenTotals = {
-    total: Number(metrics?.tokens?.totals.total ?? 0),
-    active: Number(metrics?.tokens?.totals.active ?? 0),
-    expired: Number(metrics?.tokens?.totals.expired ?? 0),
-    revoked: Number(metrics?.tokens?.totals.revoked ?? 0),
-  };
-
-  const requestBars = metrics?.requests?.bars;
-  const requestTotals = {
-      total: Number(metrics?.requests?.totals.total ?? 0),
-      doubt: Number(requestBars?.doubt ?? 0),
-      suggestion: Number(requestBars?.suggestion ?? 0),
-      token_request: Number(requestBars?.token_request ?? 0),
-      complaint: Number(requestBars?.complaint ?? 0),
-  };
-
-  const closeMonthPicker = () => {
-    const el = monthRef.current;
-    if (!el) return;
-    try {
-      const esc = new KeyboardEvent("keydown", { key: "Escape", bubbles: true });
-      el.dispatchEvent(esc);
-    } catch {}
-    el.blur();
-    setPickerOpen(false);
-    focusSinkRef.current?.focus();
-    setTimeout(() => focusSinkRef.current?.blur(), 0);
-  };
-
-  const openMonthPicker = () => {
-    const el = monthRef.current;
-    if (!el) return;
-    (el as any).showPicker?.();
-    if (document.activeElement !== el) el.focus();
-    el.click();
-    setPickerOpen(true);
-  };
-
-  const toggleMonthPicker = () => {
-    if (pickerOpen) {
-      closeMonthPicker();
-    } else {
-      openMonthPicker();
-    }
-  };
-
-  useEffect(() => {
-    const el = monthRef.current;
-    if (!el) return;
-    const onBlur = () => setPickerOpen(false);
-    const onFocus = () => setPickerOpen(true);
-    el.addEventListener("blur", onBlur);
-    el.addEventListener("focus", onFocus);
-    return () => {
-      el.removeEventListener("blur", onBlur);
-      el.removeEventListener("focus", onFocus);
+  analyses: {
+    bars: {
+      url_suspicious: number;
+      url_safe: number;
+      image_fake: number;
+      image_safe: number;
     };
-  }, []);
-
-  const onMonthKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      toggleMonthPicker();
-    }
+    totals: {
+      total_month: number;
+      urls_month: number;
+      images_month: number;
+    };
   };
-
-  const handleMonthChange = (value: string) => {
-    onChangeMonth(value);
-    closeMonthPicker();
+  users: {
+    bars: {
+      active_users: number;
+      inactive_users: number;
+    };
+    totals: {
+      total_users: number;
+      active_users: number;
+      inactive_users: number;
+    };
   };
+  tokens: {
+    bars: {
+      active: number;
+      expired: number;
+      revoked: number;
+    };
+    totals: {
+      total_tokens: number;
+      active: number;
+      revoked: number;
+    };
+  };
+  requests: {
+    bars: {
+      doubt: number;
+      suggestion: number;
+      complaint: number;
+      token_request: number;
+    };
+    totals: {
+      total_requests: number;
+      doubt: number;
+      suggestion: number;
+      complaint: number;
+      token_request: number;
+    };
+  };
+};
 
-  const selectedPeriod =
-    metrics && metrics.month && metrics.year
-      ? `${String(metrics.month).padStart(2, "0")}/${metrics.year}`
-      : periodHuman;
+export type YM = {
+  year: number;
+  month: number;
+};
 
+type ChartMode = "analysis" | "users" | "tokens" | "requests";
+
+interface Props {
+  mode: ChartMode;
+  metrics: AdminMonthMetrics | null;
+  ym?: YM;
+  loading: boolean;
+  onChangeMonth?: (val: string) => void;
+  onRefresh?: () => void;
+}
+
+const defaultAnalysisBars = { url_suspicious: 0, url_safe: 0, image_fake: 0, image_safe: 0 };
+const defaultAnalysisTotals = { total_month: 0, urls_month: 0, images_month: 0 };
+
+const defaultUsersBars = { active_users: 0, inactive_users: 0 };
+const defaultUsersTotals = { total_users: 0, active_users: 0, inactive_users: 0 };
+
+const defaultTokensBars = { active: 0, expired: 0, revoked: 0 };
+const defaultTokensTotals = { total_tokens: 0, active: 0, revoked: 0 };
+
+const defaultRequestsBars = { doubt: 0, suggestion: 0, complaint: 0, token_request: 0 };
+const defaultRequestsTotals = { total_requests: 0, doubt: 0, suggestion: 0, complaint: 0, token_request: 0 };
+
+export default function DashboardChart({ mode, metrics, loading }: Props): JSX.Element {
   let title = "";
-  let buttonAria = "";
+  let data: any[] = [];
+  let kpis: { label: string; value: number }[] = [];
+  let colors: Record<string, string> = {};
+  let labels: Record<string, string> = {};
 
   if (mode === "analysis") {
-    title = "Total de análises (mês atual/ano atual)";
-    buttonAria = "Atualizar gráfico de análises";
+    title = "Análises Realizadas";
+    const bars = metrics?.analyses?.bars || defaultAnalysisBars;
+    const totals = metrics?.analyses?.totals || defaultAnalysisTotals;
+
+    data = [
+      { name: "URLs", susp: bars.url_suspicious, safe: bars.url_safe },
+      { name: "Imagens", fake: bars.image_fake, safe: bars.image_safe },
+    ];
+    colors = { susp: "#f59e0b", fake: "#ef4444", safe: "#10b981" };
+    labels = { susp: "Suspeitas", fake: "Falsas", safe: "Seguras" };
+    
+    kpis = [
+      { label: "Total Mês", value: totals.total_month },
+      { label: "URLs", value: totals.urls_month },
+      { label: "Imagens", value: totals.images_month },
+    ];
+
   } else if (mode === "users") {
-    title = "Usuários na plataforma (mês atual/ano atual)";
-    buttonAria = "Atualizar gráfico de usuários";
+    title = "Base de Usuários";
+    const bars = metrics?.users?.bars || defaultUsersBars;
+    const totals = metrics?.users?.totals || defaultUsersTotals;
+
+    data = [
+      { name: "Total", active: bars.active_users, inactive: bars.inactive_users },
+    ];
+    colors = { active: "#10b981", inactive: "#6b7280" };
+    labels = { active: "Ativos", inactive: "Inativos" };
+
+    kpis = [
+      { label: "Total Usuários", value: totals.total_users },
+      { label: "Ativos", value: totals.active_users },
+      { label: "Inativos", value: totals.inactive_users },
+    ];
+
   } else if (mode === "tokens") {
-    title = "Tokens de API criados (mês atual/ano atual)";
-    buttonAria = "Atualizar gráfico de tokens";
-  } else {
-    title = "Solicitações recebidas (mês atual/ano atual)";
-    buttonAria = "Atualizar gráfico de solicitações";
+    title = "Tokens de API";
+    const bars = metrics?.tokens?.bars || defaultTokensBars;
+    const totals = metrics?.tokens?.totals || defaultTokensTotals;
+
+    data = [
+      { name: "Estado", active: bars.active, expired: bars.expired, revoked: bars.revoked },
+    ];
+    colors = { active: "#10b981", expired: "#f59e0b", revoked: "#ef4444" };
+    labels = { active: "Ativos", expired: "Expirados", revoked: "Revogados" };
+
+    kpis = [
+      { label: "Total Tokens", value: totals.total_tokens },
+      { label: "Ativos", value: totals.active },
+      { label: "Revogados", value: totals.revoked },
+    ];
+
+  } else if (mode === "requests") {
+    title = "Solicitações de Contato";
+    const bars = metrics?.requests?.bars || defaultRequestsBars;
+    const totals = metrics?.requests?.totals || defaultRequestsTotals;
+
+    data = [
+      { 
+        name: "Tipos", 
+        doubt: bars.doubt, 
+        sugg: bars.suggestion, 
+        complaint: bars.complaint, 
+        token: bars.token_request 
+      },
+    ];
+    colors = { doubt: "#3b82f6", sugg: "#f59e0b", complaint: "#ef4444", token: "#8b5cf6" };
+    labels = { doubt: "Dúvidas", sugg: "Sugestões", complaint: "Reclamações", token: "Tokens" };
+
+    kpis = [
+      { label: "Total", value: totals.total_requests },
+      { label: "Tokens", value: totals.token_request },
+      { label: "Outros", value: (totals.doubt) + (totals.suggestion) + (totals.complaint) },
+    ];
   }
 
-  const renderKpis = () => {
-    if (mode === "analysis") {
-      return (
-        <div className={styles.kpiRow}>
-          <div className={styles.kpiItem}>
-            <span className={styles.kpiLabel}>Análises no mês</span>
-            <span className={styles.kpiValue}>{analysisTotals.totalMonth}</span>
-          </div>
-          <div className={styles.kpiItem}>
-            <span className={styles.kpiLabel}>URLs analisadas</span>
-            <span className={styles.kpiValue}>{analysisTotals.urlsMonth}</span>
-          </div>
-          <div className={styles.kpiItem}>
-            <span className={styles.kpiLabel}>Imagens analisadas</span>
-            <span className={styles.kpiValue}>{analysisTotals.imagesMonth}</span>
-          </div>
-        </div>
-      );
-    }
-    if (mode === "users") {
-      return (
-        <div className={styles.kpiRow}>
-          <div className={styles.kpiItem}>
-            <span className={styles.kpiLabel}>Total de usuários</span>
-            <span className={styles.kpiValue}>{userTotals.totalUsers}</span>
-          </div>
-          <div className={styles.kpiItem}>
-            <span className={styles.kpiLabel}>Usuários ativos</span>
-            <span className={styles.kpiValue}>{userTotals.activeUsers}</span>
-          </div>
-          <div className={styles.kpiItem}>
-            <span className={styles.kpiLabel}>Usuários inativos</span>
-            <span className={styles.kpiValue}>{userTotals.inactiveUsers}</span>
-          </div>
-        </div>
-      );
-    }
-    if (mode === "tokens") {
-      return (
-        <div className={styles.kpiRow}>
-          <div className={styles.kpiItem}>
-            <span className={styles.kpiLabel}>Total de tokens</span>
-            <span className={styles.kpiValue}>{tokenTotals.total}</span>
-          </div>
-          <div className={styles.kpiItem}>
-            <span className={styles.kpiLabel}>Ativos</span>
-            <span className={styles.kpiValue}>{tokenTotals.active}</span>
-          </div>
-          <div className={styles.kpiItem}>
-            <span className={styles.kpiLabel}>Revogados</span>
-            <span className={styles.kpiValue}>{tokenTotals.revoked}</span>
-          </div>
-          <div className={styles.kpiItem}>
-            <span className={styles.kpiLabel}>Expirados</span>
-            <span className={styles.kpiValue}>{tokenTotals.expired}</span>
-          </div>
-        </div>
-      );
-    }
-    return (
-      <div className={styles.kpiRow}>
-        <div className={styles.kpiItem}>
-          <span className={styles.kpiLabel}>Total de solicitações</span>
-          <span className={styles.kpiValue}>{requestTotals.total}</span>
-        </div>
-        <div className={styles.kpiItem}>
-          <span className={styles.kpiLabel}>Dúvidas</span>
-          <span className={styles.kpiValue}>{requestTotals.doubt}</span>
-        </div>
-        <div className={styles.kpiItem}>
-          <span className={styles.kpiLabel}>Sugestões</span>
-          <span className={styles.kpiValue}>{requestTotals.suggestion}</span>
-        </div>
-        <div className={styles.kpiItem}>
-          <span className={styles.kpiLabel}>Tokens</span>
-          <span className={styles.kpiValue}>{requestTotals.token_request}</span>
-        </div>
-        <div className={styles.kpiItem}>
-          <span className={styles.kpiLabel}>Reclamações</span>
-          <span className={styles.kpiValue}>{requestTotals.complaint}</span>
-        </div>
-      </div>
-    );
-  };
-
-  const renderBars = () => {
-    if (mode === "analysis") {
-      return (
-        <>
-          <Bar dataKey="url_suspicious" name="URL suspeita" fill="#008b54ff" />
-          <Bar dataKey="url_safe" name="URL segura" fill="#6ab997ff" />
-          <Bar dataKey="image_fake" name="Imagem falsa" fill="#029777ff" />
-          <Bar dataKey="image_safe" name="Imagem segura" fill="#b7ecd6ff" />
-        </>
-      );
-    }
-    if (mode === "users") {
-      return (
-        <>
-          <Bar dataKey="active_users" name="Usuários ativos" fill="#6ab997ff" />
-          <Bar
-            dataKey="inactive_users"
-            name="Usuários inativos"
-            fill="#008b54ff"
-          />
-        </>
-      );
-    }
-    if (mode === "tokens") {
-      return (
-        <>
-          <Bar dataKey="active" name="Ativos" fill="#6ab997ff" />
-          <Bar dataKey="revoked" name="Revogados" fill="#008b54ff" />
-          <Bar dataKey="expired" name="Expirados" fill="#029777ff" />
-        </>
-      );
-    }
-    return (
-      <>
-        <Bar dataKey="doubt" name="Dúvidas" fill="#008b54ff" />
-        <Bar dataKey="suggestion" name="Sugestões" fill="#6ab997ff" />
-        <Bar dataKey="token_request" name="Solic. Token" fill="#029777ff" />
-        <Bar dataKey="complaint" name="Reclamações" fill="#b7ecd6ff" />
-      </>
-    );
-  };
+  const dataKeys = Object.keys(colors);
 
   return (
     <div className={styles.card}>
       <div className={styles.cardHeader}>
-        <div>
-          <p className={styles.cardTitle}>{title}</p>
-          <p className={styles.subtle}>
-            Período selecionado: <b>{selectedPeriod}</b>
-          </p>
-        </div>
-
-        <div className={styles.actions}>
-          <div className={styles.monthControl} aria-label="Alterar período">
-            <div
-              className={styles.monthButton}
-              tabIndex={0}
-              role="button"
-              aria-haspopup="dialog"
-              onClick={toggleMonthPicker}
-              onKeyDown={onMonthKey}
-            >
-              {periodHuman}
-              <span className={styles.monthIcon} aria-hidden="true" />
-            </div>
-            <input
-              ref={monthRef}
-              className={styles.monthNative}
-              type="month"
-              value={monthInputValue}
-              onChange={(e) => handleMonthChange(e.target.value)}
-              aria-label="Selecione o mês"
-            />
-            <span
-              ref={focusSinkRef}
-              tabIndex={-1}
-              className={styles.focusSink}
-            />
-          </div>
-
-          <button
-            className={styles.btn}
-            onClick={onRefresh}
-            disabled={loading}
-            aria-label={buttonAria}
-            type="button"
-          >
-            {loading ? "Atualizando..." : "Atualizar gráfico"}
-          </button>
-        </div>
+        <h3 className={styles.cardTitle}>{title}</h3>
       </div>
 
-      {renderKpis()}
+      <div className={styles.kpiRow}>
+        {kpis.map((k, i) => (
+          <div key={i} className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>{k.label}</span>
+            <span className={styles.kpiValue}>{k.value}</span>
+          </div>
+        ))}
+      </div>
 
       <div className={styles.chartWrap}>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart
-            data={chartData}
-            margin={{ left: 8, right: 24, top: 8, bottom: 8 }}
+        {loading && (
+          <div className={styles.loadingOverlay}>
+            <div className={styles.spinner} />
+          </div>
+        )}
+        
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart 
+            data={data} 
+            layout="vertical" 
+            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="rgba(255,255,255,0.25)"
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" horizontal={false} />
+            <XAxis type="number" stroke="#9ca3af" fontSize={12} hide />
+            <YAxis 
+              dataKey="name" 
+              type="category" 
+              stroke="#9ca3af" 
+              fontSize={12} 
+              width={60}
+              tickLine={false}
             />
-            <XAxis dataKey="name" tick={{ fill: "#dff7f0" }} />
-            <YAxis allowDecimals={false} tick={{ fill: "#dff7f0" }} />
             <Tooltip
               contentStyle={{
-                background: "#0f1b19",
-                border: "1px solid rgba(255,255,255,0.15)",
-                color: "#dff7f0",
+                backgroundColor: "#0f1b19",
+                borderColor: "rgba(255,255,255,0.1)",
+                color: "#fff",
+                borderRadius: "8px"
               }}
-              labelStyle={{ color: "#dff7f0", fontWeight: 700 }}
-              formatter={(value: number, name: string) => [value, name]}
-              labelFormatter={() => "Mês"}
+              cursor={{ fill: "rgba(255,255,255,0.05)" }}
             />
-            <Legend wrapperStyle={{ color: "#fff" }} />
-            {renderBars()}
+            
+            {dataKeys.map((key) => (
+              <Bar 
+                key={key} 
+                dataKey={key} 
+                name={labels[key]} 
+                stackId="a" 
+                fill={colors[key]} 
+                radius={[0, 4, 4, 0]} 
+                barSize={32}
+              />
+            ))}
           </BarChart>
         </ResponsiveContainer>
+
+        <div className={styles.legendRow}>
+          {dataKeys.map((key) => (
+            <div key={key} className={styles.legendItem}>
+              <span 
+                className={styles.legendColor} 
+                style={{ backgroundColor: colors[key] }}
+              />
+              <span>{labels[key]}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

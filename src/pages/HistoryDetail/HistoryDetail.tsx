@@ -126,7 +126,7 @@ export default function HistoryDetail(): JSX.Element {
         if (isTokenManagement) {
           path = `/administration/api/tokens/${id}`; 
         } else if (isRequestManagement) {
-          path = `/administration/contact-requests/${id}`; 
+          path = `/v1/administration/contact-requests/${id}`; 
         } else {
           path = `/user/history/${id}`;
         }
@@ -174,7 +174,7 @@ export default function HistoryDetail(): JSX.Element {
     setActionLoading(true);
     setActionErr("");
     try {
-      await apiFetch(`/administration/contact-requests/${id}/reply`, {
+      await apiFetch(`/v1/administration/contact-requests/${id}/reply`, {
         auth: true,
         method: "POST",
         body: { reply_message: replyMessage }
@@ -235,7 +235,7 @@ export default function HistoryDetail(): JSX.Element {
 
   const isTokenRequest = data?.category === 'token_request' || (!data?.category && data?.status === 'approved'); 
   const isContact = data?.category && ['doubt', 'suggestion', 'complaint'].includes(data.category);
-  const canReply = isContact && data?.status === 'open' && ['doubt', 'suggestion'].includes(data?.category || '');
+  const canReply = isContact && data?.status === 'open' && ['doubt', 'suggestion', 'complaint'].includes(data?.category || '');
 
   if (err) return <div className={styles.error}>{err}</div>;
   if (!data) return <div className={styles.loading}>Carregando…</div>;
@@ -284,19 +284,6 @@ export default function HistoryDetail(): JSX.Element {
                   <div className={styles.reasonBox} style={{marginTop: 8}}>{data.message || "—"}</div>
                 </>
               )}
-              
-              {data.admin_reply && (
-                <>
-                   <h3 className={styles.h3} style={{color:'var(--accent)'}}>Resposta enviada</h3>
-                   <p className={styles.p} style={{fontSize:12, opacity:0.7}}>
-                     Em: {data.replied_at ? new Date(data.replied_at).toLocaleString() : '-'}
-                   </p>
-                   <div className={styles.reasonBox} style={{borderColor:'var(--accent)'}}>
-                     {data.admin_reply}
-                   </div>
-                </>
-              )}
-
               {isTokenManagement && (
                 <>
                   <h3 className={styles.h3}>Informações do Token</h3>
@@ -314,6 +301,19 @@ export default function HistoryDetail(): JSX.Element {
             </div>
 
             <div className={styles.rightCol}>
+              {data.admin_reply && (
+                <>
+                   <h3 className={styles.h3Right}>Resposta enviada</h3>
+                   <p className={styles.p} style={{fontSize:12, opacity:0.7}}>
+                     Em: {data.replied_at ? new Date(data.replied_at).toLocaleString() : '-'}
+                   </p>
+                   <div className={styles.reasonBox} style={{borderColor:'var(--accent)'}}>
+                     {data.admin_reply}
+                   </div>
+                   <div style={{marginBottom: 24}}></div>
+                </>
+              )}
+
               {isRequestManagement && isTokenRequest && data.status === "open" && (
                 <>
                   {!rejectionMode && (
