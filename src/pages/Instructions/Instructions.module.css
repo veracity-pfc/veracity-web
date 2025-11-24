@@ -126,7 +126,6 @@
     opacity: .95;
 }
 
-
 @media (max-width: 670px) {
     .instructions-title {
         font-size: 22px;
@@ -155,5 +154,89 @@
         width: 44px;
         height: 44px;
         font-size: 18px;
+    }
+}
+
+/* ==== NOVAS CLASSES PARA TOKENS DE API ==== */
+
+.apiIntro {
+    margin: 0 0 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-primary);
+    opacity: .95;
+}
+
+.apiGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 8px;
+}
+
+.apiCard {
+    border-radius: 14px;
+    background: #1e1d1d;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 14px 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.apiCardHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.apiCardTitle {
+    margin: 0 0 4px;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.apiCardDesc {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--text-primary);
+    opacity: .9;
+}
+
+.copyBtn {
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.06);
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.copyBtn:hover,
+.copyBtn:focus-visible {
+    background: rgba(255, 255, 255, 0.12);
+    outline: none;
+}
+
+.codeBlock {
+    margin: 0;
+    border-radius: 10px;
+    background: #101010;
+    padding: 10px 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-x: auto;
+    max-height: 220px;
+}
+
+/* Responsivo para seção de API */
+@media (max-width: 900px) {
+    .apiGrid {
+        grid-template-columns: 1fr;
     }
 }
