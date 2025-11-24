@@ -126,7 +126,7 @@ export default function HistoryDetail(): JSX.Element {
         if (isTokenManagement) {
           path = `/administration/api/tokens/${id}`; 
         } else if (isRequestManagement) {
-          path = `/v1/administration/contact-requests/${id}`; 
+          path = `/administration/contact-requests/${id}`; 
         } else {
           path = `/v1/user/history/${id}`;
         }
