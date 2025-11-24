@@ -64,7 +64,7 @@ export default function SearchForm({ mode = "urls" }: Props): JSX.Element {
             spellCheck={false}
             placeholder={
               mode === "urls"
-                ? "Digite a URL que deseja verificar"
+                ? "Digite a URL que deseja verificar. A URL deve começar com http:// ou https://"
                 : "Cole aqui o link da imagem"
             }
             value={value}
