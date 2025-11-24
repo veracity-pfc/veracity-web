@@ -20,7 +20,6 @@
 }
 
 .notice {
-
     border-radius: 14px;
     padding: 16px 18px;
     background: linear-gradient(180deg, #e9b824 0%, #edda9e 100%);
@@ -127,14 +126,27 @@
 }
 
 @media (max-width: 670px) {
+    .instructions-block {
+        margin: 16px auto 32px;
+        padding: 0 20px;
+    }
+
     .instructions-title {
-        font-size: 22px;
+        font-size: 20px;
+        text-align: center;
+        line-height: 1.3;
     }
 
     .instructions-h1 {
-        font-size: 36px !important;
+        font-size: 30px !important;
         text-align: center;
-        padding: 0 10px;
+        padding: 0 8px;
+        line-height: 1.25;
+        margin-bottom: 8px;
+    }
+
+    .noticeWrap {
+        margin: 20px 0 28px;
     }
 
     .notice {
@@ -150,10 +162,50 @@
         font-size: 13px;
     }
 
+    .steps-wrap {
+        padding: 16px 14px 14px;
+        margin: 12px 0 24px;
+    }
+
+    .steps-bar {
+        gap: 8px;
+    }
+
     .step-btn {
-        width: 44px;
-        height: 44px;
-        font-size: 18px;
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .step-heading {
+        font-size: 13px;
+    }
+
+    .step-body {
+        font-size: 12px;
+    }
+
+    .apiGrid {
+        margin-top: 16px;
+        gap: 14px;
+    }
+
+    .apiCard {
+        padding: 14px 14px 12px;
+    }
+
+    .apiIntro {
+        font-size: 13px;
+    }
+
+    .codeBlock {
+        font-size: 11px;
+        padding: 8px 10px;
+    }
+
+    .copyBtn {
+        padding: 6px 10px;
+        font-size: 11px;
     }
 }
 
@@ -235,6 +287,6 @@
 
 @media (max-width: 900px) {
     .apiGrid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 }

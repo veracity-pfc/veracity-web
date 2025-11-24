@@ -47,6 +47,10 @@
 }
 
 @media (max-width: 980px) {
+    .page-offset {
+        padding-top: 20px !important;
+    }
+
     .contact-grid {
         grid-template-columns: 1fr;
         gap: 20px;

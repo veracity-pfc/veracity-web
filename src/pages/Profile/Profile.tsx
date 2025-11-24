@@ -20,7 +20,7 @@ import modalExitConfirmationImg from "../../assets/ilust-exit-without-save-confi
 import modalDeleteAccountConfirmationImg from "../../assets/ilust-delete-account-confirmation.png";
 import modalDeletedAccountImg from "../../assets/ilust-deleted-account.png";
 import modalInactiveAccountImg from "../../assets/ilust-inactive-account.png";
-import modalRevealTokenImg from "../../assets/ilust-warning.png";
+import modalRevealTokenImg from "../../assets/ilust-token-reveal.png";
 import modalDeleteTokenImg from "../../assets/ilust-delete-token.png";
 
 type AnyObj = Record<string, any>;
