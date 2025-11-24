@@ -251,6 +251,14 @@ export default function History(): JSX.Element {
     if (isRequestManagement) {
       const categoryLabel =
         categoryMap[item.category || ""] || item.category || "Geral";
+
+      const isDeletedUser =
+        !!item.user_email && item.user_email.endsWith("@deleted.local.com");
+
+      const displayEmail = isDeletedUser
+        ? item.user_email
+        : item.user_email || item.email || "—";
+
       return (
         <div
           className={styles.card}
@@ -274,7 +282,7 @@ export default function History(): JSX.Element {
 
           <p className={styles.meta} style={{ marginTop: 8 }}>
             <b>De:</b>{" "}
-            <span className={styles.ellipsis}>{item.email || "—"}</span>
+            <span className={styles.ellipsis}>{displayEmail}</span>
           </p>
 
           <p className={styles.meta}>

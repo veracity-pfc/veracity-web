@@ -238,6 +238,13 @@ export default function HistoryDetail(): JSX.Element {
   if (err) return <div className={styles.error}>{err}</div>;
   if (!data) return <div className={styles.loading}>Carregando…</div>;
 
+  const isDeletedUser =
+    !!data.user_email && data.user_email.includes("deleted.local");
+
+  const displayUserEmail = isDeletedUser
+    ? data.user_email
+    : data.user_email || data.email || "—";
+
   if (isAdmin) {
     return (
       <div className={styles.wrap}>
@@ -270,7 +277,7 @@ export default function HistoryDetail(): JSX.Element {
 
               <h3 className={styles.h3}>Usuário</h3>
               <p className={styles.p}>
-                <b>E-mail:</b> {data.user_email || data.email || "—"}
+                <b>E-mail:</b> {displayUserEmail}
               </p>
 
               {isRequestManagement && (
