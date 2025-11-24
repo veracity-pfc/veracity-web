@@ -284,7 +284,7 @@ export default function History(): JSX.Element {
     return (
       <div
         className={styles.card}
-        onClick={() => navigate(`/user/history/${item.id}`)}
+        onClick={() => navigate(`/v1/user/history/${item.id}`)}
       >
         <p className={styles.meta}>
           <b>Data da análise:</b>{" "}

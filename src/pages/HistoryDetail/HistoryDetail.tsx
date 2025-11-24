@@ -128,7 +128,7 @@ export default function HistoryDetail(): JSX.Element {
         } else if (isRequestManagement) {
           path = `/v1/administration/contact-requests/${id}`; 
         } else {
-          path = `/user/history/${id}`;
+          path = `/v1/user/history/${id}`;
         }
 
         const res = (await apiFetch(path, { auth: true })) as Detail;
