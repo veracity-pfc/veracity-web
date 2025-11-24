@@ -1,6 +1,6 @@
 import React, { JSX, useEffect, useState } from 'react';
 import cover from '../../assets/contact-cover.png';
-import { apiSendContact, getToken, apiGetProfile } from '../../api/client';
+import { apiFetch, getToken, apiGetProfile } from '../../api/client';
 import Toast, { useToast } from '../../components/Toast/Toast';
 import styles from './Contact.module.css';
 import '../../styles/forms.css';
@@ -79,7 +79,17 @@ export default function Contact(): JSX.Element {
                   try {
                     const category = subjectToCategory[subject] || 'doubt';
                     
-                    await apiSendContact(email.trim(), subject, message.trim(), category);
+                    await apiFetch('/v1/contact-us', {
+                      method: 'POST',
+                      body: {
+                        email: email.trim(),
+                        subject: subject,
+                        message: message.trim(),
+                        category: category
+                      },
+                      auth: isUserLoggedIn 
+                    });
+
                     setOk(true);
                     success('Mensagem enviada com sucesso!');
                   } catch (e: any) {

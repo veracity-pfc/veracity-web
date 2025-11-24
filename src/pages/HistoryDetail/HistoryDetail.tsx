@@ -1,6 +1,6 @@
 import { JSX, useEffect, useState, CSSProperties } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { apiFetch, getRole } from "../../api/client";
+import { apiApproveTokenRequest, apiFetch, apiRejectTokenRequest, getRole } from "../../api/client";
 import Toast, { useToast } from "../../components/Toast/Toast";
 import styles from "./HistoryDetail.module.css";
 
@@ -147,10 +147,7 @@ export default function HistoryDetail(): JSX.Element {
     setApproveLoading(true);
     setActionErr("");
     try {
-      await apiFetch(`/administration/api/token-requests/${id}/approve`, {
-        auth: true,
-        method: "POST",
-      });
+      await apiApproveTokenRequest(id)
       success("Token gerado com sucesso.");
       navigate("/requests");
     } catch (e: any) {
@@ -205,7 +202,7 @@ export default function HistoryDetail(): JSX.Element {
     
     try {
       if (isTokenManagement) {
-        const res = await apiFetch(`/administration/api/tokens/${id}/revoke`, {
+        const res = await apiFetch(`/v1/administration/api/tokens/${id}/revoke`, {
           auth: true,
           method: "POST",
           body: { reason },
@@ -213,11 +210,7 @@ export default function HistoryDetail(): JSX.Element {
         setData(res as Detail);
         success("Token revogado com sucesso.");
       } else {
-        const res = await apiFetch(`/administration/api/token-requests/${id}/reject`, {
-          auth: true,
-          method: "POST",
-          body: { reason },
-        });
+        const res = await apiRejectTokenRequest(id, reason)
         setData(res as Detail);
         success("Solicitação rejeitada com sucesso.");
       }
@@ -233,9 +226,14 @@ export default function HistoryDetail(): JSX.Element {
 
   const disablePrimaryActions = actionLoading || rejectionMode || replyMode;
 
-  const isTokenRequest = data?.category === 'token_request' || (!data?.category && data?.status === 'approved'); 
+  const isTokenRequest = 
+    data?.category === 'token_request' || 
+    (data?.subject && data.subject.toLowerCase().includes('token')) ||
+    (!data?.category && data?.status === 'approved');
+
   const isContact = data?.category && ['doubt', 'suggestion', 'complaint'].includes(data.category);
-  const canReply = isContact && data?.status === 'open' && ['doubt', 'suggestion', 'complaint'].includes(data?.category || '');
+  
+  const canReply = !isTokenRequest && data?.status === 'open';
 
   if (err) return <div className={styles.error}>{err}</div>;
   if (!data) return <div className={styles.loading}>Carregando…</div>;
