@@ -157,8 +157,6 @@
     }
 }
 
-/* ==== NOVAS CLASSES PARA TOKENS DE API ==== */
-
 .apiIntro {
     margin: 0 0 16px;
     font-size: 14px;
@@ -234,7 +232,6 @@
     max-height: 220px;
 }
 
-/* Responsivo para seção de API */
 @media (max-width: 900px) {
     .apiGrid {
         grid-template-columns: 1fr;
