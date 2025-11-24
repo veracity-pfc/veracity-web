@@ -71,10 +71,10 @@ export default function History(): JSX.Element {
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
-  
+
   const [q, setQ] = useState<string>("");
   const [status, setStatus] = useState<string>("");
-  const [atype, setAtype] = useState<string>(""); 
+  const [atype, setAtype] = useState<string>("");
   const [dateFrom, setDateFrom] = useState<string>("");
   const [dateTo, setDateTo] = useState<string>("");
   const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
@@ -82,10 +82,10 @@ export default function History(): JSX.Element {
   const requestSeq = useRef(0);
   const role = getRole();
   const isAdmin = role === "admin";
-  
+
   const isTokenManagement = location.pathname.startsWith("/tokens");
-  const isRequestManagement = location.pathname.startsWith("/requests"); 
-  
+  const isRequestManagement = location.pathname.startsWith("/requests");
+
   const { error } = useToast();
 
   useEffect(() => {
@@ -136,17 +136,17 @@ export default function History(): JSX.Element {
     return p.toString();
   }, [page, q, status, atype, dateFrom, dateTo, isAdmin, isRequestManagement]);
 
-  async function load() {
+  async function load(currentParams: string) {
     const seq = ++requestSeq.current;
     setLoading(true);
     try {
       let path = "";
       if (isTokenManagement) {
-        path = `/v1/administration/api/tokens?${params}`;
+        path = `/v1/administration/api/tokens?${currentParams}`;
       } else if (isRequestManagement) {
-        path = `/v1/administration/contact-requests?${params}`; 
+        path = `/v1/administration/contact-requests?${currentParams}`;
       } else {
-        path = `/v1/user/history?${params}`;
+        path = `/v1/user/history?${currentParams}`;
       }
 
       const data = (await apiFetch(path, { auth: true })) as Paged;
@@ -165,7 +165,7 @@ export default function History(): JSX.Element {
   }
 
   useEffect(() => {
-    load();
+    load(params);
   }, [params, location.pathname]);
 
   function getTitle() {
@@ -176,7 +176,7 @@ export default function History(): JSX.Element {
 
   function getPlaceholder() {
     if (isTokenManagement) return "Buscar por e-mail";
-    if (isRequestManagement) return "Buscar por e-mail ou assunto";
+    if (isRequestManagement) return "Buscar por e-mail";
     return "Buscar por URL ou nome da imagem";
   }
 
@@ -249,19 +249,30 @@ export default function History(): JSX.Element {
     }
 
     if (isRequestManagement) {
-      const categoryLabel = categoryMap[item.category || ""] || item.category || "Geral";
+      const categoryLabel =
+        categoryMap[item.category || ""] || item.category || "Geral";
       return (
         <div
           className={styles.card}
           style={{ minHeight: "160px", maxHeight: "160px", overflow: "hidden" }}
           onClick={() => navigate(`/requests/${item.id}`)}
         >
-          <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start'}}>
-            <span className={styles.tag}><b>{categoryLabel}</b></span>
-            <span style={{fontSize: 12, opacity: 0.6}}>{new Date(item.created_at).toLocaleDateString()}</span>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+            }}
+          >
+            <span className={styles.tag}>
+              <b>{categoryLabel}</b>
+            </span>
+            <span style={{ fontSize: 12, opacity: 0.6 }}>
+              {new Date(item.created_at).toLocaleDateString()}
+            </span>
           </div>
-          
-          <p className={styles.meta} style={{marginTop: 8}}>
+
+          <p className={styles.meta} style={{ marginTop: 8 }}>
             <b>De:</b>{" "}
             <span className={styles.ellipsis}>{item.email || "—"}</span>
           </p>
@@ -348,14 +359,14 @@ export default function History(): JSX.Element {
         </div>
 
         {(isTokenManagement || isRequestManagement) && (
-            <button
-              className={styles.updateBtn}
-              onClick={() => load()}
-              disabled={loading}
-              title="Atualizar lista"
-            >
-              Atualizar
-            </button>
+          <button
+            className={styles.updateBtn}
+            onClick={() => load(params)}
+            disabled={loading}
+            title="Atualizar lista"
+          >
+            Atualizar
+          </button>
         )}
       </div>
 
@@ -363,9 +374,7 @@ export default function History(): JSX.Element {
         {loading ? (
           <div className={styles.loading}>Carregando…</div>
         ) : items.length === 0 ? (
-          <div className={styles.empty}>
-            Nenhum registro encontrado.
-          </div>
+          <div className={styles.empty}>Nenhum registro encontrado.</div>
         ) : (
           <div
             className={`${styles.grid} ${
@@ -438,7 +447,7 @@ export default function History(): JSX.Element {
           setAtype("");
         }}
         showStatus
-        showType={!isAdmin || isRequestManagement} 
+        showType={!isAdmin || isRequestManagement}
         statusOptions={getStatusOptions()}
         typeOptions={getTypeOptions()}
       />

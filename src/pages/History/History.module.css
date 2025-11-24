@@ -111,7 +111,7 @@
 
 .clearBtn {
   position: absolute !important;
-  right: 120px !important; 
+  right: 100px !important; 
   top: 50% !important;
   transform: translateY(-50%) !important;
   border: 0 !important;
@@ -263,7 +263,7 @@
   }
 
   .clearBtn {
-    right: 100px !important;
+    right: 92px !important;
   }
 
   .grid {
