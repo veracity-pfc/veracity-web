@@ -138,17 +138,17 @@ function CodeExample({ title, description, snippet }: CodeExampleProps): JSX.Ele
 }
 
 function ApiTokensSection(): JSX.Element {
-  const authSnippet = `curl --location 'http://localhost:8000/v1/api/auth' \\
+  const authSnippet = `curl --location 'https://api.app-veracity.com.br/v1/api/auth' \\
 --header 'Content-Type: application/json' \\
 --data '{
   "token": "<TOKEN DE API>"
 }'`;
 
-  const imageSnippet = `curl --location 'http://localhost:8000/v1/api/image-analysis' \\
+  const imageSnippet = `curl --location 'https://api.app-veracity.com.br/v1/api/image-analysis' \\
 --header 'Authorization: Bearer <TOKEN DE API>' \\
 --form 'file=@"<ARQUIVO>"'`;
 
-  const urlSnippet = `curl --location 'http://localhost:8000/v1/api/url-analysis' \\
+  const urlSnippet = `curl --location 'https://api.app-veracity.com.br/v1/api/url-analysis' \\
 --header 'Content-Type: application/json' \\
 --header 'Authorization: Bearer <TOKEN DE API>' \\
 --data '{
