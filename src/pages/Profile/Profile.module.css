@@ -59,6 +59,31 @@
   margin: 0;
 }
 
+.adminStatsGrid {
+  margin-top: 12px;
+  display: grid;
+  row-gap: 8px;
+  font-size: 0.95rem;
+}
+
+.adminStatsHeader {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.adminStatsRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+}
+
+.adminStatsRow span:nth-child(2),
+.adminStatsRow span:nth-child(3) {
+  text-align: right;
+}
+
+
 .infoButton {
   width: 15px;
   height: 15px;

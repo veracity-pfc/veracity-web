@@ -46,9 +46,6 @@ function resolveRole(): string {
 
 function formatDateTime(iso?: any): string {
   if (!iso) return "";
-  if (typeof iso !== "string" && typeof iso !== "number" && !(iso instanceof Date)) {
-    return "";
-  }
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
   return d.toLocaleString("pt-BR", {
@@ -63,11 +60,9 @@ function formatDateTime(iso?: any): string {
 export default function Profile(): JSX.Element {
   const [loading, setLoading] = useState(true);
   const [serverErr, setServerErr] = useState("");
-
   const [initial, setInitial] = useState<AnyObj | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-
   const [errors, setErrors] = useState<{ name: string; email: string }>({
     name: "",
     email: "",
@@ -91,17 +86,11 @@ export default function Profile(): JSX.Element {
   const [apiTokenLoading, setApiTokenLoading] = useState(false);
   const [apiTokenRevoking, setApiTokenRevoking] = useState(false);
   const [apiTokenValue, setApiTokenValue] = useState("");
-
   const [apiTokenExpiresAt, setApiTokenExpiresAt] = useState<string | null>(null);
-
   const [pendingRevealSuccess, setPendingRevealSuccess] = useState(false);
-  const [dailyInfoOpen, setDailyInfoOpen] = useState(false);
-  const [apiTokenInfoOpen, setApiTokenInfoOpen] = useState(false);
 
   const dirtyRef = useRef(false);
-  const pendingNavRef = useRef<{ type: "url" | "back"; value: string | null } | null>(
-    null
-  );
+  const pendingNavRef = useRef<{ type: "url" | "back"; value: string | null } | null>(null);
 
   const { success, error } = useToast();
 
@@ -211,8 +200,7 @@ export default function Profile(): JSX.Element {
     setModalConfirmSave(false);
     setSaving(true);
     const changedName = name.trim() !== (initial?.name || "").trim();
-    const changedEmail =
-      email.trim().toLowerCase() !== (initial?.email || "").toLowerCase();
+    const changedEmail = email.trim().toLowerCase() !== (initial?.email || "").toLowerCase();
 
     try {
       setErrors({ name: "", email: "" });
@@ -225,9 +213,7 @@ export default function Profile(): JSX.Element {
       if (changedEmail) {
         const newEmail = email.trim().toLowerCase();
         await apiValidateEmailChange(newEmail);
-        const { requires_verification } = (await apiRequestEmailChange(
-          newEmail
-        )) as AnyObj;
+        const { requires_verification } = (await apiRequestEmailChange(newEmail)) as AnyObj;
         if (requires_verification) {
           success("Solicitação de alteração de e-mail enviada com sucesso!");
           localStorage.setItem("veracity_email_change_target", newEmail);
@@ -357,34 +343,27 @@ export default function Profile(): JSX.Element {
       error("O token de API não está ativo.");
       return;
     }
-    if (!info.revealed) {
-      try {
-        setApiTokenLoading(true);
-        const res = (await apiRevealApiToken()) as AnyObj;
-        const value = res.token || "";
-        const expires = res.expires_at || info.expires_at || null;
-        if (!value) {
-          throw new Error("Token de API indisponível para cópia.");
-        }
-        setApiTokenValue(value);
-        setApiTokenExpiresAt(expires);
-        setModalApiTokenReveal(true);
-        setPendingRevealSuccess(true);
-      } catch (e: any) {
-        const msg = e?.message || "Não foi possível recuperar o token de API.";
-        error(msg);
-        if (
-          msg.toLowerCase().includes("já foi revelado") ||
-          msg.toLowerCase().includes("revealed")
-        ) {
-          await refreshProfile();
-        }
-      } finally {
-        setApiTokenLoading(false);
+    try {
+      setApiTokenLoading(true);
+      const res = (await apiRevealApiToken()) as AnyObj;
+      const value = res.token || "";
+      const expires = res.expires_at || info.expires_at || null;
+      if (!value) {
+        throw new Error("Token de API indisponível para cópia.");
       }
-      return;
+      setApiTokenValue(value);
+      setApiTokenExpiresAt(expires);
+      setModalApiTokenReveal(true);
+      setPendingRevealSuccess(true);
+    } catch (e: any) {
+      const msg = e?.message || "Não foi possível recuperar o token de API.";
+      error(msg);
+      if (msg.toLowerCase().includes("já foi revelado") || msg.toLowerCase().includes("revealed")) {
+        await refreshProfile();
+      }
+    } finally {
+      setApiTokenLoading(false);
     }
-    setModalApiTokenRevoke(true);
   };
 
   const handleCloseRevealModal = () => {
@@ -437,9 +416,7 @@ export default function Profile(): JSX.Element {
 
   const showRevokeAction = hasActiveToken && !!tokenInfo?.revealed;
 
-  const apiTokenExpiresLabel = tokenInfo?.expires_at
-    ? formatDateTime(tokenInfo.expires_at)
-    : "";
+  const apiTokenExpiresLabel = tokenInfo?.expires_at ? formatDateTime(tokenInfo.expires_at) : "";
 
   return (
     <main className="container">
@@ -469,7 +446,7 @@ export default function Profile(): JSX.Element {
               setEmail(e.target.value);
               setErrors((p) => ({ ...p, email: "" }));
             }}
-            placeholder="email@domino.com"
+            placeholder="email@dominio.com"
             disabled={isAdmin}
           />
           {errors.email && <span className={styles.err}>{errors.email}</span>}
@@ -494,101 +471,114 @@ export default function Profile(): JSX.Element {
           )}
         </div>
 
-        <div className={styles.card}>
-          <div className={styles.cardTitleRow}>
-            <h3>Análises diárias restantes</h3>
-            <button
-              type="button"
-              className={styles.infoButton}
-              aria-label="Como funciona o reset diário das análises"
-              onMouseEnter={() => setDailyInfoOpen(true)}
-              onMouseLeave={() => setDailyInfoOpen(false)}
-              onFocus={() => setDailyInfoOpen(true)}
-              onBlur={() => setDailyInfoOpen(false)}
-              onClick={() => setDailyInfoOpen((v) => !v)}
-            >
-              i
-            </button>
-            {dailyInfoOpen && (
-              <div className={styles.infoTooltip}>
-                As cotas diárias são resetadas automaticamente todos os dias por
-                volta de 00h00 no fuso horário de Brasília (UTC−3). A contagem
-                considera a data do servidor, então o horário exato pode variar
-                se você estiver em outro fuso. As análises feitas com token de
-                API não são descontadas dessas cotas.
-              </div>
-            )}
-          </div>
-          <p>
-            URLs: <b>{initial?.stats?.remaining?.urls ?? 0}</b>
-          </p>
-          <p>
-            Imagens: <b>{initial?.stats?.remaining?.images ?? 0}</b>
-          </p>
-        </div>
+        {!isAdmin && (
+          <>
+            <div className={styles.card}>
+              <h3>Análises diárias restantes</h3>
+              <p>
+                URLs: <b>{initial?.stats?.remaining?.urls ?? 0}</b>
+              </p>
+              <p>
+                Imagens: <b>{initial?.stats?.remaining?.images ?? 0}</b>
+              </p>
+            </div>
 
-        <div className={styles.card}>
-          <h3>Análises realizadas</h3>
-          <p>
-            URLs: <b>{initial?.stats?.performed?.urls ?? 0}</b>
-          </p>
-          <p>
-            Imagens: <b>{initial?.stats?.performed?.images ?? 0}</b>
-          </p>
-        </div>
+            <div className={styles.card}>
+              <h3>Análises realizadas</h3>
+              <p>
+                URLs: <b>{initial?.stats?.performed?.urls ?? 0}</b>
+              </p>
+              <p>
+                Imagens: <b>{initial?.stats?.performed?.images ?? 0}</b>
+              </p>
+            </div>
 
-        <div className={styles.apiTokenCard}>
-          <div className={styles.cardTitleRow}>
-            <h3>Token de API</h3>
-            <button
-              type="button"
-              className={styles.infoButton}
-              aria-label="Como usar o token de API"
-              onMouseEnter={() => setApiTokenInfoOpen(true)}
-              onMouseLeave={() => setApiTokenInfoOpen(false)}
-              onFocus={() => setApiTokenInfoOpen(true)}
-              onBlur={() => setApiTokenInfoOpen(false)}
-              onClick={() => setApiTokenInfoOpen((v) => !v)}
-            >
-              i
-            </button>
-            {apiTokenInfoOpen && (
-              <div className={styles.infoTooltip}>
-                O token de API permite integrar o Veracity em outros sistemas
-                para realizar análises de URLs e imagens via requisições HTTP.
-                Nunca compartilhe esse valor publicamente. Para ver exemplos de
-                uso, acesse a página de Instruções e
-                consulte a seção &quot;Uso de tokens de API&quot;.
+            <div className={styles.apiTokenCard}>
+              <h3>Token de API</h3>
+              <div className={styles.apiTokenWrapper}>
+                <input
+                  className={styles.apiTokenInput}
+                  value={tokenMasked}
+                  readOnly
+                  placeholder={tokenPlaceholder}
+                />
+                <button
+                  type="button"
+                  className={styles.apiTokenCopyButton}
+                  onClick={handleCopyApiToken}
+                  disabled={!hasActiveToken || apiTokenLoading || apiTokenRevoking}
+                >
+                  {apiTokenLoading || apiTokenRevoking
+                    ? "Carregando..."
+                    : showRevokeAction
+                    ? "Excluir token"
+                    : "Revelar token"}
+                </button>
               </div>
-            )}
-          </div>
-          <div className={styles.apiTokenWrapper}>
-            <input
-              className={styles.apiTokenInput}
-              value={tokenMasked}
-              readOnly
-              placeholder={tokenPlaceholder}
-            />
-            <button
-              type="button"
-              className={styles.apiTokenCopyButton}
-              onClick={handleCopyApiToken}
-              disabled={!hasActiveToken || apiTokenLoading || apiTokenRevoking}
-              aria-label={!showRevokeAction ? "Copiar token de API" : "Revogar token de API"}
-            >
-              {apiTokenLoading || apiTokenRevoking
-                ? "Carregando..."
-                : showRevokeAction
-                ? "Excluir token"
-                : "Revelar token"}
-            </button>
-          </div>
-          {tokenInfo && apiTokenExpiresLabel && (
-            <p style={{ marginTop: 8, fontSize: 12 }}>
-              Expira em: <b>{apiTokenExpiresLabel}</b>
-            </p>
-          )}
-        </div>
+              {tokenInfo && apiTokenExpiresLabel && (
+                <p style={{ marginTop: 8, fontSize: 12 }}>
+                  Expira em: <b>{apiTokenExpiresLabel}</b>
+                </p>
+              )}
+            </div>
+          </>
+        )}
+
+        {isAdmin && (
+          <>
+            <div className={styles.card}>
+              <h3>Solicitações respondidas</h3>
+
+              <div className={styles.adminStatsGrid}>
+                <div className={styles.adminStatsRow}>
+                  <span>Dúvidas</span>
+                  <span>{initial?.admin_stats?.doubt?.responded ?? 0}</span>
+                </div>
+
+                <div className={styles.adminStatsRow}>
+                  <span>Sugestões</span>
+                  <span>{initial?.admin_stats?.suggestion?.responded ?? 0}</span>
+                </div>
+
+                <div className={styles.adminStatsRow}>
+                  <span>Reclamações</span>
+                  <span>{initial?.admin_stats?.complaint?.responded ?? 0}</span>
+                </div>
+
+                <div className={styles.adminStatsRow}>
+                  <span>Solicitação de token</span>
+                  <span>{initial?.admin_stats?.token_request?.responded ?? 0}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.card}>
+              <h3>Solicitações rejeitadas</h3>
+
+              <div className={styles.adminStatsGrid}>
+                <div className={styles.adminStatsRow}>
+                  <span>Dúvidas</span>
+                  <span>{initial?.admin_stats?.doubt?.rejected ?? 0}</span>
+                </div>
+
+                <div className={styles.adminStatsRow}>
+                  <span>Sugestões</span>
+                  <span>{initial?.admin_stats?.suggestion?.rejected ?? 0}</span>
+                </div>
+
+                <div className={styles.adminStatsRow}>
+                  <span>Reclamações</span>
+                  <span>{initial?.admin_stats?.complaint?.rejected ?? 0}</span>
+                </div>
+
+                <div className={styles.adminStatsRow}>
+                  <span>Solicitação de token</span>
+                  <span>{initial?.admin_stats?.token_request?.rejected ?? 0}</span>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </section>
 
       <Modal
