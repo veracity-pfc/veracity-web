@@ -184,17 +184,24 @@
 }
 
 .meta {
+  display: flex;       
+  align-items: center;
   margin: 6px 0;
   line-height: 1.35;
+  min-width: 0;       
+}
+
+.meta b {
+  flex-shrink: 0;      
+  margin-right: 6px;   
 }
 
 .ellipsis {
-  display: inline-block;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  vertical-align: bottom;
+  white-space: nowrap;     
+  overflow: hidden;         
+  text-overflow: ellipsis;  
+  flex-grow: 1;            
+  display: block;
 }
 
 .pag {

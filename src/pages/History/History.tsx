@@ -230,7 +230,7 @@ export default function History(): JSX.Element {
             <b>Criado em:</b>{" "}
             {new Date(item.created_at).toLocaleDateString()}
           </p>
-          <p className={styles.meta}>
+          <p className={styles.meta} style={{ whiteSpace: "nowrap" }}>
             <b>Usuário:</b>{" "}
             <span className={styles.ellipsis}>{item.user_email || "—"}</span>
           </p>
