@@ -172,7 +172,7 @@
   outline: 2px solid transparent;
   min-height: 160px;
   display: flex;
-  max-width: 350px;
+  max-width: 360px;
   flex-direction: column;
   justify-content: flex-start;
 }
@@ -264,7 +264,8 @@
   }
 
   .card {
-    max-width: 275px;
+    max-height: 190px !important;
+    max-width: 340px;
   }
 
   .gridSingle {

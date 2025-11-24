@@ -124,9 +124,9 @@ export default function HistoryDetail(): JSX.Element {
       try {
         let path = "";
         if (isTokenManagement) {
-          path = `/administration/api/tokens/${id}`; 
+          path = `/v1/administration/api/tokens/${id}`; 
         } else if (isRequestManagement) {
-          path = `/administration/contact-requests/${id}`; 
+          path = `/v1/administration/contact-requests/${id}`; 
         } else {
           path = `/v1/user/history/${id}`;
         }
@@ -278,7 +278,6 @@ export default function HistoryDetail(): JSX.Element {
                   <h3 className={styles.h3}>
                     {isContact ? categoryMap[data.category || ''] || "Mensagem" : "Mensagem do usuário"}
                   </h3>
-                  {data.subject && <p className={styles.p}><b>Assunto:</b> {data.subject}</p>}
                   <div className={styles.reasonBox} style={{marginTop: 8}}>{data.message || "—"}</div>
                 </>
               )}

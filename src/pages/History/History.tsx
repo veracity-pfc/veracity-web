@@ -265,11 +265,6 @@ export default function History(): JSX.Element {
             <b>De:</b>{" "}
             <span className={styles.ellipsis}>{item.email || "—"}</span>
           </p>
-          
-          <p className={styles.meta}>
-            <b>Assunto:</b>{" "}
-            <span className={styles.ellipsis}>{item.subject || "Solicitação de Token"}</span>
-          </p>
 
           <p className={styles.meta}>
             <b>Status:</b>{" "}
