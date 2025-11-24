@@ -27,6 +27,7 @@ type Detail = {
   subject?: string;
   admin_reply?: string;
   replied_at?: string;
+  via_token?: boolean;
 };
 
 const analysisLabelMap: Record<string, string> = {
@@ -518,6 +519,11 @@ export default function HistoryDetail(): JSX.Element {
             <b>URL:</b> {data.source || "—"}
           </p>
         )}
+
+        <p className={styles.p}>
+          <b>Origem da requisição:</b>{" "}
+          {data.via_token ? "Token de API" : "Conta do usuário"}
+        </p>
 
         <h3 className={styles.h3}>Resultado da análise</h3>
         <p className={styles.p}>

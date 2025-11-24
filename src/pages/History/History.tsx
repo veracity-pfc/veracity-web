@@ -20,6 +20,7 @@ type Item = {
   expires_at?: string;
   category?: string;
   subject?: string;
+  via_token?: boolean;
 };
 
 type Paged = {
@@ -324,6 +325,15 @@ export default function History(): JSX.Element {
             item.label ||
             "Desconhecido"}
         </p>
+
+        {item.via_token && (
+          <p
+            className={styles.meta}
+            style={{ fontSize: 12, opacity: 0.75, marginTop: 4 }}
+          >
+            Análise realizada via token de API
+          </p>
+        )}
       </div>
     );
   }
