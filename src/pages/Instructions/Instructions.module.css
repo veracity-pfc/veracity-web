@@ -206,7 +206,7 @@
 .copyBtn {
     border-radius: 999px;
     border: 1px solid rgba(255, 255, 255, 0.22);
-    background: rgba(255, 255, 255, 0.06);
+    background: #bababa;
     padding: 6px 12px;
     font-size: 12px;
     font-weight: 700;
@@ -218,6 +218,7 @@
 .copyBtn:focus-visible {
     background: rgba(255, 255, 255, 0.12);
     outline: none;
+    color: white;
 }
 
 .codeBlock {

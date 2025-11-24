@@ -95,6 +95,8 @@ export default function Profile(): JSX.Element {
   const [apiTokenExpiresAt, setApiTokenExpiresAt] = useState<string | null>(null);
 
   const [pendingRevealSuccess, setPendingRevealSuccess] = useState(false);
+  const [dailyInfoOpen, setDailyInfoOpen] = useState(false);
+  const [apiTokenInfoOpen, setApiTokenInfoOpen] = useState(false);
 
   const dirtyRef = useRef(false);
   const pendingNavRef = useRef<{ type: "url" | "back"; value: string | null } | null>(
@@ -493,7 +495,30 @@ export default function Profile(): JSX.Element {
         </div>
 
         <div className={styles.card}>
-          <h3>Análises diárias restantes</h3>
+          <div className={styles.cardTitleRow}>
+            <h3>Análises diárias restantes</h3>
+            <button
+              type="button"
+              className={styles.infoButton}
+              aria-label="Como funciona o reset diário das análises"
+              onMouseEnter={() => setDailyInfoOpen(true)}
+              onMouseLeave={() => setDailyInfoOpen(false)}
+              onFocus={() => setDailyInfoOpen(true)}
+              onBlur={() => setDailyInfoOpen(false)}
+              onClick={() => setDailyInfoOpen((v) => !v)}
+            >
+              i
+            </button>
+            {dailyInfoOpen && (
+              <div className={styles.infoTooltip}>
+                As cotas diárias são resetadas automaticamente todos os dias por
+                volta de 00h00 no fuso horário de Brasília (UTC−3). A contagem
+                considera a data do servidor, então o horário exato pode variar
+                se você estiver em outro fuso. As análises feitas com token de
+                API não são descontadas dessas cotas.
+              </div>
+            )}
+          </div>
           <p>
             URLs: <b>{initial?.stats?.remaining?.urls ?? 0}</b>
           </p>
@@ -513,7 +538,30 @@ export default function Profile(): JSX.Element {
         </div>
 
         <div className={styles.apiTokenCard}>
-          <h3>Token de API</h3>
+          <div className={styles.cardTitleRow}>
+            <h3>Token de API</h3>
+            <button
+              type="button"
+              className={styles.infoButton}
+              aria-label="Como usar o token de API"
+              onMouseEnter={() => setApiTokenInfoOpen(true)}
+              onMouseLeave={() => setApiTokenInfoOpen(false)}
+              onFocus={() => setApiTokenInfoOpen(true)}
+              onBlur={() => setApiTokenInfoOpen(false)}
+              onClick={() => setApiTokenInfoOpen((v) => !v)}
+            >
+              i
+            </button>
+            {apiTokenInfoOpen && (
+              <div className={styles.infoTooltip}>
+                O token de API permite integrar o Veracity em outros sistemas
+                para realizar análises de URLs e imagens via requisições HTTP.
+                Nunca compartilhe esse valor publicamente. Para ver exemplos de
+                uso, acesse a página de Instruções e
+                consulte a seção &quot;Uso de tokens de API&quot;.
+              </div>
+            )}
+          </div>
           <div className={styles.apiTokenWrapper}>
             <input
               className={styles.apiTokenInput}
