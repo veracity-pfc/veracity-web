@@ -93,16 +93,31 @@
 }
 
 @media (max-width: 720px) {
+    .search-form {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .search-form__capsule {
+        padding-right: 110px;
+        padding-left: 14px;
+    }
+
     .search-form__input--capsule {
-        padding-right: 156px;
+        font-size: 14px;
     }
 
     .search-form__clear--inside {
-        right: 110px;
+        right: 96px;
+        font-size: 18px;
         z-index: 2;
     }
 
     .search-form__submit--inside {
-        width: 98px;
+        width: 86px;
+        font-size: 13px;
+        padding: 0;
+        right: 6px;
+        height: 36px;
     }
 }

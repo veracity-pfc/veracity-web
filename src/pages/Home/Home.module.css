@@ -31,6 +31,9 @@
 }
 
 @media (max-width: 670px) {
+    .hero {
+        padding-top: 20px;
+    }
     .hero h1 {
         font-size: 40px;
     }

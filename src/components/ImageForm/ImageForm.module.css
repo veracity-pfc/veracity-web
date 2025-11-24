@@ -144,15 +144,25 @@
 
 @media (max-width: 720px) {
     .image-capsule {
-        padding-right: 126px;
+        padding-right: 110px;
+        padding-left: 14px;
+    }
+
+    .image-capsule__name {
+        font-size: 14px;
     }
 
     .image-capsule__clear {
-        right: 110px;
+        right: 96px;
+        font-size: 18px;
         z-index: 2;
     }
 
     .image-capsule__submit {
-        width: 98px;
+        width: 86px;
+        font-size: 13px;
+        padding: 0;
+        right: 6px;
+        height: 36px;
     }
 }
