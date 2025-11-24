@@ -106,7 +106,7 @@ export default function Footer(): JSX.Element {
       </div>
 
       <div className={cx('container', styles.copy)}>
-        Veracity - {year} © Todos os direitos reservados. | Desenvolvido por Manuela Rios - manuela.rios@veracity.com
+        Veracity - {year} © Todos os direitos reservados. | Desenvolvido por Manuela Rios
       </div>
     </footer>
   );

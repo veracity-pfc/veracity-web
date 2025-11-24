@@ -12,7 +12,7 @@ export default function TermsOfUse(): JSX.Element {
       <section className="page-offset" style={{ paddingBottom: 32 }}>
         <h1 className="about-title">Veracity — Termo de Uso</h1>
 
-        <p><strong>Versão:</strong> 1.1 &nbsp;•&nbsp; <strong>Data de vigência:</strong> 03 de novembro de 2025</p>
+        <p><strong>Versão:</strong> 1.2 • <strong>Data de vigência:</strong> 24 de novembro de 2025</p>
         <p>
           Este Termo de Uso estabelece as regras aplicáveis ao uso do “Veracity”, protótipo acadêmico (PFC)
           destinado à detecção de indícios de manipulação digital em links e imagens. O uso do serviço implica
@@ -21,124 +21,125 @@ export default function TermsOfUse(): JSX.Element {
 
         <h3>1. Definições</h3>
         <p>
-          <strong>Usuário:</strong> pessoa que utiliza a plataforma, autenticada ou não. <br />
-          <strong>Conta:</strong> registro com nome, e-mail e senha, que pode exigir verificação por e-mail. <br />
-          <strong>Conteúdo:</strong> URLs, imagens e metadados submetidos para análise. <br />
-          <strong>Análise:</strong> processamento automático de um Conteúdo (link ou imagem) e respectivos artefatos
-          técnicos (ex.: retorno de serviços terceiros e resposta de IA). <br />
-          <strong>Resultado de Análise:</strong> rótulo/risco, explicação/resumo e recomendações exibidos ao Usuário. <br />
-          <strong>Equipe Veracity:</strong> responsáveis pelo desenvolvimento acadêmico do protótipo.
+          <strong>Usuário:</strong> pessoa que utiliza a plataforma, autenticada ou não.<br />
+          <strong>Conta:</strong> registro com nome, e-mail e senha, que pode exigir verificação por e-mail.<br />
+          <strong>Conteúdo:</strong> URLs, imagens e metadados submetidos para análise.<br />
+          <strong>Análise:</strong> processamento automático de um Conteúdo e seus artefatos técnicos.<br />
+          <strong>Resultado de Análise:</strong> rótulo/risco, explicação e recomendações exibidas ao Usuário.<br />
+          <strong>Equipe Veracity:</strong> responsáveis pelo desenvolvimento acadêmico.<br />
+          <strong>Infraestrutura:</strong> serviços de hospedagem Render e proteção Cloudflare utilizados pelo protótipo.
         </p>
 
         <h3>2. Escopo e natureza acadêmica</h3>
         <p>
           O Veracity é um protótipo acadêmico, fornecido “no estado em que se encontra” e “conforme disponível”,
-          sujeito a falhas e mudanças sem aviso. Os resultados são <em>indicativos</em> e não constituem verificação
-          forense definitiva. A plataforma integra serviços de terceiros para e-mail, segurança e análise automática.
+          sujeito a falhas e mudanças sem aviso. Os resultados são indicativos e não constituem verificação forense
+          ou parecer profissional.
         </p>
 
         <h3>3. Requisitos de uso</h3>
         <p>
-          O Usuário compromete-se a utilizar o serviço de modo lícito e responsável, abstendo-se de enviar material
-          ilegal ou que viole direitos de terceiros. Evite fornecer dados pessoais sensíveis desnecessários. É vedado
-          tentar burlar limites de uso, realizar testes de intrusão sem autorização ou qualquer ato que comprometa a
-          segurança operacional.
+          O Usuário compromete-se a utilizar o serviço de modo lícito e responsável. É proibido enviar material
+          ilegal, abusivo ou que viole direitos de terceiros. Também é vedado tentar burlar limites de uso,
+          explorar vulnerabilidades, realizar testes de intrusão ou comprometer a segurança do sistema.
         </p>
 
         <h3>4. Conta, autenticação e verificação</h3>
         <p>
-          Algumas funcionalidades exigem cadastro, login e verificação de e-mail. O Usuário deve manter suas
-          credenciais em sigilo e é responsável pelas atividades realizadas na conta. O token de acesso possui prazo
-          de expiração e poderá exigir nova autenticação. O não cumprimento destes termos pode resultar em suspensão
-          ou encerramento da conta.
+          Algumas funcionalidades exigem cadastro e verificação de e-mail. O Usuário é responsável pela guarda de suas
+          credenciais. Tokens de acesso têm validade e podem exigir renovação. Violações destes termos podem resultar
+          em suspensão ou encerramento da conta.
         </p>
 
         <h3>5. Aceite dos Termos</h3>
         <p>
-          O aceite dos Termos de Uso pode ser registrado durante o fluxo de cadastro/verificação de e-mail.
-          A continuidade de uso após alterações também representa aceite da versão vigente.
+          O aceite pode ocorrer durante o cadastro e durante o uso contínuo da aplicação. Alterações posteriores serão
+          comunicadas na própria plataforma.
         </p>
 
         <h3>6. Submissão de Conteúdo e licença limitada</h3>
         <p>
-          Ao submeter Conteúdo, o Usuário concede licença <em>não exclusiva</em>, <em>revogável</em> e
-          <em> limitada</em> à Equipe Veracity para processar, armazenar temporariamente e utilizar tal Conteúdo com a
-          finalidade de operar, melhorar e avaliar academicamente o protótipo. O Usuário declara possuir autorização
-          para uso do Conteúdo enviado.
+          Ao submeter Conteúdo, o Usuário concede licença não exclusiva, revogável e limitada para que a Equipe Veracity
+          processe e armazene temporariamente esse Conteúdo com o fim de operar e avaliar academicamente o protótipo.
         </p>
 
         <h3>7. Limites de uso (quotas)</h3>
-        <p>
-          Para garantir estabilidade, aplicam-se limites de uso por perfil:
-        </p>
+        <p>Para garantir estabilidade, aplicam-se limites de uso:</p>
         <ul>
-          <li>Usuários anônimos: até 2 análises de links/dia e 1 análise de imagem/dia.</li>
-          <li>Usuários autenticados: até 5 análises de links/dia e 3 análises de imagem/dia.</li>
+          <li>Usuários anônimos: até 2 análises de URL/dia e 1 análise de imagem/dia.</li>
+          <li>Usuários autenticados: até 5 análises de URL/dia e 3 análises de imagem/dia.</li>
         </ul>
-        <p>
-          Os limites podem ser ajustados a qualquer tempo por motivos técnicos e/ou acadêmicos.
-        </p>
 
         <h3>8. Resultados, riscos e responsabilidades</h3>
         <p>
-          Podem ocorrer falsos positivos/negativos. O Resultado de Análise serve como apoio e não substitui avaliação
-          humana, políticas internas ou perícia. A decisão de uso e as consequências decorrentes cabem exclusivamente
-          ao Usuário.
+          A análise pode apresentar falsos positivos/negativos. O resultado é meramente indicativo. O uso e qualquer
+          decisão decorrente são de responsabilidade exclusiva do Usuário.
         </p>
 
         <h3>9. Privacidade e registros</h3>
         <p>
-          O Veracity pode registrar eventos de uso para segurança e auditoria (por exemplo, ações de autenticação e
-          análises realizadas), incluindo hash de IP com sal, identificador de usuário autenticado, horário do evento
-          e metadados mínimos necessários. Esses registros ajudam a prevenir abuso, investigar incidentes e medir
-          capacidade do sistema. Quando possível, os dados são minimizados e/ou pseudoanonimizados.
+          O Veracity registra eventos de autenticação, uso e estatísticas mínimas para segurança.  
+          Tais registros podem incluir: hash de IP com sal, data/hora, identificador de usuário, quotas e metadados.
+        </p>
+        <p>
+          A proteção de tráfego, firewall de aplicação, mitigação de bots e rate limiting são fornecidos pelo Cloudflare,
+          que também processa informações técnicas de conexão, como IP de origem, user-agent e características de rede,
+          conforme suas próprias políticas.
         </p>
 
         <h3>10. Integradores e provedores terceiros</h3>
         <p>
-          O protótipo utiliza serviços de terceiros, incluindo, por exemplo: envio de e-mails transacionais;
-          verificação de segurança de URLs; provedores de infraestrutura e bibliotecas de autenticação/criptografia.
-          O uso está sujeito também aos termos e políticas desses provedores.
+          O protótipo utiliza serviços de terceiros, incluindo:
+        </p>
+        <ul>
+          <li><strong>Render:</strong> hospedagem de backend, banco de dados e execução da aplicação.</li>
+          <li><strong>Cloudflare:</strong> CDN, firewall de aplicação (WAF), mitigação de DDoS, rate limiting e DNS.</li>
+          <li>Serviços de e-mail transacional.</li>
+          <li>APIs externas para análise de segurança ou processamento de imagem.</li>
+        </ul>
+        <p>
+          O uso desses serviços está sujeito aos termos e políticas de cada fornecedor.
         </p>
 
         <h3>11. Conteúdos proibidos</h3>
         <p>
-          É proibido enviar: material ilegal; dados pessoais sensíveis sem necessidade; conteúdo que viole direitos
-          de terceiros; imagens ou links com finalidade de assédio, exploração, incitação à violência, discriminação
-          ou atividades fraudulentas; bem como qualquer tentativa de exploração do protótipo.
+          É proibido enviar dados sensíveis sem necessidade, material ilegal, conteúdo ofensivo, discriminatório,
+          fraudulento ou que busque explorar o sistema.
         </p>
 
         <h3>12. Propriedade intelectual</h3>
         <p>
-          O código, identidade visual e demais ativos do Veracity são protegidos. É vedado copiar, modificar,
-          distribuir, disponibilizar publicamente, realizar engenharia reversa ou criar obras derivadas sem autorização
-          expressa da Equipe Veracity.
+          Todo o código, design e conteúdo do Veracity são protegidos. É proibido copiar, modificar, redistribuir,
+          realizar engenharia reversa ou criar obras derivadas sem autorização.
         </p>
 
         <h3>13. Limitações de responsabilidade</h3>
         <p>
-          Na máxima extensão permitida pela legislação aplicável, a Equipe Veracity não se responsabiliza por danos
-          diretos ou indiretos decorrentes do uso ou impossibilidade de uso do protótipo, incluindo perda de dados,
-          lucros cessantes, interrupções ou imprecisões de resultados.
+          Na máxima extensão permitida pela lei, a Equipe Veracity não se responsabiliza por danos diretos ou indiretos,
+          indisponibilidade, perda de dados ou imprecisões do sistema.
         </p>
 
         <h3>14. Suspensão, encerramento e exclusão de conta</h3>
         <p>
-          O acesso poderá ser suspenso ou encerrado em caso de violação destes termos ou por motivos técnicos. Em caso
-          de exclusão de conta, esforços razoáveis serão feitos para desvincular dados pessoais dos registros de uso,
-          mantendo-se logs mínimos necessários à segurança e integridade do sistema, conforme base legal aplicável.
+          O acesso pode ser suspenso em caso de violação dos termos ou por motivos técnicos. Na exclusão de conta, dados
+          pessoais serão removidos ou pseudoanonimizados, mantendo-se logs mínimos para segurança.
         </p>
 
-        <h3>15. Alterações</h3>
+        <h3>15. Transferências internacionais</h3>
         <p>
-          Os termos podem ser atualizados a qualquer momento. A versão vigente é a última publicada na aplicação. O
-          uso contínuo após alterações representa aceite.
+          A infraestrutura do Render e Cloudflare pode realizar processamento fora do Brasil. O uso do Veracity implica
+          ciência dessa transferência internacional para fins de operação da aplicação.
         </p>
 
-        <h3>16. Contato e foro</h3>
+        <h3>16. Alterações</h3>
         <p>
-          Canal de contato acadêmico será disponibilizado na própria aplicação. Fica eleito o foro da
-          região de domicílio do Usuário, salvo disposição legal em contrário.
+          Os termos podem ser atualizados a qualquer momento. O uso contínuo representará aceite da versão vigente.
+        </p>
+
+        <h3>17. Contato e foro</h3>
+        <p>
+          O contato acadêmico estará disponível na plataforma. Aplica-se o foro da região de domicílio do Usuário,
+          salvo disposição legal em contrário.
         </p>
       </section>
     </main>
