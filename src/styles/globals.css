@@ -57,6 +57,10 @@ body.bare-page .site-footer {
 }
 
 @media (max-width: 720px) {
+  .page-offset {
+    padding-top: 20px;
+  }
+
   .search-form__input--capsule {
     padding-right: 156px;
   }
