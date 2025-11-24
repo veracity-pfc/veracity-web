@@ -39,6 +39,13 @@ export default function Contact(): JSX.Element {
 
   const isInvalid = !email.trim() || message.trim().length < 10;
 
+  const handleResetForm = () => {
+    setOk(false);
+    setMessage('');
+    setSubject('Dúvida');
+    setErr('');
+  };
+
   return (
     <main>
       <Toast />
@@ -134,7 +141,15 @@ export default function Contact(): JSX.Element {
             ) : (
               <div className="steps-wrap" style={{ marginTop: 12 }}>
                 <p style={{ margin: 0, fontWeight: 800 }}>Mensagem enviada</p>
-                <p style={{ margin: '6px 0 0' }}>Obrigado pelo contato! Em breve retornaremos pelo seu e-mail.</p>
+                <p style={{ margin: '6px 0 24px' }}>Obrigado pelo contato! Em breve retornaremos pelo seu e-mail.</p>
+                <button 
+                  type="button" 
+                  className="btn-primary" 
+                  onClick={handleResetForm}
+                  style={{ width: 'auto', paddingLeft: 24, paddingRight: 24 }}
+                >
+                  Enviar nova mensagem
+                </button>
               </div>
             )}
           </div>

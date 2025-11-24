@@ -319,35 +319,49 @@ export default function History(): JSX.Element {
       <h1 className={styles.title}>{getTitle()}</h1>
 
       <div className={styles.searchRow}>
-        <span className={styles.searchIcon}>⌕</span>
-        <input
-          className={styles.search}
-          placeholder={getPlaceholder()}
-          value={q}
-          onChange={(e) => {
-            setPage(1);
-            setQ(e.target.value);
-          }}
-        />
-        <button
-          type="button"
-          className={styles.clearBtn}
-          aria-label="Limpar busca"
-          onClick={() => {
-            setQ("");
-            setPage(1);
-          }}
-          title="Limpar"
-          disabled={!q || loading}
-        >
-          ×
-        </button>
-        <button
-          className={styles.filterBtn}
-          onClick={() => setFiltersOpen(true)}
-        >
-          Filtros
-        </button>
+        <div className={styles.searchWrapper}>
+          <span className={styles.searchIcon}>⌕</span>
+          <input
+            className={styles.search}
+            placeholder={getPlaceholder()}
+            value={q}
+            onChange={(e) => {
+              setPage(1);
+              setQ(e.target.value);
+            }}
+          />
+          <button
+            type="button"
+            className={styles.clearBtn}
+            aria-label="Limpar busca"
+            onClick={() => {
+              setQ("");
+              setPage(1);
+            }}
+            title="Limpar"
+            disabled={!q || loading}
+          >
+            ×
+          </button>
+
+          <button
+            className={styles.filterBtn}
+            onClick={() => setFiltersOpen(true)}
+          >
+            Filtros
+          </button>
+        </div>
+
+        {(isTokenManagement || isRequestManagement) && (
+            <button
+              className={styles.updateBtn}
+              onClick={() => load()}
+              disabled={loading}
+              title="Atualizar lista"
+            >
+              Atualizar
+            </button>
+        )}
       </div>
 
       <div className={styles.stage}>
