@@ -10,7 +10,7 @@ export default function TermsOfUse(): JSX.Element {
   return (
     <main className="container">
       <section className="page-offset" style={{ paddingBottom: 32 }}>
-        <h1 className="about-title">Veracity — Termo de Uso</h1>
+        <h1 className="about-title">Veracity — Termos de Uso</h1>
 
         <p><strong>Versão:</strong> 1.2 • <strong>Data de vigência:</strong> 24 de novembro de 2025</p>
         <p>
