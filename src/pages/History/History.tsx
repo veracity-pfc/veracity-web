@@ -49,6 +49,7 @@ const requestStatusMap: Record<string, string> = {
   approved: "Aprovada",
   rejected: "Rejeitada",
   answered: "Respondida",
+  finished: "Encerrada",
 };
 
 const tokenStatusMap: Record<string, string> = {
