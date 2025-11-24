@@ -77,6 +77,7 @@ export default function History(): JSX.Element {
   const [q, setQ] = useState<string>("");
   const [status, setStatus] = useState<string>("");
   const [atype, setAtype] = useState<string>("");
+  const [origin, setOrigin] = useState<string>("");
   const [dateFrom, setDateFrom] = useState<string>("");
   const [dateTo, setDateTo] = useState<string>("");
   const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
@@ -95,6 +96,7 @@ export default function History(): JSX.Element {
     setQ("");
     setStatus("");
     setAtype("");
+    setOrigin("");
     setDateFrom("");
     setDateTo("");
   }, [location.pathname]);
@@ -109,6 +111,7 @@ export default function History(): JSX.Element {
     } else {
       if (q) p.set("q", q);
       if (atype) p.set("analysis_type", atype);
+      if (origin) p.set("origin", origin);
     }
 
     if (isRequestManagement && atype) {
@@ -136,7 +139,7 @@ export default function History(): JSX.Element {
       }
     }
     return p.toString();
-  }, [page, q, status, atype, dateFrom, dateTo, isAdmin, isRequestManagement]);
+  }, [page, q, status, atype, origin, dateFrom, dateTo, isAdmin, isRequestManagement]);
 
   async function load(currentParams: string) {
     const seq = ++requestSeq.current;
@@ -432,6 +435,7 @@ export default function History(): JSX.Element {
         dateTo={dateTo}
         status={status}
         atype={atype}
+        origin={origin}
         onChangeDateFrom={(v) => {
           setPage(1);
           const from = onlyDate(v);
@@ -458,15 +462,21 @@ export default function History(): JSX.Element {
           setPage(1);
           setAtype(v);
         }}
+        onChangeOrigin={(v) => {
+          setPage(1);
+          setOrigin(v);
+        }}
         onApply={() => setFiltersOpen(false)}
         onClear={() => {
           setDateFrom("");
           setDateTo("");
           setStatus("");
           setAtype("");
+          setOrigin("");
         }}
         showStatus
         showType={!isAdmin || isRequestManagement}
+        showOrigin={!isAdmin && !isRequestManagement}
         statusOptions={getStatusOptions()}
         typeOptions={getTypeOptions()}
       />

@@ -13,14 +13,17 @@ type Props = {
   dateTo: string;
   status: string;
   atype: string;
+  origin: string;
   onChangeDateFrom: (v: string) => void;
   onChangeDateTo: (v: string) => void;
   onChangeStatus: (v: string) => void;
   onChangeType: (v: string) => void;
+  onChangeOrigin: (v: string) => void; 
   onApply: () => void;
   onClear: () => void;
   showStatus?: boolean;
   showType?: boolean;
+  showOrigin?: boolean; 
   statusOptions?: Option[];
   typeOptions?: Option[];
 };
@@ -36,14 +39,17 @@ export default function Filter({
   dateTo,
   status,
   atype,
+  origin,
   onChangeDateFrom,
   onChangeDateTo,
   onChangeStatus,
   onChangeType,
+  onChangeOrigin,
   onApply,
   onClear,
   showStatus = true,
   showType = true,
+  showOrigin = true,
   statusOptions,
   typeOptions,
 }: Props) {
@@ -51,11 +57,13 @@ export default function Filter({
   const [localTo, setLocalTo] = useState(onlyDate(dateTo));
   const [localStatus, setLocalStatus] = useState(status);
   const [localType, setLocalType] = useState(atype);
+  const [localOrigin, setLocalOrigin] = useState(origin);
 
   useEffect(() => setLocalFrom(onlyDate(dateFrom)), [dateFrom]);
   useEffect(() => setLocalTo(onlyDate(dateTo)), [dateTo]);
   useEffect(() => setLocalStatus(status), [status]);
   useEffect(() => setLocalType(atype), [atype]);
+  useEffect(() => setLocalOrigin(origin), [origin]);
 
   const hasDateError = useMemo(() => {
     if (!localFrom || !localTo) return false;
@@ -81,6 +89,12 @@ export default function Filter({
       { value: "url", label: "URL" },
       { value: "image", label: "Imagem" },
     ];
+
+  const originOptions: Option[] = [
+    { value: "", label: "Todos" },
+    { value: "user", label: "Conta de usuário" },
+    { value: "token", label: "Via Token API" },
+  ];
 
   if (!open) return null;
 
@@ -163,6 +177,23 @@ export default function Filter({
               </select>
             </div>
           )}
+
+          {showOrigin && (
+            <div className={styles.field}>
+              <label className={styles.label}>Origem</label>
+              <select
+                className={styles.select}
+                value={localOrigin}
+                onChange={(e) => setLocalOrigin(e.target.value)}
+              >
+                {originOptions.map((opt) => (
+                  <option key={opt.value || "all"} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         <div className={styles.actions}>
@@ -173,6 +204,7 @@ export default function Filter({
               setLocalTo("");
               setLocalStatus("");
               setLocalType("");
+              setLocalOrigin("");
               onClear();
             }}
           >
@@ -187,6 +219,7 @@ export default function Filter({
               onChangeDateTo(localTo);
               onChangeStatus(localStatus);
               onChangeType(localType);
+              onChangeOrigin(localOrigin);
               if (!hasDateError) onApply();
             }}
           >
