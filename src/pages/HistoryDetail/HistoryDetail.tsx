@@ -508,7 +508,7 @@ export default function HistoryDetail(): JSX.Element {
       <div className={styles.panel}>
         <p className={styles.p}>
           <b>Data da análise:</b>{" "}
-          {new Date(data.created_at).toLocaleDateString()}
+          {new Date(data.created_at).toLocaleString()}
         </p>
         {data.analysis_type === "image" ? (
           <p className={styles.p}>
