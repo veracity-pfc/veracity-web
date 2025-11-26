@@ -36,41 +36,43 @@ export default function Login(): JSX.Element {
       const data = await apiLogin(email, password);
       if (data?.access_token) saveToken(data.access_token, data.role);
       window.location.assign('/');
-    } catch (err: any) {
-      const code = err?.code || err?.detail?.code;
-      let backendMessage: string | null = null;
+      } catch (err: any) {
+        const code = err?.code || err?.detail?.code;
+        let backendMessage: string | null = null;
 
-      if (typeof err?.detail === 'string') {
-        backendMessage = err.detail;
-      } else if (typeof err?.message === 'string') {
-        backendMessage = err.message;
-      } else if (typeof err?.detail?.message === 'string') {
-        backendMessage = err.detail.message;
+        if (typeof err?.detail === 'string') {
+          backendMessage = err.detail;
+        } else if (typeof err?.message === 'string') {
+          backendMessage = err.message;
+        } else if (typeof err?.detail?.message === 'string') {
+          backendMessage = err.detail.message;
+        }
+
+        const msgLower = (backendMessage || '').toLowerCase();
+
+        const inactiveByCode = code === 'ACCOUNT_INACTIVE';
+        const inactiveByMessage = msgLower.includes('conta vinculada ao e-mail informado está inativa');
+        
+        const isLocked = msgLower.includes('bloqueada') || msgLower.includes('locked');
+
+        if (inactiveByCode || inactiveByMessage) {
+          setErrMsg(
+            <>
+              A conta vinculada ao e-mail informado está inativa.{' '}
+              <a id="contact-link" href="/reactivate-account">
+                Clique aqui
+              </a>{' '}
+              para recuperar o acesso.
+            </>
+          );
+        } else if (isLocked) {
+          setErrMsg(backendMessage); 
+        } else {
+          setErrMsg('E-mail ou senha inválidos');
+        }
+      } finally {
+        setLoading(false);
       }
-
-      const inactiveByCode = code === 'ACCOUNT_INACTIVE';
-      const inactiveByMessage =
-        backendMessage &&
-        backendMessage
-          .toLowerCase()
-          .includes('conta vinculada ao e-mail informado está inativa');
-
-      if (inactiveByCode || inactiveByMessage) {
-        setErrMsg(
-          <>
-            A conta vinculada ao e-mail informado está inativa.{' '}
-            <a id="contact-link" href="/reactivate-account">
-              Clique aqui
-            </a>{' '}
-            para recuperar o acesso.
-          </>
-        );
-      } else {
-        setErrMsg('E-mail ou senha inválidos');
-      }
-    } finally {
-      setLoading(false);
-    }
   }
 
   return (
