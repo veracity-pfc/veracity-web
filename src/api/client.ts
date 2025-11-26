@@ -183,7 +183,7 @@ export const apiRegister = (
 export const apiVerifyEmail = async (email: string | null, code: string) => {
   const target = localStorage.getItem("veracity_email_change_target");
   if (!email && target) {
-    const data = await apiFetch("/v1/user/profile/email-change/confirm", {
+    const data = await apiFetch("/v1/users/profile/email-change/confirm", {
       auth: true,
       method: "POST",
       body: { email: target, code },
@@ -201,7 +201,7 @@ export const apiVerifyEmail = async (email: string | null, code: string) => {
 export const apiResendCode = (email: string | null) => {
   const target = localStorage.getItem("veracity_email_change_target");
   if (!email && target) {
-    return apiFetch("/v1/user/profile/email-change/request", {
+    return apiFetch("/v1/users/profile/email-change/request", {
       auth: true,
       method: "POST",
       body: { email: target },
@@ -213,7 +213,7 @@ export const apiResendCode = (email: string | null) => {
   });
 };
 
-export const apiGetProfile = () => apiFetch("/v1/user/profile", { auth: true });
+export const apiGetProfile = () => apiFetch("/v1/users/profile", { auth: true });
 
 export const apiAdminMetrics = () =>
   apiFetch("/v1/administration/metrics/month", { auth: true });
@@ -360,7 +360,7 @@ export async function apiResetPassword(token: string, password: string, confirm_
 }
 
 export async function apiSendContact(email: string, subject: string, message: string, category: string) {
-  return apiFetch('/v1/contact-us', {
+  return apiFetch('/v1/contact', {
     method: 'POST',
     body: { 
       email, 
@@ -372,42 +372,42 @@ export async function apiSendContact(email: string, subject: string, message: st
 }
 
 export const apiValidateName = (name: string) =>
-  apiFetch("/v1/user/profile/name?validate_only=true", {
+  apiFetch("/v1/users/profile/name?validate_only=true", {
     auth: true,
     method: "PATCH",
     body: { name },
   });
 
 export const apiUpdateName = (name: string) =>
-  apiFetch("/v1/user/profile/name", {
+  apiFetch("/v1/users/profile/name", {
     auth: true,
     method: "PATCH",
     body: { name },
   });
 
 export const apiValidateEmailChange = (email: string) =>
-  apiFetch("/v1/user/profile/email-change/request?validate_only=true", {
+  apiFetch("/v1/users/profile/email-change/request?validate_only=true", {
     auth: true,
     method: "POST",
     body: { email },
   });
 
 export const apiRequestEmailChange = (email: string) =>
-  apiFetch("/v1/user/profile/email-change/request", {
+  apiFetch("/v1/users/profile/email-change/request", {
     auth: true,
     method: "POST",
     body: { email },
   });
 
 export const apiConfirmEmailChange = (email: string, code: string) =>
-  apiFetch("/v1/user/profile/email-change/confirm", {
+  apiFetch("/v1/users/profile/email-change/confirm", {
     auth: true,
     method: "POST",
     body: { email, code },
   });
 
 export async function apiDeleteAccount(): Promise<any> {
-  const r = await fetch(`${API_BASE}/v1/user/account`, {
+  const r = await fetch(`${API_BASE}/v1/users/account`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${localStorage.getItem("veracity_token")}` },
   });
@@ -416,7 +416,7 @@ export async function apiDeleteAccount(): Promise<any> {
 }
 
 export async function apiInactivateAccount() {
-  const res = await fetch(`${API_BASE}/v1/user/account`, {
+  const res = await fetch(`${API_BASE}/v1/users/account`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -529,13 +529,13 @@ export async function getAdminMonthlyMetrics(params: {
 }
 
 export const apiRevealApiToken = () =>
-  apiFetch<{ token: string; expires_at: string | null }>("/v1/user/api-token/reveal", {
+  apiFetch<{ token: string; expires_at: string | null }>("/v1/users/api-token/reveal", {
     auth: true,
     method: "POST",
   });
 
 export const apiRevokeApiToken = () =>
-  apiFetch("/v1/user/api-token/revoke", {
+  apiFetch("/v1/users/api-token/revoke", {
     auth: true,
     method: "POST",
   });

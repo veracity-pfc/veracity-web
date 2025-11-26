@@ -151,7 +151,7 @@ export default function History(): JSX.Element {
       } else if (isRequestManagement) {
         path = `/v1/administration/contact-requests?${currentParams}`;
       } else {
-        path = `/v1/user/history?${currentParams}`;
+        path = `/v1/users/history?${currentParams}`;
       }
 
       const data = (await apiFetch(path, { auth: true })) as Paged;

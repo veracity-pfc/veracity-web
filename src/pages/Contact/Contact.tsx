@@ -79,7 +79,7 @@ export default function Contact(): JSX.Element {
                   try {
                     const category = subjectToCategory[subject] || 'doubt';
                     
-                    await apiFetch('/v1/contact-us', {
+                    await apiFetch('/v1/contact', {
                       method: 'POST',
                       body: {
                         email: email.trim(),

@@ -80,7 +80,7 @@ export default function VerifyEmail(): JSX.Element {
     try {
       setVerifying(true);
       if (isReactivation) {
-        await apiFetch("/v1/user/reactivate-account/confirm-code", {
+        await apiFetch("/v1/users/reactivate-account/confirm-code", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: { email, code: joined },
@@ -88,7 +88,7 @@ export default function VerifyEmail(): JSX.Element {
         success("Conta reativada com sucesso! Você já pode fazer login novamente.");
         navigate("/login");
       } else if (isEmailChange) {
-        await apiFetch("/v1/user/profile/email-change/confirm", {
+        await apiFetch("/v1/users/profile/email-change/confirm", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: { email, code: joined },
@@ -120,7 +120,7 @@ export default function VerifyEmail(): JSX.Element {
     setErr("");
     try {
       if (isReactivation) {
-        await apiFetch("/v1/user/reactivate-account/send-code", {
+        await apiFetch("/v1/users/reactivate-account/send-code", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: { email },
@@ -134,7 +134,7 @@ export default function VerifyEmail(): JSX.Element {
           return;
         }
         const res = await fetch(
-          `${API_BASE_URL}/v1/user/profile/email-change/request`,
+          `${API_BASE_URL}/v1/users/profile/email-change/request`,
           {
             method: "POST",
             headers: {
