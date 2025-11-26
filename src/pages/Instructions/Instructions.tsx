@@ -14,7 +14,7 @@ const urlSteps: Step[] = [
 ];
 
 const imageSteps: Step[] = [
-  { title: 'Envie a imagem', text: 'Envie o arquivo para verificação. A imagem deve estar no formato .png, .jpg ou .jpeg. e ter no máximo 1MB de tamanho.' },
+  { title: 'Envie a imagem', text: 'Envie o arquivo para verificação. A imagem deve estar no formato .png, .jpg ou .jpeg. e ter no máximo 10MB de tamanho.' },
   { title: 'Processamento', text: 'Aplicamos verificações visuais e heurísticas para indícios de manipulação.' },
   { title: 'Interpretação', text: 'Consolidamos os achados e avaliamos a probabilidade de falsificação.' },
   { title: 'Resultado', text: 'Exibimos o parecer e recomendações de como proceder com a imagem.' }
@@ -65,7 +65,7 @@ function ImportantNotice(): JSX.Element {
           <h3 id="important-notes-title" className={styles.noticeTitle}>Observação importante</h3>
         </div>
         <p className={styles.noticeBody}>
-          Usuários anônimos só podem realizar <strong>2 análises de URL</strong> e <strong>1 análise de imagem</strong> por dia.{' '}
+          Usuários anônimos só podem realizar <strong>5 análises de URL</strong> e <strong>2 análises de imagem</strong> por dia.{' '}
           <Link to="/sign-up" className={styles.noticeLink}>Crie sua conta</Link> ou{' '}
           <Link to="/login" className={styles.noticeLink}>faça login</Link> para poder realizar mais análises.
         </p>

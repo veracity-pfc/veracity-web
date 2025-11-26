@@ -5,7 +5,7 @@ import { apiAnalyzeImage } from "../../api/client";
 import { useToast } from "../Toast/Toast";
 import styles from "./ImageForm.module.css";
 
-const MAX_BYTES = 1 * 1024 * 1024;
+const MAX_BYTES = 10 * 1024 * 1024;
 
 export default function ImageForm(): JSX.Element {
   const [file, setFile] = useState<File | null>(null);
@@ -27,7 +27,7 @@ export default function ImageForm(): JSX.Element {
   const validateFile = (f: File | null | undefined): string | null => {
     if (!f) return "Nenhum arquivo selecionado.";
     if (!f.type?.startsWith("image/")) return "Apenas imagens são permitidas.";
-    if (f.size > MAX_BYTES) return "A imagem deve ter no máximo 1MB.";
+    if (f.size > MAX_BYTES) return "A imagem deve ter no máximo 10MB.";
     return null;
   };
 
