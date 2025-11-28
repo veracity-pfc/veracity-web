@@ -438,6 +438,7 @@ export type AdminMonthMetrics = {
   reference: string;
   analyses: {
     bars: {
+      url_malicious: number;
       url_suspicious: number;
       url_safe: number;
       image_fake: number;

@@ -1,7 +1,7 @@
 import { JSX, useEffect, useRef, useState } from "react";
 import styles from "./Dashboard.module.css";
-import Chart, { AdminMonthMetrics, YM } from "../../components/Chart/Chart";
-import { getAdminMonthlyMetrics, getToken } from "../../api/client";
+import Chart,{YM} from "../../components/Chart/Chart";
+import { getAdminMonthlyMetrics, getToken, AdminMonthMetrics } from "../../api/client";
 import { useToast } from "../../components/Toast/Toast";
 
 function getCurrentYM(): YM {

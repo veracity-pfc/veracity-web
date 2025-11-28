@@ -9,63 +9,7 @@ import {
   YAxis,
 } from "recharts";
 import styles from "./Chart.module.css";
-
-export type AdminMonthMetrics = {
-  year: number;
-  month: number;
-  reference: string;
-  analyses: {
-    bars: {
-      url_suspicious: number;
-      url_safe: number;
-      image_fake: number;
-      image_safe: number;
-    };
-    totals: {
-      total_month: number;
-      urls_month: number;
-      images_month: number;
-    };
-  };
-  users: {
-    bars: {
-      active_users: number;
-      inactive_users: number;
-    };
-    totals: {
-      total_users: number;
-      active_users: number;
-      inactive_users: number;
-    };
-  };
-  tokens: {
-    bars: {
-      active: number;
-      expired: number;
-      revoked: number;
-    };
-    totals: {
-      total_tokens: number;
-      active: number;
-      revoked: number;
-    };
-  };
-  requests: {
-    bars: {
-      doubt: number;
-      suggestion: number;
-      complaint: number;
-      token_request: number;
-    };
-    totals: {
-      total_requests: number;
-      doubt: number;
-      suggestion: number;
-      complaint: number;
-      token_request: number;
-    };
-  };
-};
+import { AdminMonthMetrics } from "@/api/client";
 
 export type YM = {
   year: number;
@@ -83,7 +27,7 @@ interface Props {
   onRefresh?: () => void;
 }
 
-const defaultAnalysisBars = { url_suspicious: 0, url_safe: 0, image_fake: 0, image_safe: 0 };
+const defaultAnalysisBars = { url_malicious: 0, url_suspicious: 0, url_safe: 0, image_fake: 0, image_safe: 0 };
 const defaultAnalysisTotals = { total_month: 0, urls_month: 0, images_month: 0 };
 
 const defaultUsersBars = { active_users: 0, inactive_users: 0 };
@@ -108,11 +52,11 @@ export default function DashboardChart({ mode, metrics, loading }: Props): JSX.E
     const totals = metrics?.analyses?.totals || defaultAnalysisTotals;
 
     data = [
-      { name: "URLs", susp: bars.url_suspicious, safe: bars.url_safe },
+      { name: "URLs", malicious: bars.url_malicious, susp: bars.url_suspicious, safe: bars.url_safe },
       { name: "Imagens", fake: bars.image_fake, safe: bars.image_safe },
     ];
-    colors = { susp: "#f59e0b", fake: "#ef4444", safe: "#10b981" };
-    labels = { susp: "Suspeitas", fake: "Falsas", safe: "Seguras" };
+    colors = { susp: "#e0ae41ff", fake: "#ef4444", safe: "#10b981", malicious: "#9e2f2fff" };
+    labels = { susp: "Suspeitas", fake: "Falsas", safe: "Seguras", malicious: "Maliciosas" };
     
     kpis = [
       { label: "Total Mês", value: totals.total_month },
