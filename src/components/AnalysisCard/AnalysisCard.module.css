@@ -45,3 +45,10 @@
     margin: 6px 0;
     line-height: 1.5;
 }
+
+.analysis-card__disclaimer {
+    margin-top: 18px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-muted);
+}

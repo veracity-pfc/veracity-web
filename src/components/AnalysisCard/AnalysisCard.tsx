@@ -12,15 +12,14 @@ const LABEL_MAP = {
 type KnownLabel = keyof typeof LABEL_MAP;
 
 export interface AnalysisData {
-  label: string; 
+  label: string;
   explanation?: string;
   recommendations?: string[];
-
   url?: string;
   imageUrl?: string;
   flags?: string[];
   score?: number;
-  [key: string]: unknown; 
+  [key: string]: unknown;
 }
 
 interface Props {
@@ -106,6 +105,12 @@ export default function AnalysisCard({ data }: Props): JSX.Element | null {
             </ul>
           </div>
         )}
+
+      <p className={styles["analysis-card__disclaimer"]}>
+        O Veracity é uma ferramenta de apoio. As análises podem conter erros.
+        Sempre confirme informações importantes em fontes oficiais antes de
+        tomar decisões.
+      </p>
     </div>
   );
 }
