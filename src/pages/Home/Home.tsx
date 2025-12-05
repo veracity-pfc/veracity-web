@@ -76,7 +76,7 @@ export default function Home(): JSX.Element {
           {activeTab === "images" ? <ImageForm /> : <SearchForm mode="urls" />}
 
           <p className="legal">
-            Ao utilizar o Veracity eu concordo com os{" "}
+            Ao utilizar o Veracity eu declaro que li e aceito os{" "}
             <a
               href="/terms-of-use"
               onClick={(e) => {
@@ -86,7 +86,7 @@ export default function Home(): JSX.Element {
             >
               Termos de Uso
             </a>{" "}
-            e com a{" "}
+            e a{" "}
             <a
               href="/privacy-policy"
               onClick={(e) => {

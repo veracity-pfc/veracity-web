@@ -66,8 +66,8 @@ export default function TermsOfUse(): JSX.Element {
         <h3>7. Limites de uso (quotas)</h3>
         <p>Para garantir estabilidade, aplicam-se limites de uso:</p>
         <ul>
-          <li>Usuários anônimos: até 2 análises de URL/dia e 1 análise de imagem/dia.</li>
-          <li>Usuários autenticados: até 5 análises de URL/dia e 3 análises de imagem/dia.</li>
+          <li>Usuários anônimos: até 5 análises de URL/dia e 2 análise de imagem/dia.</li>
+          <li>Usuários autenticados: até 10 análises de URL/dia e 4 análises de imagem/dia.</li>
         </ul>
 
         <h3>8. Resultados, riscos e responsabilidades</h3>
@@ -92,8 +92,10 @@ export default function TermsOfUse(): JSX.Element {
           O protótipo utiliza serviços de terceiros, incluindo:
         </p>
         <ul>
-          <li><strong>Render:</strong> hospedagem de backend, banco de dados e execução da aplicação.</li>
-          <li><strong>Cloudflare:</strong> CDN, firewall de aplicação (WAF), mitigação de DDoS, rate limiting e DNS.</li>
+          <li><strong>Render:</strong> hospedagem, deploy e execução da aplicação.</li>
+          <li><strong>Cloudflare:</strong> mitigação de DDoS, rate limiting e DNS.</li>
+          <li><strong>Neon:</strong> hospedagem do banco de dados.</li>
+          <li><strong>Resend:</strong> serviço de e-mail transacional.</li>
           <li>Serviços de e-mail transacional.</li>
           <li>APIs externas para análise de segurança ou processamento de imagem.</li>
         </ul>

@@ -12,7 +12,7 @@ export default function PrivacyPolicy(): JSX.Element {
       <section className="page-offset" style={{ paddingBottom: 32 }}>
         <h1 className="about-title">Veracity — Política de Privacidade</h1>
 
-        <p><strong>Versão:</strong> 1.2 • <strong>Data de vigência:</strong> 24 de novembro de 2025</p>
+        <p><strong>Versão:</strong> 1.3 • <strong>Data de vigência:</strong> 24 de novembro de 2025</p>
         <p>
           Esta Política descreve como o Veracity trata dados pessoais e dados técnicos durante o uso do serviço,
           em conformidade com a LGPD. Ao utilizar o protótipo, você concorda com as práticas aqui descritas.
@@ -29,7 +29,7 @@ export default function PrivacyPolicy(): JSX.Element {
           <li><strong>Dados de conta:</strong> nome, e-mail, hash de senha, status e carimbos de data/hora.</li>
           <li><strong>Dados de auditoria:</strong> hash de IP com sal, user-agent, eventos de login, quotas e métricas.</li>
           <li><strong>Conteúdo submetido:</strong> URLs, imagens e resultados derivados.</li>
-          <li><strong>Cookies e armazenamento local:</strong> tokens de sessão e preferências essenciais.</li>
+          <li><strong>Armazenamento local:</strong> token JWT de autenticação e preferências essenciais.</li>
           <li><strong>Dados processados pelo Cloudflare:</strong> IP, cabeçalhos, assinaturas de tráfego, informações de dispositivo e verificações de segurança para mitigação de ataques.</li>
         </ul>
 
@@ -37,10 +37,9 @@ export default function PrivacyPolicy(): JSX.Element {
         <ul>
           <li><strong>Operação do serviço</strong> — execução de contrato.</li>
           <li><strong>Segurança</strong> — legítimo interesse e obrigação legal/regulatória.</li>
-          <li><strong>Proteção via Cloudflare</strong> (WAF, CDN, DDoS) — legítimo interesse.</li>
+          <li><strong>Proteção via Cloudflare</strong> — legítimo interesse.</li>
           <li><strong>Métricas acadêmicas</strong> — legítimo interesse, com dados anonimizados.</li>
           <li><strong>Comunicações transacionais</strong> — execução de contrato.</li>
-          <li><strong>Cookies analíticos</strong> — consentimento (quando aplicável).</li>
         </ul>
 
         <h3>4. Compartilhamento com terceiros</h3>
@@ -48,9 +47,10 @@ export default function PrivacyPolicy(): JSX.Element {
           Compartilhamos dados com operadores essenciais:
         </p>
         <ul>
-          <li><strong>Render:</strong> hospedagem, execução de backend e banco de dados.</li>
-          <li><strong>Cloudflare:</strong> CDN, firewall de aplicação, mitigação de DDoS, cache e roteamento seguro.</li>
-          <li>Serviços de e-mail transacional.</li>
+          <li><strong>Render:</strong> hospedagem, deploy e execução da aplicação.</li>
+          <li><strong>Cloudflare:</strong>mitigação de DDoS, cache e roteamento seguro.</li>
+          <li><strong>Neon:</strong> hospedagem do banco de dados.</li>
+          <li><strong>Resend:</strong> serviço de e-mail transacional.</li>
           <li>APIs externas de análise de segurança e imagens.</li>
         </ul>
 
@@ -78,13 +78,20 @@ export default function PrivacyPolicy(): JSX.Element {
 
         <h3>8. Cookies e tecnologias similares</h3>
         <p>
-          Utilizamos cookies essenciais para autenticação. Outros cookies serão utilizados apenas mediante consentimento.
+          O Veracity não utiliza cookies próprios para autenticação, rastreamento ou preferências. A autenticação é
+          realizada exclusivamente por meio de tokens JWT armazenados no localStorage e enviados pelo cabeçalho
+          Authorization.
+        </p>
+        <p>
+          O Cloudflare pode definir cookies técnicos essenciais, como <code>__cf_bm</code> e <code>cf_clearance</code>,
+          destinados à proteção contra bots, verificação de tráfego e mitigação de ataques. Esses cookies não contêm dados
+          pessoais identificáveis e não são acessados ou utilizados pelo Veracity.
         </p>
 
         <h3>9. Segurança da informação</h3>
         <p>
           Adotamos criptografia em trânsito (HTTPS), hash de credenciais, controle de acesso e registros de auditoria.
-          A proteção adicional é garantida pelo Cloudflare (WAF, mitigação de bots, rate limiting e caches seguros).
+          A proteção adicional é garantida pelo Cloudflare (mitigação de bots, rate limiting e caches seguros).
         </p>
 
         <h3>10. Decisões automatizadas</h3>

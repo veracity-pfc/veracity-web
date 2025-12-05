@@ -63,7 +63,6 @@ export default function Footer(): JSX.Element {
               >
                 Termos de uso
               </a>
-              {!isLoggedIn && <a href="/reactivate-account">Reativar conta</a>}
             </div>
           </div>
 
@@ -85,6 +84,7 @@ export default function Footer(): JSX.Element {
                     Análise de imagens
                   </a>
                   <a href="/user/history">Histórico de análises</a>
+                  {!isLoggedIn && <a href="/reactivate-account">Reativar conta</a>}
                 </>
               )}
             </div>
