@@ -405,7 +405,7 @@ export default function Profile(): JSX.Element {
   const hasActiveToken = !!tokenInfo && tokenInfo.status === "active";
 
   const tokenMasked = hasToken
-    ? String(tokenInfo.prefix || "") + (isMobile ? "" : "•".repeat(35))
+    ? String(tokenInfo.prefix || "") + (isMobile ? "" : "*".repeat(35))
     : "";
 
   const tokenPlaceholder = !hasToken

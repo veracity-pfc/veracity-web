@@ -242,7 +242,7 @@ export default function History(): JSX.Element {
           <p className={styles.meta}>
             <b>Token:</b>{" "}
             <span style={{ fontFamily: "monospace" }}>
-              {item.token_prefix}•••••
+              {item.token_prefix}*****
             </span>
           </p>
           <p className={styles.meta}>

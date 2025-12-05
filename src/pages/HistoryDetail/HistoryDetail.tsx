@@ -294,7 +294,7 @@ export default function HistoryDetail(): JSX.Element {
                 <>
                   <h3 className={styles.h3}>Informações do Token</h3>
                   <p className={styles.p}>
-                    <b>Prefixo:</b> <span style={{fontFamily:'monospace'}}>{data.token_prefix}•••••</span>
+                    <b>Prefixo:</b> <span style={{fontFamily:'monospace'}}>{data.token_prefix}*****</span>
                   </p>
                   <p className={styles.p}>
                     <b>Expira em:</b> {data.expires_at ? new Date(data.expires_at).toLocaleString() : "—"}
