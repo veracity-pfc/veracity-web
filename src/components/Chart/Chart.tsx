@@ -59,7 +59,7 @@ export default function DashboardChart({ mode, metrics, loading }: Props): JSX.E
     labels = { susp: "Suspeitas", fake: "Falsas", safe: "Seguras", malicious: "Maliciosas" };
     
     kpis = [
-      { label: "Total Mês", value: totals.total_month },
+      { label: "Total", value: totals.total_month },
       { label: "URLs", value: totals.urls_month },
       { label: "Imagens", value: totals.images_month },
     ];
@@ -76,7 +76,7 @@ export default function DashboardChart({ mode, metrics, loading }: Props): JSX.E
     labels = { active: "Ativos", inactive: "Inativos" };
 
     kpis = [
-      { label: "Total Usuários", value: totals.total_users },
+      { label: "Total", value: totals.total_users },
       { label: "Ativos", value: totals.active_users },
       { label: "Inativos", value: totals.inactive_users },
     ];
@@ -93,7 +93,7 @@ export default function DashboardChart({ mode, metrics, loading }: Props): JSX.E
     labels = { active: "Ativos", expired: "Expirados", revoked: "Revogados" };
 
     kpis = [
-      { label: "Total Tokens", value: totals.total_tokens },
+      { label: "Total", value: totals.total_tokens },
       { label: "Ativos", value: totals.active },
       { label: "Revogados", value: totals.revoked },
     ];

@@ -79,7 +79,7 @@ export default function Dashboard(): JSX.Element {
       <header className={styles.header}>
         <div>
           <h1 className={styles.title}>Dashboard</h1>
-          <p className={styles.subtitle}>Visão geral da plataforma</p>
+          <p className={styles.subtitle}>Visão geral da plataforma - Mensal</p>
         </div>
         
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
