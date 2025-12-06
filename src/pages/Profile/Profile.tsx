@@ -556,7 +556,11 @@ export default function Profile(): JSX.Element {
                 <button
                   type="button"
                   className={styles.apiTokenCopyButton}
-                  onClick={handleCopyApiToken}
+                  onClick={
+                    showRevokeAction
+                      ? () => setModalApiTokenRevoke(true)
+                      : handleCopyApiToken
+                  }
                   disabled={!hasActiveToken || apiTokenLoading || apiTokenRevoking || saving}
                   aria-label={
                     !showRevokeAction ? "Copiar token de API" : "Revogar token de API"
