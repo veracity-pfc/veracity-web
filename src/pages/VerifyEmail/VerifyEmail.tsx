@@ -88,11 +88,25 @@ export default function VerifyEmail(): JSX.Element {
         success("Conta reativada com sucesso! Você já pode fazer login novamente.");
         navigate("/login");
       } else if (isEmailChange) {
-        await apiFetch("/v1/users/profile/email-change/confirm", {
+        const token = getToken();
+        if (!token) {
+          throw new Error("Sessão expirada. Faça login novamente.");
+        }
+
+        const res = await fetch(`${API_BASE_URL}/v1/users/profile/email-change/confirm`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: { email, code: joined },
+          headers: { 
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ email, code: joined }),
         });
+
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.detail || "Erro ao confirmar alteração de e-mail.");
+        }
+
         localStorage.removeItem("veracity_email_change_target");
         success("E-mail alterado com sucesso! Faça login novamente com o novo endereço.");
         navigate("/login");
@@ -107,6 +121,9 @@ export default function VerifyEmail(): JSX.Element {
         setErr(
           error?.message || "O código inserido está inválido. Tente novamente"
         );
+        if (error?.message?.includes("Sessão expirada")) {
+             navigate("/login");
+        }
       }
     } finally {
       setVerifying(false);

@@ -540,6 +540,9 @@ export default function Profile(): JSX.Element {
                     Nunca compartilhe esse valor publicamente. Para ver exemplos de
                     uso, acesse a página de Instruções e consulte a seção
                     &quot;Uso de tokens de API&quot;.
+                    <br />
+                    <br />
+                    Ao inativar ou excluir sua conta, seu token de API será revogado <b>automaticamente</b>.
                   </div>
                 )}
               </div>
@@ -554,7 +557,7 @@ export default function Profile(): JSX.Element {
                   type="button"
                   className={styles.apiTokenCopyButton}
                   onClick={handleCopyApiToken}
-                  disabled={!hasActiveToken || apiTokenLoading || apiTokenRevoking}
+                  disabled={!hasActiveToken || apiTokenLoading || apiTokenRevoking || saving}
                   aria-label={
                     !showRevokeAction ? "Copiar token de API" : "Revogar token de API"
                   }
@@ -681,10 +684,13 @@ export default function Profile(): JSX.Element {
       >
         <p>
           Sugerimos inativar em vez de excluir. Ao inativar, você perde o acesso,
-          mas pode reativar depois e manter seu histórico.
+          mas pode reativar depois e manter seu histórico. 
+          <br/>
+          <br/>
+          Com a exclusão da conta, suas solicitações de contato em aberto serão encerradas. 
           <br />
           <br />
-          A exclusão é permanente e não pode ser desfeita.
+          A exclusão é permanente e não pode ser desfeita. Caso tenha um token de API ativo, ele será revogado automaticamente
         </p>
       </Modal>
 
@@ -703,6 +709,9 @@ export default function Profile(): JSX.Element {
         <p>
           Ao inativar sua conta, você perderá o acesso à plataforma, mas poderá
           reativá-la depois utilizando o mesmo e-mail.
+          <br/>
+          <br/>
+          Caso tenha um token de API ativo, ele será revogado automaticamente
         </p>
       </Modal>
 
