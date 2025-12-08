@@ -213,7 +213,7 @@ export default function History(): JSX.Element {
         { value: "doubt", label: "Dúvida" },
         { value: "suggestion", label: "Sugestão" },
         { value: "complaint", label: "Reclamação" },
-        { value: "token_request", label: "Solicitação de Token API" },
+        { value: "token_request", label: "Solicitação de token de API" },
       ];
     }
     return [
