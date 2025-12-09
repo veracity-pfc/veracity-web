@@ -113,7 +113,7 @@ export default function ReactivateAccount(): JSX.Element {
             id="email"
             className="form-control"
             type="email"
-            placeholder="email@dominio.com"
+            placeholder="Informe seu e-mail"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onBlur={handleBlur}
