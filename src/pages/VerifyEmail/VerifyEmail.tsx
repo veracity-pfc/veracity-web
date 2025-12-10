@@ -88,8 +88,8 @@ export default function VerifyEmail(): JSX.Element {
         success("Conta reativada com sucesso! Você já pode fazer login novamente.");
         navigate("/login");
       } else if (isEmailChange) {
-        const token = getToken();
-        if (!token) {
+        const hasSession = !!getToken();
+        if (!hasSession) {
           throw new Error("Sessão expirada. Faça login novamente.");
         }
 
@@ -97,8 +97,8 @@ export default function VerifyEmail(): JSX.Element {
           method: "POST",
           headers: { 
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
           },
+          credentials: "include",
           body: JSON.stringify({ email, code: joined }),
         });
 
@@ -143,8 +143,8 @@ export default function VerifyEmail(): JSX.Element {
           body: { email },
         });
       } else if (isEmailChange) {
-        const token = getToken();
-        if (!token) {
+        const hasSession = !!getToken();
+        if (!hasSession) {
           toastError("Sessão expirada. Faça login para solicitar novamente.");
           setErr("Sua sessão expirou. Faça login novamente para alterar o e-mail.");
           setSending(false);
@@ -156,8 +156,8 @@ export default function VerifyEmail(): JSX.Element {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
             },
+            credentials: "include",
             body: JSON.stringify({ email }),
           }
         );

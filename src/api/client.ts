@@ -56,8 +56,8 @@ function notifyAuthChange(): void {
   window.dispatchEvent(new Event("veracity-auth-changed"));
 }
 
-export function saveToken(token: string, role?: string): void {
-  localStorage.setItem("veracity_token", token);
+export function saveToken(_token: string, role?: string): void {
+  localStorage.setItem("veracity_token", "1"); 
   if (role) localStorage.setItem("veracity_role", role);
   notifyAuthChange();
   touchActivity();
@@ -104,6 +104,10 @@ export async function apiFetch<T = any>(
   path: string,
   { auth = false, method = "GET", body, headers }: FetchOptions = {}
 ): Promise<T> {
+  if (auth && !getToken()) {
+    clearToken();
+  }
+  
   if (getToken() && shouldExpire()) {
     clearToken();
   }
@@ -111,12 +115,9 @@ export async function apiFetch<T = any>(
   const init: RequestInit = {
     method,
     headers: { "Content-Type": "application/json", ...(headers || {}) } as HeadersDict,
+    credentials: "include", 
   };
 
-  if (auth) {
-    const t = getToken();
-    if (t) (init.headers as HeadersDict).Authorization = `Bearer ${t}`;
-  }
   if (body !== undefined) {
     (init as any).body = typeof body === "string" ? body : JSON.stringify(body);
   }
@@ -147,6 +148,7 @@ export async function apiLogin(email: string, password: string): Promise<any> {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
+    credentials: "include",
   });
   let data: any = null;
   try {
@@ -315,14 +317,11 @@ export const apiAnalyzeUrl = (url: string) =>
 export async function apiAnalyzeImage(file: File): Promise<any> {
   const fd = new FormData();
   fd.append("file", file);
-  const headers: HeadersDict = {};
-  const t = getToken();
-  if (t) headers.Authorization = `Bearer ${t}`;
   touchActivity();
   const res = await fetch(`${API_BASE}/v1/analyses/image`, {
     method: "POST",
-    headers,
     body: fd,
+    credentials: "include",
   });
   let data: any = null;
   try {
@@ -409,7 +408,7 @@ export const apiConfirmEmailChange = (email: string, code: string) =>
 export async function apiDeleteAccount(): Promise<any> {
   const r = await fetch(`${API_BASE}/v1/users/account`, {
     method: "DELETE",
-    headers: { Authorization: `Bearer ${localStorage.getItem("veracity_token")}` },
+    credentials: "include",
   });
   if (!r.ok) throw new Error(((await r.json()) as any).detail || "Falha ao excluir conta.");
   return r.json();
@@ -420,8 +419,8 @@ export async function apiInactivateAccount() {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${getToken()}`,
     },
+    credentials: "include",
   });
 
   if (!res.ok) {
@@ -490,13 +489,6 @@ export type AdminMonthMetrics = {
   };
 };
 
-export function buildAuthHeader(): Record<string, string> {
-  const token = getToken();
-  if (!token) return {};
-  const hasBearer = /^Bearer\s+/i.test(token);
-  return { Authorization: hasBearer ? token : `Bearer ${token}` };
-}
-
 export async function getAdminMonthlyMetrics(params: {
   year?: number;
   month?: number;
@@ -508,7 +500,6 @@ export async function getAdminMonthlyMetrics(params: {
 
   const headers: Record<string, string> = {
     Accept: "application/json",
-    ...buildAuthHeader(),
   };
 
   const url = `${API_BASE}/v1/administration/metrics/month?${q.toString()}`;

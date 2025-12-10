@@ -11,6 +11,7 @@ import {
   getToken,
   apiRevealApiToken,
   apiRevokeApiToken,
+  getRole,
 } from "../../api/client";
 import Toast, { useToast } from "../../components/Toast/Toast";
 import Modal from "../../components/Modal/Modal";
@@ -26,22 +27,7 @@ import modalDeleteTokenImg from "../../assets/ilust-delete-token.png";
 type AnyObj = Record<string, any>;
 
 function resolveRole(): string {
-  const ls = (localStorage.getItem("role") || "").toLowerCase();
-  if (ls) return ls;
-  const t = typeof getToken === "function" ? getToken() : null;
-  if (!t) return "";
-  try {
-    const payload = JSON.parse(atob(t.split(".")[1] || ""));
-    return String(
-      payload.role ||
-        payload.user_role ||
-        payload["role"] ||
-        payload["userRole"] ||
-        ""
-    ).toLowerCase();
-  } catch {
-    return "";
-  }
+  return (getRole() || "").toLowerCase();
 }
 
 function formatDateTime(iso?: any): string {

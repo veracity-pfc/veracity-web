@@ -1,22 +1,13 @@
 import React, { JSX, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getToken } from '../../api/client';
+import { getRole, getToken } from '../../api/client';
 import Logo from '../Logo';
 import styles from './Footer.module.css';
 
 const cx = (...xs: Array<string | false | null | undefined>) => xs.filter(Boolean).join(' ');
 
 function resolveRole(): string {
-  const ls = (localStorage.getItem('role') || '').toLowerCase();
-  if (ls) return ls;
-  const t = typeof getToken === 'function' ? getToken() : null;
-  if (!t) return '';
-  try {
-    const payload = JSON.parse(atob(t.split('.')[1] || ''));
-    return String(payload.role).toLowerCase();
-  } catch {
-    return '';
-  }
+  return (getRole() || '').toLowerCase();
 }
 
 export default function Footer(): JSX.Element {
@@ -28,7 +19,7 @@ export default function Footer(): JSX.Element {
   useEffect(() => {
     const role = resolveRole();
     setIsAdmin(role === 'admin');
-    setIsLoggedIn(!!role);
+    setIsLoggedIn(!!getToken());
   }, []);
 
   const goHomeWithTab = (tab: 'urls' | 'images') => (e: React.MouseEvent<HTMLAnchorElement>) => {
