@@ -12,7 +12,7 @@ export default function PrivacyPolicy(): JSX.Element {
       <section className="page-offset" style={{ paddingBottom: 32 }}>
         <h1 className="about-title">Veracity — Política de Privacidade</h1>
 
-        <p><strong>Versão:</strong> 1.3 • <strong>Data de vigência:</strong> 24 de novembro de 2025</p>
+        <p><strong>Versão:</strong> 1.4 • <strong>Data de vigência:</strong> 10 de dezembro de 2025</p>
         <p>
           Esta Política descreve como o Veracity trata dados pessoais e dados técnicos durante o uso do serviço,
           em conformidade com a LGPD. Ao utilizar o protótipo, você concorda com as práticas aqui descritas.
@@ -29,7 +29,7 @@ export default function PrivacyPolicy(): JSX.Element {
           <li><strong>Dados de conta:</strong> nome, e-mail, hash de senha, status e carimbos de data/hora.</li>
           <li><strong>Dados de auditoria:</strong> hash de IP com sal, user-agent, eventos de login, quotas e métricas.</li>
           <li><strong>Conteúdo submetido:</strong> URLs, imagens e resultados derivados.</li>
-          <li><strong>Armazenamento local:</strong> token JWT de autenticação e preferências essenciais.</li>
+          <li><strong>Cookies e armazenamento:</strong> cookies de sessão (HttpOnly) para autenticação e preferências essenciais no armazenamento local.</li>
           <li><strong>Dados processados pelo Cloudflare:</strong> IP, cabeçalhos, assinaturas de tráfego, informações de dispositivo e verificações de segurança para mitigação de ataques.</li>
         </ul>
 
@@ -78,14 +78,14 @@ export default function PrivacyPolicy(): JSX.Element {
 
         <h3>8. Cookies e tecnologias similares</h3>
         <p>
-          O Veracity não utiliza cookies próprios para autenticação, rastreamento ou preferências. A autenticação é
-          realizada exclusivamente por meio de tokens JWT armazenados no localStorage e enviados pelo cabeçalho
-          Authorization.
+          O Veracity utiliza cookies próprios estritamente necessários para a autenticação e segurança da sessão (identificados como <code>access_token</code>).
+          Estes cookies são configurados com as diretivas <strong>HttpOnly</strong> e <strong>Secure</strong>, garantindo que não sejam acessíveis via JavaScript para prevenir ataques (XSS) e proteger as credenciais do Usuário.
+          O armazenamento local (localStorage) é utilizado apenas para indicadores de estado da interface e preferências não sensíveis.
         </p>
         <p>
           O Cloudflare pode definir cookies técnicos essenciais, como <code>__cf_bm</code> e <code>cf_clearance</code>,
           destinados à proteção contra bots, verificação de tráfego e mitigação de ataques. Esses cookies não contêm dados
-          pessoais identificáveis e não são acessados ou utilizados pelo Veracity.
+          pessoais identificáveis e não são acessados ou utilizados pelo Veracity para fins de rastreamento publicitário.
         </p>
 
         <h3>9. Segurança da informação</h3>

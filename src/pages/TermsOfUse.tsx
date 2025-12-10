@@ -12,7 +12,7 @@ export default function TermsOfUse(): JSX.Element {
       <section className="page-offset" style={{ paddingBottom: 32 }}>
         <h1 className="about-title">Veracity — Termos de Uso</h1>
 
-        <p><strong>Versão:</strong> 1.2 • <strong>Data de vigência:</strong> 24 de novembro de 2025</p>
+        <p><strong>Versão:</strong> 1.3 • <strong>Data de vigência:</strong> 10 de dezembro de 2025</p>
         <p>
           Este Termo de Uso estabelece as regras aplicáveis ao uso do “Veracity”, protótipo acadêmico (PFC)
           destinado à detecção de indícios de manipulação digital em links e imagens. O uso do serviço implica
@@ -47,8 +47,8 @@ export default function TermsOfUse(): JSX.Element {
         <h3>4. Conta, autenticação e verificação</h3>
         <p>
           Algumas funcionalidades exigem cadastro e verificação de e-mail. O Usuário é responsável pela guarda de suas
-          credenciais. Tokens de acesso têm validade e podem exigir renovação. Violações destes termos podem resultar
-          em suspensão ou encerramento da conta.
+          credenciais. A autenticação utiliza cookies de sessão seguros que não devem ser compartilhados. Tokens de acesso
+          têm validade e podem exigir renovação. Violações destes termos podem resultar em suspensão ou encerramento da conta.
         </p>
 
         <h3>5. Aceite dos Termos</h3>
@@ -78,8 +78,9 @@ export default function TermsOfUse(): JSX.Element {
 
         <h3>9. Privacidade e registros</h3>
         <p>
-          O Veracity registra eventos de autenticação, uso e estatísticas mínimas para segurança.  
-          Tais registros podem incluir: hash de IP com sal, data/hora, identificador de usuário, quotas e metadados.
+          O Veracity registra eventos de autenticação, uso e estatísticas mínimas para segurança, utilizando cookies
+          técnicos para manutenção da sessão. Tais registros podem incluir: hash de IP com sal, data/hora, identificador
+          de usuário, quotas e metadados.
         </p>
         <p>
           A proteção de tráfego, firewall de aplicação, mitigação de bots e rate limiting são fornecidos pelo Cloudflare,
