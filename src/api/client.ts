@@ -514,8 +514,15 @@ export async function getAdminMonthlyMetrics(params: {
     if (resp.status === 401) {
       throw new Error("Não autenticado. Faça login como administrador para ver o gráfico.");
     }
-    const msg = await resp.text().catch(() => "");
-    throw new Error(msg || `Falha ao obter métricas (${resp.status})`);
+    
+    let data: any = null;
+    try {
+      data = await resp.json();
+    } catch {}
+
+    const msg = extractErrorMessage(data, await resp.text().catch(() => "") || `Falha ao obter métricas (${resp.status})`);
+    
+    throw new Error(msg);
   }
   return resp.json();
 }
