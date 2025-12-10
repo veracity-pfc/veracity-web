@@ -489,6 +489,13 @@ export type AdminMonthMetrics = {
   };
 };
 
+export const apiApproveEmailChange = (token: string) =>
+  apiFetch("/v1/users/profile/email-change/approve", {
+    auth: true,
+    method: "POST",
+    body: { token },
+  });
+
 export async function getAdminMonthlyMetrics(params: {
   year?: number;
   month?: number;

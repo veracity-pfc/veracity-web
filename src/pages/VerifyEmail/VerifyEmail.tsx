@@ -2,7 +2,7 @@ import { JSX, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Logo from "../../components/Logo";
 import ReturnIcon from "../../assets/icon-return.png";
-import { apiVerifyEmail, apiResendCode, apiFetch, getToken } from "../../api/client";
+import { apiVerifyEmail, apiResendCode, apiFetch, getToken, clearToken } from "../../api/client";
 import Toast, { useToast } from "../../components/Toast/Toast";
 import "../../styles/forms.css";
 import styles from "./VerifyEmail.module.css";
@@ -98,7 +98,7 @@ export default function VerifyEmail(): JSX.Element {
           headers: { 
             "Content-Type": "application/json",
           },
-          credentials: "include",
+          credentials: "include", 
           body: JSON.stringify({ email, code: joined }),
         });
 
@@ -108,6 +108,7 @@ export default function VerifyEmail(): JSX.Element {
         }
 
         localStorage.removeItem("veracity_email_change_target");
+        clearToken(); 
         success("E-mail alterado com sucesso! Faça login novamente com o novo endereço.");
         navigate("/login");
       } else {

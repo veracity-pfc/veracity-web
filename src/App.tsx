@@ -20,7 +20,7 @@ import { getToken, getRole, initAuthWatch } from './api/client';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Toast from './components/Toast/Toast';
 import ReactivateAccount from './pages/ReactivateAccount/ReactivateAccount';
-
+import ApproveEmailChange from './pages/ApproveEmailChange/ApproveEmailChange'; 
 
 function RequireAuth({ children }: PropsWithChildren): JSX.Element {
   const token = getToken();
@@ -55,15 +55,20 @@ export default function App(): JSX.Element {
         <Route path="/about" element={<About />} />
         <Route path="/instructions" element={<Instructions />} />
         <Route path="/contact-us" element={<Contact />} />
+
         <Route path="/terms-of-use" element={<TermsOfUse />} />
-        <Route path="/reactivate-account" element={<ReactivateAccount />}/>
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        
+        
         <Route path="/login" element={<Login />} />
         <Route path="/sign-up" element={<Register />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/reactivate-account" element={<ReactivateAccount />}/>
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         
+        <Route path="/approve-email-change" element={<RequireAuth><ApproveEmailChange /></RequireAuth>} />
+
         <Route path="/user/profile" element={<RequireAuth><Profile /></RequireAuth>} />
         <Route path="/user/history" element={<RequireAuth><History /></RequireAuth>} />
         <Route path="/user/history/:id" element={<RequireAuth><HistoryDetail /></RequireAuth>} />

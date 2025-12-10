@@ -202,11 +202,14 @@ export default function Profile(): JSX.Element {
         const newEmail = email.trim().toLowerCase();
         await apiValidateEmailChange(newEmail);
         const { requires_verification } = (await apiRequestEmailChange(newEmail)) as AnyObj;
+        
         if (requires_verification) {
-          success("Solicitação de alteração de e-mail enviada com sucesso!");
-          localStorage.setItem("veracity_email_change_target", newEmail);
+          success(`Link de confirmação enviado para seu e-mail atual. Aprove para continuar.`);
+          
+          setInitial((prev) => prev ? ({...prev, name: name.trim()}) : prev);
+          setEmail(initial?.email || "");
+          
           dirtyRef.current = false;
-          window.location.assign("/verify-email?mode=email-change");
           return;
         }
       }
